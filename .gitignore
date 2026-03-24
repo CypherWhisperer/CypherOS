@@ -7,3 +7,6 @@ result-*
 
 # Never commit secrets
 identity/shadow
+
+#  Temporary stuff
+temp/
