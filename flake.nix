@@ -30,7 +30,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 
     home-manager = {
-      url    = "github:nix-community/home-manager/release-24.11";
+      # url    = "github:nix-community/home-manager/release-24.11";
+      url = "https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
