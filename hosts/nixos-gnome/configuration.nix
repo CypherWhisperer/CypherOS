@@ -63,8 +63,13 @@
   # btrfs is built into the mainline kernel — no extra module needed.
   # Add any hardware-specific modules here if required.
   # boot.kernelModules = [ ];
-
-
+  
+  # ─────────────────────────────────────────────────────────────────────────────
+  # VENTOY AND OTHER FILESYSTEMS
+  # ─────────────────────────────────────────────────────────────────────────────
+  boot.supportedFilesystems = [ "ntfs" "exfat" "vfat"];
+  #services.udev.packages = [ pkgs.usbutils];
+  
   # ─────────────────────────────────────────────────────────────────────────────
   # NETWORKING
   # ─────────────────────────────────────────────────────────────────────────────
@@ -251,6 +256,13 @@
   # Home Manager's gnome.nix has its own allowUnfree for user-level packages.
   # Both are needed — they operate in different package scopes.
   nixpkgs.config.allowUnfree = true;
+  
+  # ─────────────────────────────────────────────────────────────────────────────
+  # ALLOWED UNTRUSTED PACKAGES
+  # ─────────────────────────────────────────────────────────────────────────────
+  nixpkgs.config.permittedInsecurePackages = ["ventoy-1.1.10"];
+  
+  
 
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -293,6 +305,7 @@
       "audio"          # direct audio device access (belt-and-suspenders with PipeWire)
       "video"          # GPU/video device access
       "input"          # input device access (needed for some Wayland compositors)
+      "disk"           # disk operations, such as using ventoy
     ];
   };
 
