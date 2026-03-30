@@ -360,7 +360,7 @@ in
 
     # userSettings: written to VSCode's settings.json.
     # Shared settings are merged here.
-    profiles.defult.userSettings = sharedSettings;
+    profiles.default.userSettings = sharedSettings;
 
     profiles.default.extensions = with pkgs.vscode-extensions; [
       # ── Theme ────────────────────────────────────────────────────────────
