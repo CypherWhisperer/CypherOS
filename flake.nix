@@ -27,11 +27,14 @@
   #   "follows" is a flake mechanism that says "use the same nixpkgs input
   #   as the parent flake, don't fetch your own copy."
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+   # nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11"; # stable channel
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; # unstable channel
+
 
     home-manager = {
       # url    = "github:nix-community/home-manager/release-24.11";
-      url = "https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz";
+      #url = "https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz";
+      url = "github:nix-community/home-manager/master"; # for the unstable channel
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
