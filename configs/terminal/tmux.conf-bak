@@ -1,0 +1,255 @@
+# this file can either be saved as $HOME/.tmux.conf or $XDG_CONFIG_HOME/tmux/.tmux/.tmux.conf
+
+# ----- BASIC SETTINGS -----
+
+# <prefix> r to reload this config
+unbind r
+bind r source-file ~/.tmux.conf \; display "Config reloaded!..."
+
+# Changing prefix from default (C-b) to C-s
+set -g prefix C-s
+set-option -g prefix2 none
+#unbind C-b
+#set -g prefix C-Space
+#bind C-Space send-prefix
+
+# ----- TERMINAL & COLOR SETTINGS -----
+
+# True color support - fixing colors within Tmux
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+set-option -sa terminal-overrides ",xterm*:Tc"
+set -gq allow-passthrough on
+
+# ----- WINDOW & PANE SETTINGS -----
+
+# Status bar position
+set-option -g status-position top
+
+# Indexing - make more intuitive
+set -g base-index 1
+set -g pane-base-index 1
+set-window-option -g pane-base-index 1
+set-option -g renumber-windows on
+
+# Enable mouse support
+set -g mouse on
+
+# ----- NAVIGATION KEYBINDINGS -----
+
+# Window navigation - SHIFT+ALT+vim keys (h or l) to switch between windows
+bind -n M-H previous-window
+bind -n M-L next-window
+
+# Pane navigation - vim keys
+bind-key h select-pane -L
+bind-key j select-pane -D
+bind-key k select-pane -U
+bind-key l select-pane -R
+
+# Pane resizing - repeatable using vim-like motions
+bind -r h resize-pane -L 5
+bind -r j resize-pane -D 5
+bind -r k resize-pane -U 5
+bind -r l resize-pane -R 5
+
+# Pane Maximizing
+bind -r m resize-pane -Z
+
+# Splitting panes in current working directory
+unbind '"'
+bind - split-window -v -c "#{pane_current_path}"
+unbind %
+bind | split-window -h -c "#{pane_current_path}"
+
+# ----- COPY MODE SETTINGS -----
+
+# enter copy mode - <prefix> [ and navigate via vim keys, and enter select mode via
+#` Ctrl v + Space` and then use vim nav keys to define the area of text to copy 
+#from buffer ---> or use a mouse
+#However,  the above workflow is cumbersome - let's fix that 
+
+# Set vi mode
+set-window-option -g mode-keys vi
+
+# Easy entry to copy mode
+unbind v
+bind v copy-mode
+
+# Selection key bindings
+bind-key -T copy-mode-vi 'v' send-keys -X begin-selection
+bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+# ^^ toggle btn line select and rectangle mode via CTRL v
+#bind key -T copy-mode-vi 'y' send -X copy-selection 
+bind-key -T copy-mode-vi 'y' send-keys -X copy-selection-and-cancel
+
+# Prevent mouse drag from exiting copy mode - mouse support in copy mode
+unbind -T copy-mode-vi MouseDragEnd1Pane
+
+#now in Tmux, hit <prefix> v and be in copy mode,move around,v to do a selection, 
+
+
+# ----- SESSION MANAGEMENT -----
+
+# Create new named session with prompt
+bind-key n command-prompt "new-session -s '%%'"
+
+
+# ----- PLUGINS -----
+# With plugins, it's recommended to list them all, <prefix> I, kill tmux server
+# `tmux kill-server` - to clean up things - and then relaunch server
+# `tmux new -s master` - launching a new named session
+
+# ways of listing the themes
+ #set -g @plugin 'gitbub_username/plugin_name'
+ #set -g @plugin 'github_username/plugin_name#branch'
+ #set -g @plugin 'git@github.com:user/plugin'
+ #set -g @plugin 'git@bitbucket.com:user/plugin' 
+
+#setting the path where  tpm is going to install all other plugins
+#set-environment -g TMUX_PLUGIN_MANAGER_PATH ~/.config/tmux/.tmux/plugins 
+
+# Core plugins
+set -g @plugin 'tmux-plugins/tpm'                  # Plugin manager
+set -g @plugin 'tmux-plugins/tmux-sensible'        # Sensible defaults
+set -g @plugin 'tmux-plugins/tmux-yank'            # Yanking with 'y'
+
+# Navigation and session management
+set -g @plugin 'christoomey/vim-tmux-navigator'    # Seamless vim/tmux navigation
+set -g @plugin 'omerxx/tmux-sessionx'              # Session management (replaces sessionizer)
+
+# Persistence
+set -g @plugin 'tmux-plugins/tmux-resurrect'       # Persist sessions after reboot
+set -g @plugin 'tmux-plugins/tmux-continuum'       # Auto-save every 15 mins
+
+# Status line utilities
+set -g @plugin 'tmux-plugins/tmux-online-status'   # Online status indicator
+set -g @plugin 'tmux-plugins/tmux-battery'         # Battery status
+
+# Development tools
+set -g @plugin 'idevtier/tmux-cargo'               # Cargo integration
+set -g @plugin 'ofirgall/tmux-browser'             # Browser integration
+
+# Theme
+set -g @plugin 'catppuccin/tmux'                   # Catppuccin theme
+
+# ----- PLUGIN CONFIGURATIONS -----
+
+# Sessionx
+set -g @sessionx-bind 'o'                          # Bind to <prefix> o
+
+# Persistence
+set -g @resurrect-capture-pane-contents "on"       # Save pane contents
+set -g @continuum-restore "on"                     # Restore automatically
+
+# Online status
+#set -g @online_icon "ok"
+#set -g @offline_icon "nok"
+
+# ----- THEME CONFIGURATION -----
+
+# Catppuccin theme configuration
+
+set -g @catppuccin_flavor 'mocha'
+set -g @catppuccin_window_status_style 'rounded'
+
+# Status line configuration
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+set -g status-right "#{E:@catppuccin_status_application}"
+set -agF status-right "#{E:@catppuccin_status_cpu}"
+set -ag status-right "#{E:@catppuccin_status_session}"
+set -ag status-right "#{E:@catppuccin_status_uptime}"
+set -agF status-right "#{E:@catppuccin_status_battery}"
+
+# Random theme called Dracula
+
+# For Dracula theme config
+#set -g @plugin 'dracula/tmux'
+ 
+#set -g @dracula-show-powerline true
+#set -g @dracula-fixed-location "Japan"
+#set -g @dracula-plugins "weather"
+#set -g @dracula-show-flags true
+#set -g @dracula-show-left-icon session
+
+# Alternative Catppuccin configuration (commented out for reference)
+# set -g @catppuccin_flavor "mocha"
+# set -g @catppuccin_status_background "none"
+# set -g @catppuccin_window_status_style "none"
+# set -g @catppuccin_pane_status_enabled "off"
+# set -g @catppuccin_pane_border_status "off"
+# 
+# # status left look and feel
+# set -g status-left-length 100
+# set -g status-left ""
+# set -ga status-left "#{?client_prefix,#{#[bg=#{@thm_red},fg=#{@thm_bg},bold]  #S },#{#[bg=#{@thm_bg},fg=#{@thm_green}]  #S }}"
+# set -ga status-left "#[bg=#{@thm_bg},fg=#{@thm_overlay_0},none]│"
+# set -ga status-left "#[bg=#{@thm_bg},fg=#{@thm_blue}]  #{=/-32/...:#{s|$USER|~|:#{b:pane_current_path}}} "
+# set -ga status-left "#[bg=#{@thm_bg},fg=#{@thm_overlay_0},none]#{?window_zoomed_flag,│,}"
+# set -ga status-left "#[bg=#{@thm_bg},fg=#{@thm_yellow}]#{?window_zoomed_flag,  zoom ,}"
+# 
+# # status right look and feel
+# set -g status-right-length 100
+# set -g status-right ""
+# set -ga status-right "#{?#{e|>=:10,#{battery_percentage}},#{#[bg=#{@thm_red},fg=#{@thm_bg}]},#{#[bg=#{@thm_bg},fg=#{@thm_pink}]}} #{battery_icon} #{battery_percentage} "
+# set -ga status-right "#[bg=#{@thm_bg},fg=#{@thm_overlay_0}, none]│"
+# set -ga status-right "#[bg=#{@thm_bg}]#{?#{==:#{online_status},ok},#[fg=#{@thm_mauve}] 󰖩 on ,#[fg=#{@thm_red},bold]#[reverse] 󰖪 off }"
+# 
+# # Configure Tmux
+# set -g status-position bottom
+# set -g status-style "bg=#{@thm_bg}"
+# set -g status-justify "absolute-centre"
+# 
+# # window look and feel
+# set -wg automatic-rename on
+# set -g automatic-rename-format "#{pane_current_command}"
+# 
+# set -g window-status-format " #I#{?#{!=:#{window_name},Window},: #W,} "
+# set -g window-status-style "bg=#{@thm_bg},fg=#{@thm_rosewater}"
+# set -g window-status-last-style "bg=#{@thm_bg},fg=#{@thm_peach}"
+# set -g window-status-activity-style "bg=#{@thm_red},fg=#{@thm_bg}"
+# set -g window-status-bell-style "bg=#{@thm_red},fg=#{@thm_bg},bold"
+# set -gF window-status-separator "#[bg=#{@thm_bg},fg=#{@thm_overlay_0}]│"
+# 
+# set -g window-status-current-format " #I#{?#{!=:#{window_name},Window},: #W,} "
+# set -g window-status-current-style "bg=#{@thm_peach},fg=#{@thm_bg},bold"
+
+#<----- sessionizer - study the script --- but sessionx handles it - JUST CURIOUS
+
+# Sessionizer functionality (keep for reference with sessionx installed)
+#bind-key -r f run-shell "tmux neww ~/path/to/tmux-sessionizer" 
+# Example sessionizer script for Tmux
+	#!/usr/env/bin bash
+	
+	# save this file as ~/path/to/tmux-sessionizer (~/.tmux/tmux_...)
+	# make it executable: chmod +x ~/path/to/tmux-sessionizer
+	
+#	if [[ $# -eq 1 ]]; then #if script is ran with one arg
+#		selected=$1
+#	else
+#		selected=$(fd -H . ~/dotfiles ~/Desktop/main-cs ~/Desktop/main-cs/Projects ~/Desktop/work ~/Desktop/work/youtube -t d -d 1 | fzf)
+#	fi
+	
+#	if [[ -z $selected ]]; then
+#		exit 0
+#	fi
+	
+#	selected_name=$(basename "$selected" | tr . _)
+#	tmux_running=$(pgrep tmux)
+	
+#	if [[ -z $TMUX ]] && [[ -z $tmux_running ]];then
+#		tmux new_session -s $selected_name -c $selected
+#		exit 0
+#	fi
+	
+#	if ! tmux has-session -t=$selected_name 2> /dev/null;then
+#		tmux new-session -ds $selected_name -c $selected
+#	fi
+	
+#	tmux switch-client -t $selected_name
+
+
+# Initialize TMUX plugin manager (keep this line at the bottom of the config)
+run '~/.tmux/plugins/tpm/tpm'

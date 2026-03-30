@@ -20,16 +20,33 @@
 # Usage:
 #   imports = [ ../../modules/de/gnome.nix ];
 
+
 { config, pkgs, lib, ... }:
 
+
 {
+  imports = [
+    ../../modules/apps/zsh.nix
+    ../../modules/apps/git.nix
+    ../../modules/apps/ssh.nix
+    ../../modules/apps/kitty.nix
+    ../../modules/apps/ghostty.nix
+    ../../modules/apps/tmux.nix
+    ../../modules/apps/neovim.nix
+    ../../modules/apps/vim.nix
+    ../../modules/apps/btop.nix
+    ../../modules/apps/htop.nix
+    ../../modules/apps/fastfetch.nix
+    # ../../modules/apps/vscode.nix
+  ];
+  
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
   # Some packages (spotify, obsidian, steam, etc.) carry proprietary licenses.
   # Nix refuses to build or install them unless you explicitly permit this.
   # Scoping it here keeps the allowance contained to this Home Manager config.
-  nixpkgs.config.allowUnfree = true;
+  #nixpkgs.config.allowUnfree = true; # the declaration on configuration.nix suffices
 
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -58,28 +75,49 @@
     gnomeExtensions.hide-top-bar
     gnomeExtensions.logo-menu
     gnomeExtensions.transparent-top-bar-adjustable-transparency
-    gnomeExtensions.wobbly-windows
+    gnomeExtensions.compiz-windows-effect
     gnomeExtensions.appindicator
+    
+    #gnomeExtensions.appimage-manager
+    #gnomeExtensions.window-state-manager
+    #gnomeExtensions.workspace-switcher-manager
+    #gnomeExtensions.tweaks-in-system-menu
 
-    # blur-me and blur-provider: not in nixpkgs at time of writing.
     # blur-my-shell covers the core blur use case (panel, overview, appfolder).
-    # Can be fetched via fetchurl from extensions.gnome.org if needed later.
-
-    # gnome-fuzzy-app-search: not in nixpkgs. Revisit if GNOME's built-in
-    # search feels lacking.
-
+    gnome-extension-manager
+    
     # ── Browsers ─────────────────────────────────────────────────────────────
     brave
     firefox
 
     # ── Terminals ────────────────────────────────────────────────────────────
-    kitty
-    ghostty
+    #kitty
+    #ghostty
 
     # ── Editors & IDEs ───────────────────────────────────────────────────────
-    neovim
-    # cursor  ← pkgs.cursor exists but may lag upstream. Uncomment when needed.
-    # vscode  ← pkgs.vscode if needed. Both are unfree (covered above).
+    #neovim
+    antigravity
+    #antigravity-fhs
+    #vscode
+    #vscodium
+    #vscode-with-extensions
+    code-cursor
+  
+    # ────── Development ──────────────────────────────────────────────────────
+    # Android / Flutter
+    android-studio   # bare install — configure SDK via its own UI first
+    flutter          # includes dart SDK
+    # android-tools   # adb + fastboot — enable when you start using a device
+
+    # LSP servers and formatters referenced in settings above
+    nixd             # Nix language server (nix.serverPath)
+    nixfmt-rfc-style # Nix formatter (nix.serverSettings.nixd.formatting.command)
+    shellcheck       # Bash linting (shellcheck.executablePath)
+    kubectl          # Kubernetes CLI (vs-kubernetes.kubectl-path)
+
+    # ── System Design ────────────────────────────────────────────────────────
+    drawio
+    staruml
 
     # ── Communication ────────────────────────────────────────────────────────
     discord
@@ -94,7 +132,7 @@
     inkscape
     blender
     krita
-    kdenlive
+    kdePackages.kdenlive
     audacity
     obs-studio
 
@@ -103,11 +141,11 @@
     spotify           # unfree
 
     # ── Proton Ecosystem ─────────────────────────────────────────────────────
-    protonvpn-gui
+    proton-vpn
     megasync
-    # proton-mail: check pkgs.proton-mail — available in nixpkgs as of late 2024.
-    # Uncomment once confirmed against your nixpkgs channel.
-    # proton-mail
+    protonmail-desktop
+    #protonmail-bridge-gui
+    #protonmail-bridge
 
     # ── Gaming ───────────────────────────────────────────────────────────────
     steam             # unfree; includes steam-run and pressure-vessel
@@ -122,19 +160,32 @@
     fastfetch         # system info display (neofetch successor)
     btop              # interactive resource monitor
     htop              # lighter resource monitor
-    tmux              # terminal multiplexer
+    #tmux              # terminal multiplexer
     tree              # directory tree display
     ranger            # vim-keyed terminal file manager
-    zsh
     fish
     nushell
-    git
+    ## ────────────── ZSH ──────────────
+    #zsh
+    pkgs.zsh-powerlevel10k   # the p10k theme itself
+    pkgs.keychain            # SSH agent manager
+    pkgs.eza                 # modern ls replacement (used in aliases)
+    ## ────────────── ZSH ──────────────
+   
+    ## ────────────── GIT ──────────────    
+    #git
     git-lfs
+    delta    # git pager (pulled in by programs.git.delta but good to be explicit)
+    ## ────────────── GIT ──────────────    
     curl
     wget
     pass              # password-store: GPG-backed password manager
     rsync
     keychain          # SSH/GPG key agent manager across sessions
+    #lf
+    #yazi
+    #yaziPlugins.mediainfo
+    #yaziPlugins.time-travel
 
     # ── Dev Tooling ───────────────────────────────────────────────────────────
     nodejs_20         # pinned to LTS; change to nodejs if you want latest
@@ -157,8 +208,12 @@
     # On NixOS it comes in via the GNOME system packages automatically.
     cantarell-fonts
     fira-code
-    noto-fonts-emoji
-    (nerdfonts.override { fonts = [ "RobotoMono" "JetBrainsMono" ]; })
+    noto-fonts-color-emoji #basic
+    #noto-fonts-cjk-sans
+    #noto-fonts-extra
+    nerd-fonts.roboto-mono
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.caskaydia-cove   # font for kitty + ghostty
 
   ];
 
@@ -178,8 +233,8 @@
   gtk = {
     enable = true;
 
-    theme = {
-      name    = "adw-gtk3";
+    gtk4.theme = {
+      name    = "adw-gtk3-dark"; # Dark variant
       package = pkgs.adw-gtk3;
     };
 
@@ -235,6 +290,11 @@
       cursor-size             = 24;
     };
 
+    # Enforde Dark Mode at XDG portal level
+    "org/freedesktop/appearance" = {
+      color-scheme = lib.hm.gvariant.mkUint32 1; # the value 1 does the magic
+    };
+
     # ── Keyboard: Layout & XKB Remapping ──────────────────────────────────
     # Your remapping lives here — no keyd daemon needed.
     #
@@ -245,7 +305,7 @@
     # sources: list of (type, layout) tuples. ('xkb', 'us') = US QWERTY.
     "org/gnome/desktop/input-sources" = {
       sources     = [ (lib.hm.gvariant.mkTuple [ "xkb" "us" ]) ];
-      xkb-options = [ "ctrl:swapcaps" "menu:super" "altwin:menu_win" ];
+      xkb-options = [ "ctrl:swapcaps"]; #REMOVED: "menu:super" "altwin:menu_win" 
     };
 
     # ── Window Manager Keybindings ─────────────────────────────────────────
@@ -378,6 +438,12 @@
         "com.mattjakeman.ExtensionManager.desktop"
         "ca.desrt.dconf-editor.desktop"
       ];
+    };
+
+    # ── Extension: hide-top-bar ───────────────────────────────────────────-
+    "org/gnome/shell/extensions/hidetopbar" ={
+      enable-active-window = true;
+      enable-intellihide = true;
     };
 
     # ── Extension: blur-my-shell ───────────────────────────────────────────

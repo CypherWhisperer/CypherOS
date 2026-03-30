@@ -52,6 +52,7 @@
     grub.enable = true;
     grub.efiSupport = true;
     grub.device = "nodev";
+    grub.useOSProber = true;
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/boot";
   };
@@ -108,12 +109,33 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # These settings apply at the virtual console (TTY) level and to the X/Wayland
   # session before GNOME's own input-sources settings take over.
-  # The xkb-options here match your dconf input-sources settings exactly,
-  # so the remapping is consistent from TTY login through to the desktop.
   services.xserver.xkb = {
     layout  = "us";
-    options = "ctrl:swapcaps,menu:super,altwin:menu_win";
+    options = "ctrl:swapcaps"; # REMOVED: ,menu:super,altwin:menu_win
   };
+
+  # The above approach worked for the Ctrl-Caps swap, but failed on Super-Menu 
+  # Let's attempt keyd approach.
+  # The reason keyd wins here: XKB operates on a key symbol level and some Wayland 
+  # compositors (including GNOME's Mutter) selectively honour XKB options. 
+  # keyd operates on raw evdev events before any of that, so it's compositor-agnostic.
+  # it intercepts at the input device level before the compositor sees the event, so it
+  # works in both Wayland and X11, in TTYs, and everywhere.
+  
+  #services.keyd = {
+  # enable = true;
+  #  keyboards.default = {
+  #    ids = [ "*" ];
+  #    settings = {
+  #      main = {
+  #        # Caps Lock ↔ Ctrl (belt-and-suspenders with XKB swap)
+  #        capslock = "leftcontrol";
+  #        # Menu key → Super
+  #        menu = "leftmeta";
+  #      };
+  #    };
+  #  };
+  #};
 
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -149,19 +171,19 @@
   #
   # Everything listed here would otherwise be installed system-wide automatically.
   environment.gnome.excludePackages = with pkgs; [
-    gnome-tour          # the first-run tour wizard — not needed
-    yelp                # GNOME help browser — documentation you'll never open
-    totem               # GNOME Videos — you use vlc
-    gnome-maps          # GNOME Maps
+    gnome-tour           # the first-run tour wizard — not needed
+    yelp                 # GNOME help browser — documentation you'll never open
+    totem                # GNOME Videos — you use vlc
+    gnome-maps           # GNOME Maps
     gnome-weather        # GNOME Weather widget
     gnome-contacts       # GNOME Contacts
-    gnome-music          # GNOME Music — you use spotify
-    epiphany             # GNOME Web (the built-in browser) — you use brave/firefox
-    geary                # GNOME Mail client — you use proton-mail
-    gnome-calendar       # optional: keep if you use it, exclude if not
-    simple-scan          # scanner app — keep if you have a scanner, exclude if not
+    gnome-music          # GNOME Music — I use spotify
+    epiphany             # GNOME Web (the built-in browser) — I use brave/firefox
+    geary                # GNOME Mail client — I use proton-mail
+    gnome-calendar       # 
+    simple-scan          # scanner app — keep if thou have a scanner, exclude if not
     gnome-clocks         # keep or exclude based on preference
-    gnome-characters     # character/emoji picker — borderline useful
+    # gnome-characters     # character/emoji picker — borderline useful
   ];
 
 
@@ -178,7 +200,7 @@
   # wireplumber is the session manager that routes audio streams between apps
   # and hardware via PipeWire. Think of PipeWire as the router and WirePlumber
   # as the traffic controller.
-  hardware.pulseaudio.enable = false;   # PipeWire replaces PulseAudio
+  services.pulseaudio.enable = false;   # PipeWire replaces PulseAudio
 
   services.pipewire = {
     enable            = true;
@@ -217,7 +239,7 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # Docker daemon runs at the system level. The docker-client CLI is installed
   # by Home Manager. The daemon must be here.
-  # extraGroups below adds cypher-whisperer to the docker group so you can run
+  # extraGroups below adds cypher-whisperer to the docker group so user can run
   # docker commands without sudo.
   virtualisation.docker.enable = true;
 
@@ -265,18 +287,18 @@
     home         = "/home/cypher-whisperer";
     shell        = pkgs.zsh;
     extraGroups  = [
-      "wheel"         # sudo access
+      "wheel"          # sudo access
       "networkmanager" # manage network connections without sudo
-      "docker"        # run docker without sudo
-      "audio"         # direct audio device access (belt-and-suspenders with PipeWire)
-      "video"         # GPU/video device access
-      "input"         # input device access (needed for some Wayland compositors)
+      "docker"         # run docker without sudo
+      "audio"          # direct audio device access (belt-and-suspenders with PipeWire)
+      "video"          # GPU/video device access
+      "input"          # input device access (needed for some Wayland compositors)
     ];
   };
 
   # mutableUsers = false would make NixOS the sole authority on users —
-  # passwd and adduser commands would be ignored. Leaving it true (the default)
-  # for now since you may want to change passwords interactively. Revisit in
+  # passwd and adduser commands would be ignored. We'll Leave it true (the default)
+  # for now since we may want to change passwords interactively. Revisit in
   # the hardening phase.
   # users.mutableUsers = false;
 
@@ -303,6 +325,7 @@
     curl         # needed for initial Nix/HM bootstrap commands
     vim          # emergency editor before HM applies neovim
     home-manager # the home-manager CLI must be on the system PATH
+    os-prober    # For detecting other OSs in a multi-boot setup
   ];
 
 
@@ -314,7 +337,7 @@
   fonts.packages = with pkgs; [
     cantarell-fonts
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     fira-code
   ];
 
