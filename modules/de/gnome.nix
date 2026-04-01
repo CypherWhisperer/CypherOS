@@ -121,10 +121,11 @@
     jetbrains.webstorm
 
     # ────── Development ──────────────────────────────────────────────────────
-    # Android / Flutter
-    android-studio # bare install — configure SDK via its own UI first
+
+    # ANDROID
+    android-studio # bare install — configure SDK via UI. (bundles emulator, SDK manager, AVD manager)
+    android-tools   # adb + fastboot — enable when you start using a device
     flutter # includes dart SDK
-    # android-tools   # adb + fastboot — enable when you start using a device
 
     # LSP servers and formatters referenced in settings above
     nixd # Nix language server (nix.serverPath)
@@ -134,7 +135,7 @@
     vcpkg # C++ Library Manager for Windows, Linux, and macOS
 
     # ── Workflow and Automation ──────────────────────────────────────────────
-    n8n
+    #n8n  # NOTE: the install is memory intensive
 
     # ── System Design ────────────────────────────────────────────────────────
     drawio
@@ -218,8 +219,9 @@
     #yaziPlugins.time-travel
     #yaziPlugins.[git, gitui, lazygit, vcs-files]
     #yaziPlugins.[starship,no-status, mediainfo, bookmarks, smartpaste,
-    # full-border, wl-clipboard, yatline-catppuccin, relative-motions,
-    # rich-preview, recycle-bin, smart-enter, toggle-pane] # CUSTOMIZATION
+    #    full-border, wl-clipboard, yatline-catppuccin, relative-motions,
+    #    rich-preview, recycle-bin, smart-enter, toggle-pane
+    # ] # CUSTOMIZATION
     #
     #yaziPlugins.sudo
     #yaziPlugins.[rsync, chmod

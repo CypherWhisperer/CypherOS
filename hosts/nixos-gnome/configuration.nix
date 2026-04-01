@@ -275,6 +275,23 @@
   # docker commands without sudo.
   virtualisation.docker.enable = true;
 
+  # ─────────────────────────────────────────────────────────────────────────────
+  # VIRTUALIZATION
+  # ─────────────────────────────────────────────────────────────────────────────
+  virtualisation.libvirtd = { # libvirt: the daemon virt-manager talks to
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm; # QEMU compiled specifically with KVM enabled.
+      #qemu_full #  includes everything (all emulation targets, all frontends)
+      #qemu_xen  # Xen hypervisor variant. If you're running a Xen setup.
+      #qemu-user # userspace emulation only. Useful for cross-compilation but not VM hosting
+      # Python bindings and QMP protocol tools. Only needed if you're scripting VM management programmatically.
+      #qemu-python-utils
+      #python313Packages.qemu
+      #python313Packages.qemu-qmp
+    };
+  };
+
 
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)
@@ -333,6 +350,8 @@
       "video"          # GPU/video device access
       "input"          # input device access (needed for some Wayland compositors)
       "disk"           # disk operations, such as using ventoy
+      "adbusers"       # android development and emulation with adb
+      "libvirtd" "kvm" # Virtualization with KVM and qemu
     ];
   };
 
@@ -366,6 +385,10 @@
     vim          # emergency editor before HM applies neovim
     home-manager # the home-manager CLI must be on the system PATH
     os-prober    # For detecting other OSs in a multi-boot setup
+
+    # VIRTUALIZATION
+    virt-manager # the standard GUI for managing KVM/QEMU VMs on Linux.
+    qemu-utils  # CLI tools for working with disk images (qemu-img, qemu-nbd, etc.)
   ];
 
 
