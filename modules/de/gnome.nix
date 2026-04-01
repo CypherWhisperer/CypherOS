@@ -133,12 +133,18 @@
     kubectl # Kubernetes CLI (vs-kubernetes.kubectl-path)
     vcpkg # C++ Library Manager for Windows, Linux, and macOS
 
+    # ── Workflow and Automation ──────────────────────────────────────────────
+    n8n
+
     # ── System Design ────────────────────────────────────────────────────────
     drawio
     staruml
 
     # ── Communication ────────────────────────────────────────────────────────
     discord
+    # whatsapp-for-mac
+    whatsapp-electron # Electron wrapper around Whatsapp
+    whatsapp-chat-exporter # WhatsApp database parser
 
     # ── Notes & Productivity ─────────────────────────────────────────────────
     obsidian # unfree
@@ -155,6 +161,8 @@
     audacity
     obs-studio
     penpot-desktop
+    figma-linux
+    figma-agent
 
     # ── Media ────────────────────────────────────────────────────────────────
     vlc
@@ -449,28 +457,69 @@
       # looks them up in the applications directories on your PATH.
       # Order here = left-to-right order in the dash.
       # Apps not installed produce a broken icon; remove them or install the app.
+
+      # To find the .desktop names, simply run the command below that checks
+      # places where GNOME looks for and returns a sorted list
+      #
+      #    find /run/current-system/sw/share/applications \
+      #       ~/.local/share/applications \
+      #       ~/.nix-profile/share/applications \
+      #       /etc/profiles/per-user/$USER/share/applications \
+      #      -name "*.desktop" 2>/dev/null | xargs -I{} basename {} | sort
+
       favorite-apps = [
+        # browser
         "brave-browser.desktop"
         "firefox.desktop"
+        # communication
         "discord.desktop"
-        "org.gnome.Nautilus.desktop"
-        "kitty.desktop"
+        "com.github.dagmoller.whatsapp-electron.desktop"
+        # development
+        "code.desktop"
+        "antigravity.desktop"
+        "cursor.desktop"
+        "webstorm.desktop"
+        "android-studio.desktop"
+        # terminal
         "com.mitchellh.ghostty.desktop"
-        "nvim.desktop"
+        "kitty.desktop"
+        # productivity
         "obsidian.desktop"
-        "libreoffice-writer.desktop"
-        "org.gimp.GIMP.desktop"
+        "org.gnome.TextEditor.desktop"
+        "vim.desktop"
+        # creative
+        "blender.desktop"
+        "gimp.desktop"
         "org.inkscape.Inkscape.desktop"
-        "org.kde.kdenlive.desktop"
-        "vlc.desktop"
+        "org.kde.krita.desktop"
+        "figma-linux.desktop"
+        "Penpot.desktop"
+        # misc
         "spotify.desktop"
-        "steam.desktop"
-        "org.keepassxc.KeePassXC.desktop"
+        "claude.desktop"
         "megasync.desktop"
-        "proton.vpn.app.gtk.desktop"
+        "com.github.rafostar.Clapper.desktop"
         "org.gnome.SystemMonitor.desktop"
-        "com.mattjakeman.ExtensionManager.desktop"
-        "ca.desrt.dconf-editor.desktop"
+
+        #  REMOVED:
+        #   "org.gnome.Nautilus.desktop"
+        #   "nautilus-autorun-software.desktop"
+        #   "audacity.desktop"
+        #   "libreoffice-writer.desktop"
+        #   "org.kde.kdenlive.desktop"
+        #   "steam.desktop"
+        #   "org.keepassxc.KeePassXC.desktop"
+        #   "proton.vpn.app.gtk.desktop"
+        #   "com.mattjakeman.ExtensionManager.desktop"
+        #   "ca.desrt.dconf-editor.desktop"
+        #   "proton-mail.desktop"
+        #   "proton-pass.desktop"
+        #   "proton.vpn.app.gtk.desktop"
+        #   "staruml.desktop"
+        #   "nixos-manual.desktop"
+        #   "nvim.desktop"
+        #   "starunl.desktop"
+        #   "drawio.desktop"
       ];
     };
 
