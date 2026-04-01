@@ -37,6 +37,15 @@
       url = "github:nix-community/home-manager/master"; # for the unstable channel
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Claude Desktop Linux port.
+    # inputs.nixpkgs.follows deduplicates — HM, claude-desktop, and our system
+    # all evaluate against the same nixpkgs revision. Without this, Nix would
+    # fetch and evaluate a second (possibly different) nixpkgs for claude-desktop.
+    claude-desktop = {
+      url = "github:aaddrick/claude-desktop-debian";
+      inputs.nixpkgs.follows = "nixpkgs";   # deduplicate — use our nixpkgs, not theirs
+    };
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -44,7 +53,12 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # outputs is a function that receives the resolved inputs and returns
   # an attribute set of everything this flake produces.
-  outputs = { self, nixpkgs, home-manager, ... }:
+
+  # CLAUDE RELATED COMMENT BLOCK
+  # The @ binding captures ALL inputs into a single attribute set called `inputs`.
+  # We need the `inputs` name so we can pass it through specialArgs into
+  # NixOS modules (configuration.nix uses `inputs.claude-desktop.overlays.default`).
+  outputs = { self, nixpkgs, home-manager, claude-desktop, ... }@inputs:
   let
     # system: the CPU architecture + OS pair Nix uses to select packages.
     # x86_64-linux covers standard 64-bit Intel/AMD Linux machines.
@@ -54,6 +68,14 @@
     # pkgs: the nixpkgs package set for our system, with unfree allowed.
     # Declaring it here means we reference it once rather than repeating
     # the same nixpkgs.legacyPackages.${system} call everywhere.
+
+    # CLAUDE RELATED COMMENT BLOCK
+    # pkgs is instantiated here for use in standalone homeConfigurations.
+    # The NixOS nixosConfigurations path does NOT use this pkgs — NixOS builds
+    # its own pkgs internally (with the overlays applied via nixpkgs.overlays
+    # in configuration.nix). Using this pkgs in nixosConfigurations would
+    # bypass the overlay, which is why homeConfigurations.pkgs and
+    # nixosConfigurations.pkgs are intentionally separate.
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
@@ -73,6 +95,16 @@
 
       nixos-gnome = nixpkgs.lib.nixosSystem {
         inherit system;
+
+        # CLAUDE RELATED COMMENT BLOCK
+        # specialArgs threads the `inputs` attrset into every NixOS
+        # module in this configuration. This is the only way to make
+        # `inputs.claude-desktop` available inside configuration.nix without
+        # importing the flake directly there (which would break modularity).
+        # The overlay registration in configuration.nix reads:
+        #   nixpkgs.overlays = [ inputs.claude-desktop.overlays.default ];
+        specialArgs = { inherit inputs; };
+
         modules = [
           # The system-level configuration for this host
           ./hosts/nixos-gnome/configuration.nix
@@ -82,6 +114,13 @@
           # command needed when using this integration.
           home-manager.nixosModules.home-manager
           {
+            # CLAUDE RELATED COMMENT BLOCK
+            # useGlobalPkgs: Home Manager uses the same nixpkgs instance as the
+            # system — critically, this means the claude-desktop overlay that was
+            # applied via nixpkgs.overlays in configuration.nix is also visible
+            # inside Home Manager modules (pkgs.claude-desktop exists in claude.nix).
+            # Without this, HM would build its own pkgs without the overlay.
+
             # useGlobalPkgs: Home Manager uses the same nixpkgs instance as the
             # system. Prevents downloading a second copy of nixpkgs.
             home-manager.useGlobalPkgs    = true;
@@ -90,6 +129,10 @@
             # into /etc/profiles/per-user/<user>/ rather than ~/.nix-profile.
             # This makes them available in GDM and system contexts.
             home-manager.useUserPackages  = true;
+
+            # Thread inputs into Home Manager modules too, in case any HM module
+            # ever needs to reference a flake input directly.
+            home-manager.extraSpecialArgs = { inherit inputs; };
 
             # The actual Home Manager configuration for cypher-whisperer.
             # This imports gnome.nix which declares all user-space packages,

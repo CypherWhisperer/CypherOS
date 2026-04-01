@@ -27,7 +27,7 @@
 #   sudo nixos-rebuild switch --flake .#nixos-gnome
 #   home-manager switch --flake .#cypher-whisperer@nixos-gnome
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   imports = [
@@ -51,6 +51,8 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
+
+    # ../../modules/de/gnome.nix
   ];
 
 
@@ -302,11 +304,19 @@
   nixpkgs.config.allowUnfree = true;
 
   # ─────────────────────────────────────────────────────────────────────────────
+  # CLAUDE DESKTOP
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Register the claude-desktop overlay at the system level.
+  # This patches pkgs so that pkgs.claude-desktop exists everywhere —
+  # in system config AND in Home Manager modules that receive the same pkgs.
+  nixpkgs.overlays = [
+    inputs.claude-desktop.overlays.default
+  ];
+
+  # ─────────────────────────────────────────────────────────────────────────────
   # ALLOWED UNTRUSTED PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
   nixpkgs.config.permittedInsecurePackages = ["ventoy-1.1.10"];
-
-
 
 
   # ─────────────────────────────────────────────────────────────────────────────

@@ -66,7 +66,7 @@
       " ── Appearance ───────────────────────────────────────────────────────────
       set termguicolors          " 24-bit true color (requires a capable terminal)
       " colorscheme tokyonight-night
-      colorscheme catpuccin-mocha
+      colorscheme catpuccin_mocha
 
       set number                 " absolute line numbers
       set relativenumber         " relative numbers for easy jump targets (5j, 12k)

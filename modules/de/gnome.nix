@@ -29,6 +29,7 @@
 
 {
   imports = [
+    ../../modules/apps/claude.nix
     ../../modules/apps/zsh.nix
     ../../modules/apps/git.nix
     ../../modules/apps/ssh.nix
@@ -491,6 +492,7 @@
         "vim.desktop"
         # creative
         "blender.desktop"
+        "claude-desktop.desktop"
         "gimp.desktop"
         "org.inkscape.Inkscape.desktop"
         "org.kde.krita.desktop"
