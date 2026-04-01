@@ -1,0 +1,79 @@
+{
+	"name": "rust-pack",
+	"displayName": "Rust Extension Pack",
+	"description": "Extension Pack for Rust",
+	"version": "0.3.38",
+	"preview": true,
+	"private": true,
+	"publisher": "Swellaby",
+	"author": {
+		"name": "Swellaby",
+		"email": "opensource@swellaby.com",
+		"url": "http://swellaby.com"
+	},
+	"categories": [
+		"Extension Packs"
+	],
+	"extensionPack": [
+		"rust-lang.rust-analyzer",
+		"serayuzgur.crates",
+		"tamasfe.even-better-toml"
+	],
+	"keywords": [
+		"rust",
+		"rustlang"
+	],
+	"icon": "images/icon.png",
+	"galleryBanner": {
+		"color": "#b7410e",
+		"theme": "dark"
+	},
+	"engines": {
+		"vscode": "^1.0.0"
+	},
+	"scripts": {
+		"pretest": "rimraf .testresults",
+		"test": "mocha",
+		"lint": "eslint \"**/*.js\"",
+		"clean": "rimraf .testresults/ .publish/**/*",
+		"format": "prettier --check \"**/*.@(js|md|json|yml)\"",
+		"format:fix": "prettier --write \"**/*.@(js|md|json|yml)\"",
+		"package:vsix": "vsce package -o .publish/$npm_package_name-$npm_package_version.vsix",
+		"prepackage:vsix": "mkdirp .publish",
+		"package:vsix:windows": "vsce package -o .publish/%npm_package_name%-%npm_package_version%.vsix",
+		"prepackage:vsix:windows": "mkdirp .publish",
+		"publish:vsix": "vsce publish --packagePath .publish/$npm_package_name-$npm_package_version.vsix",
+		"publish:vsix:windows": "vsce publish --packagePath .publish/%npm_package_name%-%npm_package_version%.vsix",
+		"publish:ext": "vsce publish patch",
+		"vsce:login": "vsce login swellaby",
+		"vsce": "vsce",
+		"version:tagless": "npm --no-git-tag-version version patch",
+		"dev:setup": "npm i && npm test && npm run lint",
+		"dev:reset": "npm run clean && node -e \"require('rimraf').sync('node_modules');\" && npm run dev:setup"
+	},
+	"devDependencies": {
+		"@swellaby/eslint-config": "^2.0.0",
+		"chai": "^4.3.7",
+		"eslint": "^8.46.0",
+		"mkdirp": "^3.0.1",
+		"mocha": "^10.2.0",
+		"mocha-multi-reporters": "^1.5.1",
+		"prettier": "^2.8.8",
+		"rimraf": "^5.0.1",
+		"vsce": "^2.15.0"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/swellaby/vscode-rust-pack/issues/new",
+		"email": "opensource@swellaby.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/swellaby/vscode-rust-pack.git"
+	},
+	"homepage": "https://github.com/swellaby/vscode-rust-pack",
+	"__metadata": {
+		"installedTimestamp": 1739029641241,
+		"size": 14696
+	}
+}

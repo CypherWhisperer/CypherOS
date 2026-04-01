@@ -1,0 +1,52 @@
+{
+	"name": "dark-decay-pro",
+	"displayName": "Dark Decay Pro",
+	"description": "A pure dark decay theme without any compromises.",
+	"version": "1.0.0",
+	"publisher": "nishantg96",
+	"license": "MIT",
+	"keywords": [
+		"theme",
+		"dark",
+		"dark-decay",
+		"decay",
+		"pro"
+	],
+	"icon": "./assets/icon.png",
+	"homepage": "https://github.com/nishantg96/Dark-Decay-Pro-VSCode",
+	"repository": {
+		"url": "https://github.com/nishantg96/Dark-Decay-Pro-VSCode",
+		"type": "git"
+	},
+	"bugs": {
+		"url": "https://github.com/nishantg96/Dark-Decay-Pro-VSCode/issues"
+	},
+	"galleryBanner": {
+		"color": "#101419",
+		"theme": "dark"
+	},
+	"engines": {
+		"vscode": "^1.17.0"
+	},
+	"categories": [
+		"Themes",
+		"Other"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Dark Decay Pro",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark-decay-color-theme.json"
+			}
+		]
+	},
+	"scripts": {
+		"package": "vsce package",
+		"publish": "vsce publish"
+	},
+	"__metadata": {
+		"installedTimestamp": 1739029414103,
+		"size": 1602773
+	}
+}

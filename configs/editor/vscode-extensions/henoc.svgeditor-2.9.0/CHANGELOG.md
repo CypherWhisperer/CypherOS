@@ -1,0 +1,73 @@
+# CHANGELOG
+
+- 2.9.0
+  - Correct only the changed portions without auto formatting
+- 2.8.0
+  - Support script
+  - Add preview mode
+    - Other modes now certainly stop the animations and scripts
+- 2.7.0
+  - Support style attribute and tag
+  - Improve font settings
+- 2.6.0
+  - Suuport use
+  - Remove extension option: `showAll`
+- 2.5.0
+  - Fix bugs of nested svg
+  - Fix panel behavior better
+  - Support defs
+  - Add container viewer selector
+  - Add operations and keybindings: rotate ±90, rotate ±15
+- 2.4.0
+  - Support image
+  - Set keybindings for commands
+  - Change extension icon
+- 2.3.0
+  - Enable to use clipboard: `ctrl+c`, `ctrl+x`, `ctrl+v`
+  - Keyboard shortcut: `delete` or `backspace` to delete shapes
+  - Use yarn
+- 2.2.0
+  - Update only differences when modifying SVG code
+  - Support linearGradient, radialGradient again
+- 2.1.0
+  - Fix auto deletion unsupported attributes bug
+  - add basic font selection window
+  - add "object to path" operation
+- 2.0.0
+  - Reimplement with typescript again😫
+  - VSCode theme color is now reflected because of VSCode WebView API
+  - Indicates whether tags or attributes written by user is now supported by svgeditor or not
+  - Support unit🎉
+  - Support transform attribute🎉
+  - Add some configurations
+- 1.0.0 Add text mode again, remove dependency of elm-mdl
+- 0.17.0 Enable to move text
+- 0.16.0 It was changed to reference always a content of latest active editor 
+- 0.15.1 Fix align bug
+- 0.15.0 Add node increment and decrement operation
+- 0.14.1 Fix a bug text disappears
+- 0.14.0 Support scale-up and scale-down
+- 0.13.0 Support align
+- 0.12.0 Implement rotation again
+- 0.11.0 Support "object to path" operation
+- 0.10.2 Fix path bug
+- 0.10.1 Fix opacity bug
+- 0.10.0 Introduce SVGO for each output
+- 0.9.0 Support some stroke attributes
+- 0.8.1 Get better
+- 0.8.0 Renewal gradient features as gradient mode
+- 0.7.0 Support linear and radial gradients
+- 0.6.0 Use elm-mdl
+- 0.5.3 Fix display size
+- 0.5.2 Fix color in hand mode
+- 0.5.1 Get better
+- 0.5.0 Enable to resolve reference. Elements filled with linearGradient are recognized correct for example.
+- 0.4.5 Fix bug of new file command
+- 0.4.4 Add path mode again
+- 0.4.3 Add opacity adjustment button and fix style bugs
+- 0.4.2 Enable to select path element again
+- 0.4.1 Support embedded CSS again
+- 0.4.0 Reimplement with Elm. Many things have improved, but some functions are temporary unavailable😥
+- 0.3.0 Added group and ungroup button, improved right click menu
+- 0.2.0 Affected embedded CSS in SVG
+- 0.1.0 Released

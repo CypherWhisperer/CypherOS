@@ -20,9 +20,12 @@
 # Usage:
 #   imports = [ ../../modules/de/gnome.nix ];
 
-
-{ config, pkgs, lib, ... }:
-
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -39,7 +42,7 @@
     ../../modules/apps/fastfetch.nix
     ../../modules/apps/vscode.nix
   ];
-  
+
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
@@ -47,7 +50,6 @@
   # Nix refuses to build or install them unless you explicitly permit this.
   # Scoping it here keeps the allowance contained to this Home Manager config.
   #nixpkgs.config.allowUnfree = true; # the declaration on configuration.nix suffices
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # PACKAGES
@@ -77,7 +79,7 @@
     gnomeExtensions.transparent-top-bar-adjustable-transparency
     gnomeExtensions.compiz-windows-effect
     gnomeExtensions.appindicator
-    
+
     #gnomeExtensions.appimage-manager
     #gnomeExtensions.window-state-manager
     #gnomeExtensions.workspace-switcher-manager
@@ -85,7 +87,7 @@
 
     # blur-my-shell covers the core blur use case (panel, overview, appfolder).
     gnome-extension-manager
-    
+
     # ── VENTOY   ─────────────────────────────────────────────────────────────
     ventoy
     #ventoy-full
@@ -93,13 +95,13 @@
     #ventoy-full-gtk # GUI supported gtk version
     exfatprogs # exFAT filesystem userspace utilities
     dosfstools # Utilities for creating and checking FAT and VFAT file systems
-    ntfs3g     # FUSE-based NTFS driver with full write support
-    parted     # Create, destroy, resize, check, and copy partitions
-    gparted    # Graphical disk partitioning tool
+    ntfs3g # FUSE-based NTFS driver with full write support
+    parted # Create, destroy, resize, check, and copy partitions
+    gparted # Graphical disk partitioning tool
     util-linux # Set of system utilities for Linux
-    usbutils   # Tools for working with USB devices, such as lsusb
-    pciutils   # Programs 4 inspecting & manipulating PCI devices configuration
-   
+    usbutils # Tools for working with USB devices, such as lsusb
+    pciutils # Programs 4 inspecting & manipulating PCI devices configuration
+
     # ── Browsers ─────────────────────────────────────────────────────────────
     brave
     firefox
@@ -116,18 +118,20 @@
     #vscodium
     #vscode-with-extensions
     code-cursor
-  
+    jetbrains.webstorm
+
     # ────── Development ──────────────────────────────────────────────────────
     # Android / Flutter
-    android-studio   # bare install — configure SDK via its own UI first
-    flutter          # includes dart SDK
+    android-studio # bare install — configure SDK via its own UI first
+    flutter # includes dart SDK
     # android-tools   # adb + fastboot — enable when you start using a device
 
     # LSP servers and formatters referenced in settings above
-    nixd             # Nix language server (nix.serverPath)
+    nixd # Nix language server (nix.serverPath)
     nixfmt-rfc-style # Nix formatter (nix.serverSettings.nixd.formatting.command)
-    shellcheck       # Bash linting (shellcheck.executablePath)
-    kubectl          # Kubernetes CLI (vs-kubernetes.kubectl-path)
+    shellcheck # Bash linting (shellcheck.executablePath)
+    kubectl # Kubernetes CLI (vs-kubernetes.kubectl-path)
+    vcpkg # C++ Library Manager for Windows, Linux, and macOS
 
     # ── System Design ────────────────────────────────────────────────────────
     drawio
@@ -137,7 +141,7 @@
     discord
 
     # ── Notes & Productivity ─────────────────────────────────────────────────
-    obsidian          # unfree
+    obsidian # unfree
     libreoffice
     keepassxc
 
@@ -145,69 +149,82 @@
     gimp
     inkscape
     blender
+    #houdini
     krita
     kdePackages.kdenlive
     audacity
     obs-studio
+    penpot-desktop
 
     # ── Media ────────────────────────────────────────────────────────────────
     vlc
-    spotify           # unfree
+    spotify # unfree
+    clapper
 
     # ── Proton Ecosystem ─────────────────────────────────────────────────────
     proton-vpn
-    megasync
+    proton-pass
     protonmail-desktop
+    megasync
     #protonmail-bridge-gui
     #protonmail-bridge
 
     # ── Gaming ───────────────────────────────────────────────────────────────
-    steam             # unfree; includes steam-run and pressure-vessel
+    steam # unfree; includes steam-run and pressure-vessel
     wine
     winetricks
 
     # ── CLI Tooling ───────────────────────────────────────────────────────────
-    fzf               # fuzzy finder — pipes, history search, file selection
-    ripgrep           # rg: fast grep replacement, respects .gitignore
-    bat               # cat with syntax highlighting and line numbers
-    fd                # find replacement: simpler syntax, faster
-    fastfetch         # system info display (neofetch successor)
-    btop              # interactive resource monitor
-    htop              # lighter resource monitor
+    fzf # fuzzy finder — pipes, history search, file selection
+    ripgrep # rg: fast grep replacement, respects .gitignore
+    bat # cat with syntax highlighting and line numbers
+    fd # find replacement: simpler syntax, faster
+    fastfetch # system info display (neofetch successor)
+    btop # interactive resource monitor
+    htop # lighter resource monitor
     #tmux              # terminal multiplexer
-    tree              # directory tree display
-    ranger            # vim-keyed terminal file manager
+    tree # directory tree display
+    ranger # vim-keyed terminal file manager
     fish
     nushell
     ## ────────────── ZSH ──────────────
     #zsh
-    pkgs.zsh-powerlevel10k   # the p10k theme itself
-    pkgs.keychain            # SSH agent manager
-    pkgs.eza                 # modern ls replacement (used in aliases)
+    pkgs.zsh-powerlevel10k # the p10k theme itself
+    pkgs.keychain # SSH agent manager
+    pkgs.eza # modern ls replacement (used in aliases)
     ## ────────────── ZSH ──────────────
-   
-    ## ────────────── GIT ──────────────    
+
+    ## ────────────── GIT ──────────────
     #git
     git-lfs
-    delta    # git pager (pulled in by programs.git.delta but good to be explicit)
-    ## ────────────── GIT ──────────────    
+    delta # git pager (pulled in by programs.git.delta but good to be explicit)
+    ## ────────────── GIT ──────────────
     curl
     wget
-    pass              # password-store: GPG-backed password manager
+    pass # password-store: GPG-backed password manager
     rsync
-    keychain          # SSH/GPG key agent manager across sessions
-    #lf
-    #yazi
+    keychain # SSH/GPG key agent manager across sessions
+    lf
+    yazi     # checkout yaziPlugins.[plugin] for yazi plugins
     #yaziPlugins.mediainfo
     #yaziPlugins.time-travel
+    #yaziPlugins.[git, gitui, lazygit, vcs-files]
+    #yaziPlugins.[starship,no-status, mediainfo, bookmarks, smartpaste,
+    # full-border, wl-clipboard, yatline-catppuccin, relative-motions,
+    # rich-preview, recycle-bin, smart-enter, toggle-pane] # CUSTOMIZATION
+    #
+    #yaziPlugins.sudo
+    #yaziPlugins.[rsync, chmod
+    #yaziPlugins.[ouch,lsar, compress] # archive related
+
 
     # ── Dev Tooling ───────────────────────────────────────────────────────────
-    nodejs_20         # pinned to LTS; change to nodejs if you want latest
+    nodejs_20 # pinned to LTS; change to nodejs if you want latest
     python3
     cmake
-    pipx              # install Python CLI tools in isolated envs
-    mkcert            # generate locally-trusted TLS certs for dev
-    docker-client     # CLI only — the daemon itself is an OS-level concern
+    pipx # install Python CLI tools in isolated envs
+    mkcert # generate locally-trusted TLS certs for dev
+    docker-client # CLI only — the daemon itself is an OS-level concern
 
     # ── Security & Networking ─────────────────────────────────────────────────
     nmap
@@ -222,15 +239,14 @@
     # On NixOS it comes in via the GNOME system packages automatically.
     cantarell-fonts
     fira-code
-    noto-fonts-color-emoji #basic
+    noto-fonts-color-emoji # basic
     #noto-fonts-cjk-sans
     #noto-fonts-extra
     nerd-fonts.roboto-mono
     nerd-fonts.jetbrains-mono
-    nerd-fonts.caskaydia-cove   # font for kitty + ghostty
+    nerd-fonts.caskaydia-cove # font for kitty + ghostty
 
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # GTK THEME, ICONS, CURSOR, FONTS
@@ -248,19 +264,19 @@
     enable = true;
 
     gtk4.theme = {
-      name    = "adw-gtk3-dark"; # Dark variant
+      name = "adw-gtk3-dark"; # Dark variant
       package = pkgs.adw-gtk3;
     };
 
     iconTheme = {
-      name    = "Adwaita";
+      name = "Adwaita";
       package = pkgs.adwaita-icon-theme;
     };
 
     cursorTheme = {
-      name    = "Adwaita";
+      name = "Adwaita";
       package = pkgs.adwaita-icon-theme;
-      size    = 24;
+      size = 24;
     };
 
     font = {
@@ -268,7 +284,6 @@
       size = 11;
     };
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # DCONF SETTINGS
@@ -292,16 +307,16 @@
 
     # ── Interface ──────────────────────────────────────────────────────────
     "org/gnome/desktop/interface" = {
-      color-scheme            = "prefer-dark";   # drives the dark mode toggle
-      clock-format            = "24h";
+      color-scheme = "prefer-dark"; # drives the dark mode toggle
+      clock-format = "24h";
       show-battery-percentage = false;
-      font-name               = "Cantarell 11";
-      document-font-name      = "Cantarell 11";
-      monospace-font-name     = "Monospace 11";
-      gtk-theme               = "adw-gtk3";
-      icon-theme              = "Adwaita";
-      cursor-theme            = "Adwaita";
-      cursor-size             = 24;
+      font-name = "Cantarell 11";
+      document-font-name = "Cantarell 11";
+      monospace-font-name = "Monospace 11";
+      gtk-theme = "adw-gtk3";
+      icon-theme = "Adwaita";
+      cursor-theme = "Adwaita";
+      cursor-size = 24;
     };
 
     # Enforde Dark Mode at XDG portal level
@@ -318,25 +333,30 @@
     #
     # sources: list of (type, layout) tuples. ('xkb', 'us') = US QWERTY.
     "org/gnome/desktop/input-sources" = {
-      sources     = [ (lib.hm.gvariant.mkTuple [ "xkb" "us" ]) ];
-      xkb-options = [ "ctrl:swapcaps"]; #REMOVED: "menu:super" "altwin:menu_win" 
+      sources = [
+        (lib.hm.gvariant.mkTuple [
+          "xkb"
+          "us"
+        ])
+      ];
+      xkb-options = [ "ctrl:swapcaps" "menu:super" "altwin:menu_win"]; # REMOVED:
     };
 
     # ── Window Manager Keybindings ─────────────────────────────────────────
     # Vim-style workspace navigation carried over from your Debian dconf dump.
     "org/gnome/desktop/wm/keybindings" = {
-      switch-to-workspace-1    = [ "<Control>1" ];
-      switch-to-workspace-2    = [ "<Control>2" ];
-      switch-to-workspace-3    = [ "<Control>3" ];
-      switch-to-workspace-4    = [ "<Control>4" ];
-      switch-to-workspace-left  = [ "<Control>h" ];
+      switch-to-workspace-1 = [ "<Control>1" ];
+      switch-to-workspace-2 = [ "<Control>2" ];
+      switch-to-workspace-3 = [ "<Control>3" ];
+      switch-to-workspace-4 = [ "<Control>4" ];
+      switch-to-workspace-left = [ "<Control>h" ];
       switch-to-workspace-right = [ "<Control>l" ];
-      switch-to-workspace-up    = [ "<Control><Alt>Up" ];
-      switch-to-workspace-down  = [ "<Control><Alt>Down" ];
-      move-to-workspace-left    = [ "<Control><Shift>h" ];
-      move-to-workspace-right   = [ "<Control><Shift>l" ];
-      move-to-workspace-up      = [ "<Control><Shift><Alt>Up" ];
-      move-to-workspace-down    = [ "<Control><Shift><Alt>Down" ];
+      switch-to-workspace-up = [ "<Control><Alt>Up" ];
+      switch-to-workspace-down = [ "<Control><Alt>Down" ];
+      move-to-workspace-left = [ "<Control><Shift>h" ];
+      move-to-workspace-right = [ "<Control><Shift>l" ];
+      move-to-workspace-up = [ "<Control><Shift><Alt>Up" ];
+      move-to-workspace-down = [ "<Control><Shift><Alt>Down" ];
     };
 
     # ── Workspace Behaviour ────────────────────────────────────────────────
@@ -357,31 +377,31 @@
     };
 
     "org/gnome/settings-daemon/plugins/power" = {
-      idle-dim                       = false;
-      power-button-action            = "suspend";
-      sleep-inactive-ac-type         = "nothing";   # never sleep on AC
-      sleep-inactive-battery-timeout = 900;          # 15 min on battery
-      sleep-inactive-battery-type    = "nothing";
+      idle-dim = false;
+      power-button-action = "suspend";
+      sleep-inactive-ac-type = "nothing"; # never sleep on AC
+      sleep-inactive-battery-timeout = 900; # 15 min on battery
+      sleep-inactive-battery-type = "nothing";
     };
 
     # ── Night Light ────────────────────────────────────────────────────────
     "org/gnome/settings-daemon/plugins/color" = {
-      night-light-enabled            = true;
-      night-light-schedule-automatic = false;  # manual schedule, not auto-timezone
+      night-light-enabled = true;
+      night-light-schedule-automatic = false; # manual schedule, not auto-timezone
     };
 
     # ── Touchpad ───────────────────────────────────────────────────────────
     "org/gnome/desktop/peripherals/touchpad" = {
-      natural-scroll              = true;
+      natural-scroll = true;
       two-finger-scrolling-enabled = true;
-      click-method                = "fingers";
-      speed                       = 0.45531914893617031;
+      click-method = "fingers";
+      speed = 0.45531914893617031;
     };
 
     # ── Mouse ──────────────────────────────────────────────────────────────
     "org/gnome/desktop/peripherals/mouse" = {
       natural-scroll = false;
-      speed          = 0.4893617021276595;
+      speed = 0.4893617021276595;
     };
 
     # ── Wallpaper ──────────────────────────────────────────────────────────
@@ -389,20 +409,20 @@
     #   ~/.local/share/backgrounds/cypher-wallpaper.jpg
     # This dconf entry will then point at it correctly.
     "org/gnome/desktop/background" = {
-      picture-uri        = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
-      picture-uri-dark   = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
-      picture-options    = "zoom";
+      picture-uri = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
+      picture-uri-dark = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
+      picture-options = "zoom";
       color-shading-type = "solid";
-      primary-color      = "#000000000000";
-      secondary-color    = "#000000000000";
+      primary-color = "#000000000000";
+      secondary-color = "#000000000000";
     };
 
     "org/gnome/desktop/screensaver" = {
-      picture-uri        = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
-      picture-options    = "zoom";
+      picture-uri = "file:///home/cypher-whisperer/.local/share/backgrounds/cypher-wallpaper.jpg";
+      picture-options = "zoom";
       color-shading-type = "solid";
-      primary-color      = "#000000000000";
-      secondary-color    = "#000000000000";
+      primary-color = "#000000000000";
+      secondary-color = "#000000000000";
     };
 
     # ── Shell: Enabled Extensions + Dash Favorites ─────────────────────────
@@ -455,7 +475,7 @@
     };
 
     # ── Extension: hide-top-bar ───────────────────────────────────────────-
-    "org/gnome/shell/extensions/hidetopbar" ={
+    "org/gnome/shell/extensions/hidetopbar" = {
       enable-active-window = true;
       enable-intellihide = true;
     };
@@ -467,25 +487,25 @@
 
     "org/gnome/shell/extensions/blur-my-shell/panel" = {
       brightness = 0.6;
-      sigma      = 30;
+      sigma = 30;
     };
 
     "org/gnome/shell/extensions/blur-my-shell/appfolder" = {
       brightness = 0.6;
-      sigma      = 30;
+      sigma = 30;
     };
 
     "org/gnome/shell/extensions/blur-my-shell/dash-to-dock" = {
-      blur               = true;
-      brightness         = 0.6;
-      sigma              = 30;
-      static-blur        = true;
+      blur = true;
+      brightness = 0.6;
+      sigma = 30;
+      static-blur = true;
       style-dash-to-dock = 0;
     };
 
     "org/gnome/shell/extensions/blur-my-shell/window-list" = {
       brightness = 0.6;
-      sigma      = 30;
+      sigma = 30;
     };
 
     # ── Extension: logo-menu ───────────────────────────────────────────────
@@ -494,19 +514,23 @@
     # lets you preview them. symbolic-icon = true uses the monochrome variant.
     "org/gnome/shell/extensions/Logo-menu" = {
       menu-button-icon-image = 19;
-      symbolic-icon          = true;
-      use-custom-icon        = false;
+      symbolic-icon = true;
+      use-custom-icon = false;
     };
 
     # ── Extension: coverflow-alt-tab ──────────────────────────────────────
     "org/gnome/shell/extensions/coverflowalttab" = {
-      switcher-background-color = lib.hm.gvariant.mkTuple [ 1.0 1.0 1.0 ];
+      switcher-background-color = lib.hm.gvariant.mkTuple [
+        1.0
+        1.0
+        1.0
+      ];
     };
 
     # ── Extension: compiz-windows-effect ──────────────────────────────────
     "org/gnome/shell/extensions/com/github/hermes83/compiz-windows-effect" = {
       last-version = 29;
-      preset       = "R";
+      preset = "R";
     };
 
     # ── Extension: clipboard-indicator ────────────────────────────────────
@@ -529,11 +553,14 @@
 
     # ── App Grid Folders ───────────────────────────────────────────────────
     "org/gnome/desktop/app-folders" = {
-      folder-children = [ "System" "Utilities" ];
+      folder-children = [
+        "System"
+        "Utilities"
+      ];
     };
 
     "org/gnome/desktop/app-folders/folders/System" = {
-      name      = "X-GNOME-Shell-System.directory";
+      name = "X-GNOME-Shell-System.directory";
       translate = true;
       apps = [
         "nm-connection-editor.desktop"
@@ -545,7 +572,7 @@
     };
 
     "org/gnome/desktop/app-folders/folders/Utilities" = {
-      name      = "X-GNOME-Shell-Utilities.directory";
+      name = "X-GNOME-Shell-Utilities.directory";
       translate = true;
       apps = [
         "org.gnome.Evince.desktop"
@@ -556,7 +583,6 @@
     };
 
   }; # end dconf.settings
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # XDG PROFILE LAUNCHER SCRIPT
@@ -590,7 +616,6 @@
       exec gnome-session
     '';
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # HOME MANAGER STATE VERSION

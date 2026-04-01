@@ -14,38 +14,42 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/74e9ae87-4ab3-4312-8202-2bbb633e39b0";
+    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
       fsType = "btrfs";
       options = [ "subvol=@nixos-root" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/3DE5-FF97";
+    { device = "/dev/disk/by-uuid/8355-B4F9";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
   fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/74e9ae87-4ab3-4312-8202-2bbb633e39b0";
+    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
       fsType = "btrfs";
       options = [ "subvol=@home" ];
     };
 
-  fileSystems."/DATA" =
-    { device = "/dev/disk/by-uuid/74e9ae87-4ab3-4312-8202-2bbb633e39b0";
+  fileSystems."/cypher-whisperer/DATA" =
+    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
       fsType = "btrfs";
       options = [ "subvol=@data" ];
     };
 
   fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/74e9ae87-4ab3-4312-8202-2bbb633e39b0";
+    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
       fsType = "btrfs";
       options = [ "subvol=@nix-store" ];
     };
 
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/866454b6-51a8-4c56-aeae-068d2ecafaf4"; }
-    ];
+  fileSystems."/swap" =
+    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
+      fsType = "btrfs";
+      options = [ "subvol=@swap" ];
+    };
+
+  swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

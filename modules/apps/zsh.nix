@@ -27,7 +27,12 @@
 #   before the shell starts, so ZDOTDIR resolves correctly per profile automatically.
 #   No manual ZDOTDIR wiring is needed here.
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ─────────────────────────────────────────────────────────────────────────────
@@ -45,14 +50,14 @@
     # historyFile: explicit path keeps history on @home regardless of which
     # OS is booted. The file is in ZDOTDIR so it moves with the XDG profile.
     history = {
-      path     = "${config.home.homeDirectory}/.config/zsh/.zsh_history";
-      size     = 50000;   # lines kept in memory during session
-      save     = 50000;   # lines written to file
-      share    = true;    # share history across all zsh sessions (SHARE_HISTORY)
-      extended = true;    # save timestamps with each entry (EXTENDED_HISTORY)
-      ignoreDups    = true;   # don't record duplicate consecutive entries
-      ignoreSpace   = true;   # don't record entries starting with a space
-      expireDuplicatesFirst = true;  # expire dupes before unique entries when trimming
+      path = "${config.home.homeDirectory}/.config/zsh/.zsh_history";
+      size = 50000; # lines kept in memory during session
+      save = 50000; # lines written to file
+      share = true; # share history across all zsh sessions (SHARE_HISTORY)
+      extended = true; # save timestamps with each entry (EXTENDED_HISTORY)
+      ignoreDups = true; # don't record duplicate consecutive entries
+      ignoreSpace = true; # don't record entries starting with a space
+      expireDuplicatesFirst = true; # expire dupes before unique entries when trimming
     };
 
     # ── Completion ────────────────────────────────────────────────────────────
@@ -60,7 +65,7 @@
     # autosuggestion and syntaxHighlighting are OMZ plugins here, but HM also
     # has first-class support — using OMZ for consistency with your existing setup.
     enableCompletion = true;
-    autosuggestion.enable  = true;   # zsh-autosuggestions (inline ghost text)
+    autosuggestion.enable = true; # zsh-autosuggestions (inline ghost text)
     syntaxHighlighting.enable = true; # zsh-syntax-highlighting (color as you type)
 
     # ── Oh-My-Zsh ─────────────────────────────────────────────────────────────
@@ -68,15 +73,15 @@
     # Powerlevel10k must NOT be set as an OMZ theme here; it's sourced manually
     # in initExtraBeforeCompInit to enable instant prompt correctly.
     oh-my-zsh = {
-      enable  = true;
-      theme   = "";       # p10k takes over — no OMZ theme
+      enable = true;
+      theme = ""; # p10k takes over — no OMZ theme
       plugins = [
-        "git"             # git aliases (gst, gco, gp, gl, etc.)
-        "sudo"            # press Esc twice to prepend sudo to last command
-        "colored-man-pages"  # syntax-coloured man pages
-        "command-not-found"  # suggests packages for unknown commands (distro-aware)
-        "direnv"          # hooks direnv into the shell
-        "fzf"             # OMZ fzf plugin: key bindings + completion
+        "git" # git aliases (gst, gco, gp, gl, etc.)
+        "sudo" # press Esc twice to prepend sudo to last command
+        "colored-man-pages" # syntax-coloured man pages
+        "command-not-found" # suggests packages for unknown commands (distro-aware)
+        "direnv" # hooks direnv into the shell
+        "fzf" # OMZ fzf plugin: key bindings + completion
       ];
     };
 
@@ -85,15 +90,15 @@
     # here — it caches the prompt before the slow parts of zshrc execute.
     # Instant prompt requires this block to be at the very top of zshrc execution.
     initContent = lib.mkMerge [
-    
+
       (lib.mkOrder 500 ''
-	  # ── Completion Security Bypass ─────────────────────────────────────────
-  	  # compinit rejects Nix store paths as "insecure" because they're not owned
-	  # by root or $USER. The -u flag suppresses the interactive prompt and the
-	  # insecure directory warning. Safe on NixOS — the store is immutable.
-	  ZSH_DISABLE_COMPFIX=true
+        	  # ── Completion Security Bypass ─────────────────────────────────────────
+          	  # compinit rejects Nix store paths as "insecure" because they're not owned
+        	  # by root or $USER. The -u flag suppresses the interactive prompt and the
+        	  # insecure directory warning. Safe on NixOS — the store is immutable.
+        	  ZSH_DISABLE_COMPFIX=true
       '')
-    
+
       (lib.mkOrder 550 ''
         # ── Powerlevel10k: Instant Prompt ──────────────────────────────────────
         # Must run before anything that produces output or requires console input.
@@ -102,11 +107,11 @@
           source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
         fi
       '')
-  
+
       # ── initExtra ─────────────────────────────────────────────────────────────
       # Everything else: environment variables, functions, keybinds, tool inits.
       # OMZ has already been sourced by this point (HM sources it before initExtra).
-      
+
       ''
         # ── Powerlevel10k: Load Theme ───────────────────────────────────────────
         # Source the p10k theme from the Nix store (installed via home.packages).
@@ -114,7 +119,7 @@
         source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
         [[ -f ''${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh ]] \
           && source ''${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh
-  
+
         # ── ZSH Options ────────────────────────────────────────────────────────
         setopt AUTO_CD              # type a directory name to cd into it
         setopt AUTO_PUSHD           # cd pushes old dir onto stack (use popd to go back)
@@ -122,7 +127,7 @@
         setopt PUSHD_SILENT         # don't print the dir stack after pushd/popd
         setopt CORRECT              # suggest corrections for mistyped commands
         setopt COMPLETE_ALIASES     # complete aliases as commands
-  
+
         # ── Completion Styling ─────────────────────────────────────────────────
         # Use the same menu-driven completion you had, with case-insensitive matching
         zstyle ':completion:*' menu select
@@ -131,32 +136,32 @@
         zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
         # Keep compinit security check quiet on Nix store paths
         zstyle ':completion:*' accept-exact-dirs true
-  
+
         # ── Key Bindings ───────────────────────────────────────────────────────
         bindkey '^[[H'  beginning-of-line   # Home key
         bindkey '^[[F'  end-of-line         # End key
         bindkey '^[[3~' delete-char         # Delete key
         bindkey '^[[A'  history-search-backward  # Up: history prefix search
         bindkey '^[[B'  history-search-forward   # Down: history prefix search
-  
+
         # ── Environment Variables ──────────────────────────────────────────────
         #export EDITOR="nvim"
         export EDITOR="vim"
         export VISUAL="nvim"
         export PAGER="less"
         export LESS="-R --mouse"  # -R: keep ANSI colours; --mouse: scroll with mouse
-  
+
         # XDG compliance for tools that don't respect it by default
         export LESSHISTFILE="''${XDG_STATE_HOME:-$HOME/.local/state}/less_history"
         export PYTHON_HISTORY="''${XDG_STATE_HOME:-$HOME/.local/state}/python_history"
         export PARALLEL_HOME="''${XDG_CONFIG_HOME:-$HOME/.config}/parallel"
         export SCREENRC="''${XDG_CONFIG_HOME:-$HOME/.config}/screen/screenrc"
         export WGETRC="''${XDG_CONFIG_HOME:-$HOME/.config}/wgetrc"
-  
+
         # ── PATH Extensions ────────────────────────────────────────────────────
         # ~/.local/bin: Home Manager places user scripts and launchers here
         export PATH="$HOME/.local/bin:$PATH"
-  
+
         # ── NVM (Node Version Manager) ─────────────────────────────────────────
         # NVM is not in nixpkgs in a form that integrates cleanly with HM programs.nodejs.
         # We source it from its standard install location.
@@ -166,7 +171,7 @@
         export NVM_DIR="$HOME/.nvm"
         [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
         [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-  
+
         # ── Keychain (SSH Agent) ───────────────────────────────────────────────
         # Keychain manages the ssh-agent lifecycle. It starts the agent once per
         # login session and caches the socket path so all shells (and tmux panes)
@@ -177,7 +182,7 @@
         if [[ -f "$HOME/.ssh/id_ed25519" ]]; then
           eval $(keychain --quiet --eval id_ed25519)
         fi
-  
+
         # ── Terminal Startup: fastfetch ────────────────────────────────────────
         # Only fire in interactive shells, not in scripts or SSH sessions without TTY.
         # do_render checks the terminal emulator for image protocol support.
@@ -188,9 +193,9 @@
             fastfetch                    # text logo fallback for other terminals
           fi
         fi
-  
+
         # ── Custom Functions ───────────────────────────────────────────────────
-  
+
         # do_render: detect whether the current terminal supports image rendering.
         # Used by the fastfetch block above and available for other scripts.
         # Extend TERMINAL_IMAGE_SUPPORT if you add a new image-capable terminal.
@@ -205,7 +210,7 @@
             *) return 1 ;;
           esac
         }
-  
+
         # command_not_found_handler: pretty error + package search hint.
         # On NixOS/Nix-enabled systems, suggests `nix-locate` or nixpkgs search.
         # On Arch/Debian/Fedora, the OMZ command-not-found plugin handles this.
@@ -223,11 +228,11 @@
           fi
           return 127
         }
-  
+
         # ── fzf Custom Functions ───────────────────────────────────────────────
         # These extend fzf beyond the default Ctrl-R/Ctrl-T bindings.
         # All four are aliased below (ffcd, ffe, ffec, ffch).
-  
+
         # ffcd: fuzzy cd — browse directory tree, cd on selection
         function _fuzzy_change_directory() {
           local initial_query="$1"
@@ -247,7 +252,7 @@
             -o -type d -print 2>/dev/null | fzf "''${fzf_options[@]}")
           [[ -n "$selected_dir" && -d "$selected_dir" ]] && cd "$selected_dir"
         }
-  
+
         # ffe: fuzzy edit — browse files, open selected in $EDITOR
         function _fuzzy_edit_search_file() {
           local initial_query="$1"
@@ -262,7 +267,7 @@
           [[ -n "$selected_file" && -f "$selected_file" ]] \
             && ''${EDITOR:-nvim} "$selected_file"
         }
-  
+
         # ffec: fuzzy edit by content — grep for text, open matching file
         function _fuzzy_edit_search_file_content() {
           local selected_file
@@ -275,7 +280,7 @@
                   --preview-window=right:60% --preview "$preview_cmd")
           [[ -n "$selected_file" ]] && ''${EDITOR:-nvim} "$selected_file"
         }
-  
+
         # ffch: fuzzy command history search (replaces default Ctrl-R with richer UI)
         function _fuzzy_search_cmd_history() {
           local selected
@@ -285,7 +290,7 @@
                   --bind='ctrl-r:toggle-sort' --query="''${LBUFFER}" +m)
           [[ -n "$selected" ]] && LBUFFER="$selected"
         }
-  
+
         # ── ZSH Autosuggestions Tuning ─────────────────────────────────────────
         # history first, then completion engine — same as HyDE's setup
         export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
@@ -296,66 +301,67 @@
     # ── Shell Aliases ─────────────────────────────────────────────────────────
     shellAliases = {
       # ── Navigation ───────────────────────────────────────────────────────
-      ".."    = "cd ..";
-      "..."   = "cd ../..";
-      ".3"    = "cd ../../..";
-      ".4"    = "cd ../../../..";
-      ".5"    = "cd ../../../../..";
-      "home"  = "cd $HOME";
-      "proj"  = "cd $HOME/Projects";
-      "docs"  = "cd $HOME/Documents";
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      ".3" = "cd ../../..";
+      ".4" = "cd ../../../..";
+      ".5" = "cd ../../../../..";
+      "home" = "cd $HOME/DATA/";
+      "proj" = "cd $HOME/DATA/FILES/PROJECTS";
+      "docs" = "cd $HOME/Documents";
 
       # ── fzf Fuzzy Helpers (defined as functions in initExtra above) ───────
-      "ffcd"  = "_fuzzy_change_directory";
-      "ffe"   = "_fuzzy_edit_search_file";
-      "ffec"  = "_fuzzy_edit_search_file_content";
-      "ffch"  = "_fuzzy_search_cmd_history";
+      "ffcd" = "_fuzzy_change_directory";
+      "ffe" = "_fuzzy_edit_search_file";
+      "ffec" = "_fuzzy_edit_search_file_content";
+      "ffch" = "_fuzzy_search_cmd_history";
 
       # ── Editors ───────────────────────────────────────────────────────────
-      "n"     = "nvim";
-      "v"     = "vim";
+      "n" = "nvim";
+      "v" = "vim";
 
       # ── System Conveniences ───────────────────────────────────────────────
-      "c"     = "clear";
-      "cls"   = "clear && ls";
-      "cla"   = "clear && ls -lah";
-      "cp"    = "cp -r";             # recursive by default (your preference)
-      "mkdir" = "mkdir -p";          # create parent dirs automatically
-      "open"  = "xdg-open";          # open files with default app
+      "c" = "clear";
+      "cls" = "clear && ls";
+      "cla" = "clear && ls -lah";
+      "cp" = "cp -r"; # recursive by default (your preference)
+      "mkdir" = "mkdir -p"; # create parent dirs automatically
+      "open" = "xdg-open"; # open files with default app
 
       # ── Listing (use eza if available, fall back to ls) ───────────────────
       # eza is a modern ls replacement with icons, git status, tree view.
       # It's declared in modules/common/cli.nix. The fallback means this
       # alias is safe even before HM applies on a fresh install.
-      "ls"    = "eza --icons --group-directories-first 2>/dev/null || ls --color=auto";
-      "ll"    = "eza -lh --icons --group-directories-first --git 2>/dev/null || ls -lh";
-      "la"    = "eza -lah --icons --group-directories-first --git 2>/dev/null || ls -lah";
-      "tree"  = "eza --tree --icons 2>/dev/null || tree";
+      "ls" = "eza --icons --group-directories-first 2>/dev/null || ls --color=auto";
+      "ll" = "eza -lh --icons --group-directories-first --git 2>/dev/null || ls -lh";
+      "la" = "eza -lah --icons --group-directories-first --git 2>/dev/null || ls -lah";
+      "tree" = "eza --tree --icons 2>/dev/null || tree";
 
       # ── Nix / Home Manager ────────────────────────────────────────────────
       # Shortcuts for the commands you'll type most during CypherOS work.
-      "hms"   = "home-manager switch --flake $HOME/Projects/cypher-system";
-      "nrs"   = "sudo nixos-rebuild switch --flake $HOME/Projects/cypher-system";
-      "nfu"   = "nix flake update --flake $HOME/Projects/cypher-system";
+      "hms" = "home-manager switch --flake $HOME/Projects/cypher-system";
+      "nrs" = "sudo nixos-rebuild switch --flake $HOME/Projects/cypher-system";
+      "nfu" = "nix flake update --flake $HOME/Projects/cypher-system";
 
       # ── Git ───────────────────────────────────────────────────────────────
       # OMZ git plugin provides the heavy aliases (gst, gco, gp, gl, etc.)
       # These are the ones not covered by OMZ or that override it.
-      "g"     = "git";
-      "gs"    = "git status";
-      "gd"    = "git diff";
-      "gl"    = "git log --oneline --graph --decorate";
+      "g" = "git";
+      "gs" = "git status";
+      "gd" = "git diff";
+      "gl" = "git log --oneline --graph --decorate";
 
       # ── Docker ────────────────────────────────────────────────────────────
-      "d"     = "docker";
-      "dc"    = "docker compose";
-      "dps"   = "docker ps";
-      "dpa"   = "docker ps -a";
-      "di"    = "docker images";
+      "d" = "docker";
+      "dc" = "docker compose";
+      "dps" = "docker ps";
+      "dpa" = "docker ps -a";
+      "di" = "docker images";
 
       # ── Application Fixes ─────────────────────────────────────────────────
       # Brave sometimes leaves a stale lock file and refuses to start.
-      "bravefix" = "rm -f ~/.config/BraveSoftware/Brave-Browser/SingletonLock ~/.config/BraveSoftware/Brave-Browser/SingletonSocket";
+      "bravefix" =
+        "rm -f ~/.config/BraveSoftware/Brave-Browser/SingletonLock ~/.config/BraveSoftware/Brave-Browser/SingletonSocket";
     };
 
     # ── sessionVariables ──────────────────────────────────────────────────────
@@ -364,8 +370,8 @@
     # the terminal (e.g. EDITOR, VISUAL) go here rather than in initExtra
     # so they're set early in the session.
     sessionVariables = {
-      EDITOR  = "nvim";
-      VISUAL  = "nvim";
+      EDITOR = "nvim";
+      VISUAL = "nvim";
     };
   };
 
@@ -373,8 +379,8 @@
   # programs.fzf wires fzf into zsh properly: generates the shell integration
   # script and sets default options. The fzf package itself is in common/cli.nix.
   programs.fzf = {
-    enable            = true;
-    enableZshIntegration = true;   # sources fzf key-bindings and completion
+    enable = true;
+    enableZshIntegration = true; # sources fzf key-bindings and completion
 
     # Default options: applied to every fzf invocation unless overridden.
     # --height: don't take over the full terminal

@@ -47,7 +47,7 @@
       #   tokyonight-nvim (same palette as kitty — consistency)
       #   catppuccin-vim  (same palette as tmux — consistency)
       # Swap by changing the plugin name and the colorscheme line in extraConfig.
-      
+
       catppuccin-vim
       #tokyonight-nvim
     ];
@@ -65,7 +65,8 @@
 
       " ── Appearance ───────────────────────────────────────────────────────────
       set termguicolors          " 24-bit true color (requires a capable terminal)
-      colorscheme tokyonight-night
+      " colorscheme tokyonight-night
+      colorscheme catpuccin-mocha
 
       set number                 " absolute line numbers
       set relativenumber         " relative numbers for easy jump targets (5j, 12k)

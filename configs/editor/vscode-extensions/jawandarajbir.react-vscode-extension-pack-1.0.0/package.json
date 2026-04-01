@@ -1,0 +1,45 @@
+{
+	"name": "react-vscode-extension-pack",
+	"displayName": "React Extension Pack",
+	"description": "Popular VS Code extensions for React development.",
+	"version": "1.0.0",
+	"publisher": "jawandarajbir",
+	"engines": {
+		"vscode": "^1.15.0"
+	},
+	"icon": "react.png",
+	"galleryBanner": {
+		"color": "#222222",
+		"theme": "dark"
+	},
+	"keywords": [
+		"react",
+		"reactjs",
+		"node",
+		"javascript",
+		"es6"
+	],
+	"categories": [
+		"Extension Packs"
+	],
+	"repository": {
+		"url": "https://github.com/jawandarajbir/react-vscode-extension-pack"
+	},
+	"homepage": "https://github.com/jawandarajbir/react-vscode-extension-pack",
+	"bugs": {
+		"url": "https://github.com/jawandarajbir/react-vscode-extension-pack/issues"
+	},
+	"extensionDependencies": [
+		"xabikos.ReactSnippets",
+		"dbaeumer.vscode-eslint",
+		"xabikos.javascriptsnippets",
+		"jasonnutter.search-node-modules",
+		"christian-kohler.npm-intellisense",
+		"christian-kohler.path-intellisense"
+	],
+	"__metadata": {
+		"installedTimestamp": 1758528245857,
+		"targetPlatform": "undefined",
+		"size": 18679
+	}
+}
