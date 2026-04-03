@@ -91,7 +91,9 @@ in
     BRAVE_DIR="$HOME/.config/BraveSoftware/Brave-Browser/Default"
 
     $DRY_RUN_CMD mkdir -p "$BRAVE_DIR"
+    $DRY_RUN_CMD mkdir -p "$BRAVE_DIR/sanitized_background_images"
 
+    # ── Seed flat config files ─────────────────────────────────────────────
     for seed_file in Preferences Bookmarks; do
       TARGET="$BRAVE_DIR/$seed_file"
       SOURCE="${braveConfigDir}/$seed_file"
@@ -104,5 +106,19 @@ in
         $VERBOSE_ECHO "Brave: $seed_file already present, skipping"
       fi
     done
+
+    # ── Seed background image ──────────────────────────────────────────────
+    # Brave reads this on launch for the custom NTP background.
+    # The filename must match exactly what Preferences references internally.
+    BG_TARGET="$BRAVE_DIR/sanitized_background_images/brave_bg.jpg"
+    BG_SOURCE="${braveConfigDir}/sanitized_background_images/brave_bg.jpg"
+
+    if [ ! -f "$BG_TARGET" ]; then
+      $VERBOSE_ECHO "Brave: seeding NTP background → $BG_TARGET"
+      $DRY_RUN_CMD cp "$BG_SOURCE" "$BG_TARGET"
+      $DRY_RUN_CMD chmod 644 "$BG_TARGET"
+    else
+      $VERBOSE_ECHO "Brave: NTP background already present, skipping"
+    fi
   '';
 }

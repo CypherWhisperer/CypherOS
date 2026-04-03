@@ -381,18 +381,18 @@
   #
   # The source path references the asset co-located with this flake — hermetic,
   # no manual copying needed.
-  #system.activationScripts.userAvatar = {
-  #  text = ''
-  #    install -Dm644 ${../../modules/de/assets/default-gnome-avatar.jpg} \
-  #      /var/lib/AccountsService/icons/cypher-whisperer
-  #    # AccountsService also needs a config file pointing at the icon
-  #    mkdir -p /var/lib/AccountsService/users
-  #    cat > /var/lib/AccountsService/users/cypher-whisperer <<EOF
-  #[User]
-  #Icon=/var/lib/AccountsService/icons/cypher-whisperer
-  #EOF
-  #  '';
-  #};
+  system.activationScripts.userAvatar = {
+    text = ''
+      install -Dm644 ${../../modules/de/assets/default-gnome-avatar.jpg} \
+        /var/lib/AccountsService/icons/cypher-whisperer
+      # AccountsService also needs a config file pointing at the icon
+      mkdir -p /var/lib/AccountsService/users
+      cat > /var/lib/AccountsService/users/cypher-whisperer <<EOF
+  [User]
+  Icon=/var/lib/AccountsService/icons/cypher-whisperer
+  EOF
+    '';
+  };
 
   # ─────────────────────────────────────────────────────────────────────────────
   # GDM BLURRED BACKGROUND
