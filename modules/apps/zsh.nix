@@ -332,16 +332,32 @@
       # eza is a modern ls replacement with icons, git status, tree view.
       # It's declared in modules/common/cli.nix. The fallback means this
       # alias is safe even before HM applies on a fresh install.
-      "ls" = "eza --icons --group-directories-first 2>/dev/null || ls --color=auto";
-      "ll" = "eza -lh --icons --group-directories-first --git 2>/dev/null || ls -lh";
-      "la" = "eza -lah --icons --group-directories-first --git 2>/dev/null || ls -lah";
-      "tree" = "eza --tree --icons 2>/dev/null || tree";
+
+      # "ls" = "eza --icons --group-directories-first 2>/dev/null || ls --color=auto";   # <- Finicky
+      # "ll" = "eza -lh --icons --group-directories-first --git 2>/dev/null || ls -lh";   # <- Finicky
+      # "la" = "eza -lah --icons --group-directories-first --git 2>/dev/null || ls -lah"; # <- Finicky
+      "l" = "eza --icons --group-directories-first";
+      "ls" = "ls --color=auto";
+      "la" = "ls -lah";
+      "e" = "eza --icons";
+
+      # "tree" = "eza --tree --icons 2>/dev/null || tree"; # <- Finicky
+      "tree" = ''
+        function() {
+          if [[ "$*" == *"-L"* || "$*" == *"-I"* ]]; then
+            command tree "$@"
+          else
+            eza --tree --icons "$@"
+          fi
+        }
+      '';
+      "et" = "eza --tree --icons";
 
       # ── Nix / Home Manager ────────────────────────────────────────────────
       # Shortcuts for the commands you'll type most during CypherOS work.
-      "hms" = "home-manager switch --flake $HOME/Projects/cypher-system";
-      "nrs" = "sudo nixos-rebuild switch --flake $HOME/Projects/cypher-system";
-      "nfu" = "nix flake update --flake $HOME/Projects/cypher-system";
+      "hms" = "home-manager switch --flake $HOME/CYPHER_OS";
+      "nrs" = "sudo nixos-rebuild switch --flake $HOME/CYPHER_OS";
+      "nfu" = "nix flake update --flake $HOME/CYPHER_OS";
 
       # ── Git ───────────────────────────────────────────────────────────────
       # OMZ git plugin provides the heavy aliases (gst, gco, gp, gl, etc.)

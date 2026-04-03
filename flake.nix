@@ -15,7 +15,7 @@
 # To add a new HM-only host: add a homeConfigurations entry.
 
 {
-  description = "cypher-system — CypherOS unified multi-OS configuration flake";
+  description = "CypherOS unified multi-OS configuration flake";
 
   # ─────────────────────────────────────────────────────────────────────────────
   # INPUTS
@@ -32,7 +32,7 @@
 
 
     home-manager = {
-      # url    = "github:nix-community/home-manager/release-24.11";
+      #url = "github:nix-community/home-manager/release-24.11";
       #url = "https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz";
       url = "github:nix-community/home-manager/master"; # for the unstable channel
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,7 +44,7 @@
     # fetch and evaluate a second (possibly different) nixpkgs for claude-desktop.
     claude-desktop = {
       url = "github:aaddrick/claude-desktop-debian";
-      inputs.nixpkgs.follows = "nixpkgs";   # deduplicate — use our nixpkgs, not theirs
+      inputs.nixpkgs.follows = "nixpkgs"; # deduplicate — use our nixpkgs, not theirs
     };
   };
 
@@ -65,10 +65,6 @@
     # If you ever add an ARM machine, you'd add "aarch64-linux" entries.
     system = "x86_64-linux";
 
-    # pkgs: the nixpkgs package set for our system, with unfree allowed.
-    # Declaring it here means we reference it once rather than repeating
-    # the same nixpkgs.legacyPackages.${system} call everywhere.
-
     # CLAUDE RELATED COMMENT BLOCK
     # pkgs is instantiated here for use in standalone homeConfigurations.
     # The NixOS nixosConfigurations path does NOT use this pkgs — NixOS builds
@@ -76,6 +72,10 @@
     # in configuration.nix). Using this pkgs in nixosConfigurations would
     # bypass the overlay, which is why homeConfigurations.pkgs and
     # nixosConfigurations.pkgs are intentionally separate.
+
+    # pkgs: the nixpkgs package set for the system, with unfree allowed.
+    # Declaring it here means we reference it once rather than repeating
+    # the same nixpkgs.legacyPackages.${system} call everywhere.
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
@@ -144,6 +144,10 @@
               home.username    = "cypher-whisperer";
               home.homeDirectory = "/home/cypher-whisperer";
             };
+
+            # This tells HM to rename any conflicting existing files to .hm-bak
+            # instead of refusing to proceed.
+            home-manager.backupFileExtension = "hm-bak";
           }
         ];
       };

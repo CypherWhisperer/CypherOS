@@ -371,6 +371,109 @@
   # the hardening phase.
   # users.mutableUsers = false;
 
+  # ─────────────────────────────────────────────────────────────────────────────
+  # USER AVATAR (AccountsService)
+  # ─────────────────────────────────────────────────────────────────────────────
+  # AccountsService is the D-Bus daemon that GDM and the lock screen use to
+  # display the user tile (name + avatar). It reads from a system path that
+  # home.file cannot touch (it's root-owned). An activationScript runs as root
+  # during nixos-rebuild switch, so it can write there.
+  #
+  # The source path references the asset co-located with this flake — hermetic,
+  # no manual copying needed.
+  #system.activationScripts.userAvatar = {
+  #  text = ''
+  #    install -Dm644 ${../../modules/de/assets/default-gnome-avatar.jpg} \
+  #      /var/lib/AccountsService/icons/cypher-whisperer
+  #    # AccountsService also needs a config file pointing at the icon
+  #    mkdir -p /var/lib/AccountsService/users
+  #    cat > /var/lib/AccountsService/users/cypher-whisperer <<EOF
+  #[User]
+  #Icon=/var/lib/AccountsService/icons/cypher-whisperer
+  #EOF
+  #  '';
+  #};
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GDM BLURRED BACKGROUND
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GDM runs its own isolated gnome-shell instance — user extensions (including
+  # blur-my-shell) never run there. The only way to set a GDM background is to
+  # patch the gnome-shell gresource file that GDM reads.
+  #
+  # Strategy (activation script, not overlay):
+  #   - Runs against the already-built gnome-shell binary — no source rebuild.
+  #   - Extracts the gresource, swaps the background image, recompiles it into
+  #     a writable system path that gdm reads first.
+  #   - Runs on every nixos-rebuild switch; idempotent.
+  #   - We write to /etc/gnome-shell-gdm-theme/ and point GDM at it via a
+  #     gnome-shell CSS override.
+  #
+  # PREREQUISITE: generate the blurred image once:
+  #   nix-shell -p imagemagick --run \
+  #     "convert modules/de/assets/default-gnome-bg.jpg -blur 0x18 modules/de/assets/default-gdm-bg.jpg"
+#  system.activationScripts.gdmBackground = {
+#    deps = [ "users" ];
+#    text = let
+#      gnomeShellGresource =
+#        "${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource";
+#      blurredBg = ../../modules/de/assets/default-gdm-bg.jpg;
+#      gresource = "${pkgs.glib.dev}/bin/gresource";
+#      glib-compile = "${pkgs.glib}/bin/glib-compile-resources";
+#    in ''
+#      # Bail out gracefully if tools aren't present rather than failing activation
+#      if [ ! -f ${gresource} ]; then
+#        echo "gdmBackground: gresource not found, skipping" >&2
+#        exit 0
+#      fi
+#
+#      WORKDIR=$(mktemp -d)
+#     trap "rm -rf $WORKDIR" EXIT
+#
+#      for r in $(${gresource} list ${gnomeShellGresource}); do
+#        rel=''${r#/org/gnome/shell/}
+#        mkdir -p "$WORKDIR/''${rel%/*}"
+#        ${gresource} extract ${gnomeShellGresource} "$r" \
+#          > "$WORKDIR/$rel"
+#      done
+#
+#      cp ${blurredBg} "$WORKDIR/theme/noise-texture.png"
+#
+#      mkdir -p /etc/gnome-shell-gdm-theme
+#      ${glib-compile} \
+#        --target="/etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource" \
+#        --sourcedir="$WORKDIR" \
+#        "$WORKDIR/gnome-shell-theme.gresource.xml"
+#    '';
+#  };
+
+  # Point GDM's gnome-shell at the patched gresource.
+  # GDM respects GNOME_SHELL_SESSION_MODE and will find our file if it's in
+  # the search path. The cleanest way on NixOS is a udev rule or a GDM
+  # environment override via gdm's custom.conf.
+  # environment.etc."gdm/custom.conf".text = ''
+  #   [daemon]
+  #   [security]
+  #   [xdmcp]
+  #   [chooser]
+  #   [debug]
+  # '';
+
+  # Override the GDM gnome-shell gresource path via an environment variable
+  # injected into the GDM session.
+  #systemd.services.gdm.environment = {
+  #  GNOME_SHELL_THEME_DIR = "/etc/gnome-shell-gdm-theme";
+
+    # Honest note: The GNOME_SHELL_THEME_DIR env var approach may or may not be
+    # respected depending on your gnome-shell version — this is the part that's
+    # genuinely version-sensitive. If it doesn't take effect, the fallback is a
+    #  symlink override:
+    # ln -sf /etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource \
+    #   ${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource
+    #— but that writes into the store (read-only). The cleanest alternative at
+    # that point is a services.xserver.displayManager.gdm.extraConfig-style
+    # approach or a bind mount.
+ # };
 
   # ─────────────────────────────────────────────────────────────────────────────
   # ZSH (SYSTEM LEVEL)
@@ -399,6 +502,8 @@
     # VIRTUALIZATION
     virt-manager # the standard GUI for managing KVM/QEMU VMs on Linux.
     qemu-utils  # CLI tools for working with disk images (qemu-img, qemu-nbd, etc.)
+
+    glib  #  needed for gdmBackground activation script
   ];
 
 

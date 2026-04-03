@@ -14,37 +14,31 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
+    { device = "/dev/disk/by-uuid/8aa3000d-17de-4f17-b378-3ab11357c0f7";
       fsType = "btrfs";
       options = [ "subvol=@nixos-root" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/8355-B4F9";
+    { device = "/dev/disk/by-uuid/0389-4D77";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
   fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
+    { device = "/dev/disk/by-uuid/8aa3000d-17de-4f17-b378-3ab11357c0f7";
       fsType = "btrfs";
       options = [ "subvol=@home" ];
     };
 
-  fileSystems."/cypher-whisperer/DATA" =
-    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
-      fsType = "btrfs";
-      options = [ "subvol=@data" ];
-    };
-
   fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
+    { device = "/dev/disk/by-uuid/8aa3000d-17de-4f17-b378-3ab11357c0f7";
       fsType = "btrfs";
       options = [ "subvol=@nix-store" ];
     };
 
   fileSystems."/swap" =
-    { device = "/dev/disk/by-uuid/be538557-3745-48c3-8980-7260af4a1de0";
+    { device = "/dev/disk/by-uuid/8aa3000d-17de-4f17-b378-3ab11357c0f7";
       fsType = "btrfs";
       options = [ "subvol=@swap" ];
     };

@@ -65,7 +65,8 @@ let
     name = ".vscode/extensions/${dir}";
     value = {
       source = "${extSrc}/${dir}";
-      recursive = true; # symlink the directory contents, not the dir itself
+      #recursive = true; # symlink the directory contents, not the dir itself
+      recursive = false; # since we want the directory itself synced as a unit
     };
   };
 
@@ -97,8 +98,6 @@ let
     "swellaby.rust-pack-0.3.38"
     "13xforever.language-x86-64-assembly-3.1.4"
   ];
-
-  home.file = builtins.listToAttrs (map mkExtLink backupExtensions);
 
   # ── Marketplace Extension Builder ─────────────────────────────────────────
   # For extensions not in nixpkgs.
@@ -521,7 +520,8 @@ let
     # Flutter SDK path: Home Manager installs flutter to the Nix store.
     # The path below is set dynamically — replace with the actual store path
     # or set it to the flutter binary location after first switch:
-    #   which flutter | xargs dirname | xargs dirname
+    #   `which flutter | xargs dirname | xargs dirname`
+    #  e.g /etc/profiles/per-user/cypher-whisperer
     # Alternatively leave unset and let the extension auto-detect.
     # "dart.flutterSdkPath" = "/path/to/flutter";  # set after first switch
     "dart.debugExternalPackageLibraries" = false;
@@ -736,6 +736,9 @@ in
       ]
       ++ marketplaceExtensions;
   };
+
+  # Deploying the backup extension extensions
+  home.file = builtins.listToAttrs (map mkExtLink backupExtensions);
 
   # ── Shared Settings Deployment ──────────────────────────────────────────────
   # Deploy the same settings.json to Cursor and Antigravity.
