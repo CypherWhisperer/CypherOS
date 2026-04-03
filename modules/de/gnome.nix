@@ -67,6 +67,7 @@ in
 
 {
   imports = [
+    ../../modules/apps/brave.nix
     ../../modules/apps/claude.nix
     ../../modules/apps/obsidian.nix
     ../../modules/apps/zsh.nix
@@ -146,7 +147,7 @@ in
     pciutils # Programs 4 inspecting & manipulating PCI devices configuration
 
     # ── Browsers ─────────────────────────────────────────────────────────────
-    brave
+    # brave # handled by ../apps/brave.nix
     firefox
 
     # ── Terminals ────────────────────────────────────────────────────────────

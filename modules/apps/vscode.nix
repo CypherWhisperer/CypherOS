@@ -711,7 +711,7 @@ in
         twxs.cmake
 
         # ── Vim keybindings ──────────────────────────────────────────────────
-        vscodevim.vim
+        #vscodevim.vim
 
         # ── Flutter / Dart ────────────────────────────────────────────────────
         dart-code.flutter # Flutter tooling, hot reload, device management

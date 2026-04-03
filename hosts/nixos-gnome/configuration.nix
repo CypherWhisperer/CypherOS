@@ -66,11 +66,11 @@
   # efi.canTouchEfiVariables = true: lets NixOS write its boot entry to NVRAM.
   # Required for systemd-boot to work on most UEFI firmware.
   boot.loader = {
-    systemd-boot.enable      = false;
+    systemd-boot.enable = false;
     grub.enable = true;
     grub.efiSupport = true;
     grub.device = "nodev";
-    grub.useOSProber = true;
+    grub.useOSProber = false;  # enable on a multiboot machine
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/boot";
   };
