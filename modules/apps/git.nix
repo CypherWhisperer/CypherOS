@@ -160,7 +160,7 @@
       navigate     = true;   # n/N to move between diff sections
       side-by-side = false;  # unified diff by default; toggle with `delta --side-by-side`
       line-numbers = true;
-      syntax-theme = "Tokyo Night";  # matches your terminal palette
+      syntax-theme = "Catppuccin-mocha"; # matches terminal palette
       features     = "decorations";
       decorations = {
         commit-decoration-style      = "blue ol";
