@@ -8,15 +8,16 @@ xdg.userDirs = {
 
   documents  = "$HOME/DATA/FILES/dox";
   videos     = "$HOME/DATA/FILES/Videos";
-  download   = "$HOME/DATA/FILES/SHARED/Downloads";
-  desktop    = "$HOME/DATA";          # no separate Desktop dir — point at root
-  templates  = "$HOME/DATA";          # same
-  publicShare = "$HOME/DATA";         # same
-  music      = "$HOME/DATA/FILES";    # no dedicated music dir — adjust if needed
-  pictures   = "$HOME/DATA/SYSTEMS_FILES/SHARED/Pictures";
+  download   = "$HOME/DATA/FILES/DE_FILES/SHARED/Downloads";
+  desktop    = "$HOME/DATA/FILES";          # no separate Desktop dir — point at root
+  templates  = "$HOME/DATA/FILES";          # same
+  publicShare = "$HOME/DATA/FILES";         # same
+  music      = "$HOME/DATA/FILES/Music";
+  pictures   = "$HOME/DATA/FILES/DE_FILES/SHARED/Pictures";
 
   # extraConfig: non-standard dirs that apps sometimes read
   extraConfig = {
     XDG_PROJECTS_DIR = "$HOME/DATA/FILES/PROJECTS";
+    # XDG_MEGA_DIR = "$HOME/DATA/FILES/MEGA";
   };
 };
