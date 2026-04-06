@@ -1,6 +1,11 @@
-# Empty stub to be populated at the right phase
+# imports all common sub-modules
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # stub — not yet implemented
