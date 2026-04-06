@@ -95,6 +95,12 @@ in
     #".local/share/Steam/steamapps" = {
     #  source = "${steamDataSrc}/steamapps";
     #};
+
+    # ~/.local/share/Steam/steamapps → STEAM_FILES/Steam/config
+    ".local/share/Steam/config" = {
+      source = "${steamDataSrc}/config";
+    };
+
   };
 
   # ── Migration / bootstrap activation ────────────────────────────────────────
@@ -123,10 +129,11 @@ in
     # Ensure our source directories exist (home.file symlink target must exist)
     ${pkgs.coreutils}/bin/mkdir -p "$STEAM_SRC/userdata"
     ${pkgs.coreutils}/bin/mkdir -p "$STEAM_SRC/steamapps"
+    ${pkgs.coreutils}/bin/mkdir -p "$STEAM_SRC/config"
 
     # ── Back up and clear any pre-existing real directories ──────────────────
     # We check: if the path exists AND is not already a symlink → back up.
-    for dir in userdata steamapps; do
+    for dir in userdata steamapps config; do
       TARGET="$STEAM_XDG/$dir"
       if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
         echo "[steam-data] WARNING: $TARGET exists and is not a symlink."
