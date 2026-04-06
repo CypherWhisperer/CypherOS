@@ -27,7 +27,13 @@
 #   sudo nixos-rebuild switch --flake .#nixos-gnome
 #   home-manager switch --flake .#cypher-whisperer@nixos-gnome
 
-{ config, pkgs, lib, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -51,10 +57,8 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
-
-    # ../../modules/de/gnome.nix
+    ../../modules/gaming/steam.nix
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # BOOT LOADER
@@ -70,7 +74,7 @@
     grub.enable = true;
     grub.efiSupport = true;
     grub.device = "nodev";
-    grub.useOSProber = false;  # enable on a multiboot machine
+    grub.useOSProber = false; # enable on a multiboot machine
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/boot";
   };
@@ -85,7 +89,11 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # VENTOY AND OTHER FILESYSTEMS
   # ─────────────────────────────────────────────────────────────────────────────
-  boot.supportedFilesystems = [ "ntfs" "exfat" "vfat"];
+  boot.supportedFilesystems = [
+    "ntfs"
+    "exfat"
+    "vfat"
+  ];
   #services.udev.packages = [ pkgs.usbutils];
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -95,9 +103,12 @@
   # indicator and Settings panel talk to it via D-Bus.
   # hostName: set this to whatever you want this machine to identify as.
   networking = {
-    hostName      = "cypher-nixos";
+    hostName = "cypher-nixos";
     networkmanager.enable = true;
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
   };
   # CONSIDER: handling DNS resolution, instead of the router (resolved approach)
   # services.resolved.enable = true;
@@ -106,8 +117,6 @@
   # networking.networkmanager.enable = true;
   # networking.networkmanager.dns = "systemd-resolved";
 
-
-
   # ─────────────────────────────────────────────────────────────────────────────
   # LOCALE & TIME
   # ─────────────────────────────────────────────────────────────────────────────
@@ -115,17 +124,16 @@
 
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
-    LC_ADDRESS        = "en_US.UTF-8";
+    LC_ADDRESS = "en_US.UTF-8";
     LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT    = "en_US.UTF-8";
-    LC_MONETARY       = "en_US.UTF-8";
-    LC_NAME           = "en_US.UTF-8";
-    LC_NUMERIC        = "en_US.UTF-8";
-    LC_PAPER          = "en_US.UTF-8";
-    LC_TELEPHONE      = "en_US.UTF-8";
-    LC_TIME           = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # KEYBOARD (SYSTEM LEVEL)
@@ -133,7 +141,7 @@
   # These settings apply at the virtual console (TTY) level and to the X/Wayland
   # session before GNOME's own input-sources settings take over.
   services.xserver.xkb = {
-    layout  = "us";
+    layout = "us";
     options = "ctrl:swapcaps,menu:super,altwin:menu_win"; # REMOVED:
   };
 
@@ -146,19 +154,19 @@
   # works in both Wayland and X11, in TTYs, and everywhere.
 
   services.keyd = {
-   enable = true;
-   keyboards.default = {
-     # Replace the specific keyboard ID below if necessary, or use "*"
-     ids = [ "*" ];
-     settings = {
-  # ATTEMPT 1
-  #      main = {
-  #        # Caps Lock ↔ Ctrl (belt-and-suspenders with XKB swap)
-  #        capslock = "leftcontrol";
-  #        # Menu key → Super
-  #        menu = "leftmeta";
-  #      };
-  # ATTEMPT 2
+    enable = true;
+    keyboards.default = {
+      # Replace the specific keyboard ID below if necessary, or use "*"
+      ids = [ "*" ];
+      settings = {
+        # ATTEMPT 1
+        #      main = {
+        #        # Caps Lock ↔ Ctrl (belt-and-suspenders with XKB swap)
+        #        capslock = "leftcontrol";
+        #        # Menu key → Super
+        #        menu = "leftmeta";
+        #      };
+        # ATTEMPT 2
         main = {
           # Remap Menu key (KEY_CONTEXT_MENU) to Super (KEY_LEFTMETA)
           # Remap Super key (KEY_LEFTMETA) to Menu (KEY_CONTEXT_MENU)
@@ -167,10 +175,9 @@
           "KEY_CONTEXT_MENU" = "KEY_LEFTMETA";
           "KEY_LEFTMETA" = "KEY_CONTEXT_MENU";
         };
-     };
-   };
+      };
+    };
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # DISPLAY SERVER + GNOME
@@ -188,12 +195,11 @@
   services.xserver.enable = true;
 
   services.displayManager.gdm = {
-    enable    = true;
-    wayland   = true;   # prefer Wayland sessions; GDM falls back to X11 if needed
+    enable = true;
+    wayland = true; # prefer Wayland sessions; GDM falls back to X11 if needed
   };
 
   services.desktopManager.gnome.enable = true;
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # GNOME BLOATWARE EXCLUSION
@@ -205,21 +211,20 @@
   #
   # Everything listed here would otherwise be installed system-wide automatically.
   environment.gnome.excludePackages = with pkgs; [
-    gnome-tour           # the first-run tour wizard — not needed
-    yelp                 # GNOME help browser — documentation you'll never open
-    totem                # GNOME Videos — you use vlc
-    gnome-maps           # GNOME Maps
-    gnome-weather        # GNOME Weather widget
-    gnome-contacts       # GNOME Contacts
-    gnome-music          # GNOME Music — I use spotify
-    epiphany             # GNOME Web (the built-in browser) — I use brave/firefox
-    geary                # GNOME Mail client — I use proton-mail
-    gnome-calendar       #
-    simple-scan          # scanner app — keep if thou have a scanner, exclude if not
-    gnome-clocks         # keep or exclude based on preference
+    gnome-tour # the first-run tour wizard — not needed
+    yelp # GNOME help browser — documentation you'll never open
+    totem # GNOME Videos — you use vlc
+    gnome-maps # GNOME Maps
+    gnome-weather # GNOME Weather widget
+    gnome-contacts # GNOME Contacts
+    gnome-music # GNOME Music — I use spotify
+    epiphany # GNOME Web (the built-in browser) — I use brave/firefox
+    geary # GNOME Mail client — I use proton-mail
+    gnome-calendar
+    simple-scan # scanner app — keep if thou have a scanner, exclude if not
+    gnome-clocks # keep or exclude based on preference
     # gnome-characters     # character/emoji picker — borderline useful
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # SOUND
@@ -234,16 +239,15 @@
   # wireplumber is the session manager that routes audio streams between apps
   # and hardware via PipeWire. Think of PipeWire as the router and WirePlumber
   # as the traffic controller.
-  services.pulseaudio.enable = false;   # PipeWire replaces PulseAudio
+  services.pulseaudio.enable = false; # PipeWire replaces PulseAudio
 
   services.pipewire = {
-    enable            = true;
-    alsa.enable       = true;    # ALSA compatibility layer
-    alsa.support32Bit = true;    # 32-bit ALSA support (needed for Steam/Wine)
-    pulse.enable      = true;    # PulseAudio compatibility layer (most apps use this API)
+    enable = true;
+    alsa.enable = true; # ALSA compatibility layer
+    alsa.support32Bit = true; # 32-bit ALSA support (needed for Steam/Wine)
+    pulse.enable = true; # PulseAudio compatibility layer (most apps use this API)
     wireplumber.enable = true;
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # PRINTING
@@ -252,21 +256,19 @@
   # network (the "Add Printer" dialog in GNOME Settings finds network printers via this).
   services.printing.enable = true;
   services.avahi = {
-    enable   = true;
+    enable = true;
     nssmdns4 = true;
     openFirewall = true;
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # BLUETOOTH
   # ─────────────────────────────────────────────────────────────────────────────
   hardware.bluetooth = {
-    enable      = true;
+    enable = true;
     powerOnBoot = true;
   };
   services.blueman.enable = true;
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # DOCKER
@@ -280,7 +282,8 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # VIRTUALIZATION
   # ─────────────────────────────────────────────────────────────────────────────
-  virtualisation.libvirtd = { # libvirt: the daemon virt-manager talks to
+  virtualisation.libvirtd = {
+    # libvirt: the daemon virt-manager talks to
     enable = true;
     qemu = {
       package = pkgs.qemu_kvm; # QEMU compiled specifically with KVM enabled.
@@ -293,7 +296,6 @@
       #python313Packages.qemu-qmp
     };
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)
@@ -316,8 +318,7 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # ALLOWED UNTRUSTED PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
-  nixpkgs.config.permittedInsecurePackages = ["ventoy-1.1.10"];
-
+  nixpkgs.config.permittedInsecurePackages = [ "ventoy-1.1.10" ];
 
   # ─────────────────────────────────────────────────────────────────────────────
   # NIX SETTINGS
@@ -326,12 +327,17 @@
   # so they're gated behind this flag. You need both enabled to use flakes.
   # nix-command is the unified `nix` CLI (nix build, nix run, nix shell, etc.).
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     # trusted-users allows cypher-whisperer to run nix as a trusted user —
     # necessary for `home-manager switch` to work with the multi-user daemon.
-    trusted-users = [ "root" "cypher-whisperer" ];
+    trusted-users = [
+      "root"
+      "cypher-whisperer"
+    ];
   };
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # USER ACCOUNT
@@ -348,20 +354,21 @@
   # and services. Each group is explained inline.
   users.users.cypher-whisperer = {
     isNormalUser = true;
-    uid          = 1000;
-    description  = "Cypher Whisperer";
-    home         = "/home/cypher-whisperer";
-    shell        = pkgs.zsh;
-    extraGroups  = [
-      "wheel"          # sudo access
+    uid = 1000;
+    description = "Cypher Whisperer";
+    home = "/home/cypher-whisperer";
+    shell = pkgs.zsh;
+    extraGroups = [
+      "wheel" # sudo access
       "networkmanager" # manage network connections without sudo
-      "docker"         # run docker without sudo
-      "audio"          # direct audio device access (belt-and-suspenders with PipeWire)
-      "video"          # GPU/video device access
-      "input"          # input device access (needed for some Wayland compositors)
-      "disk"           # disk operations, such as using ventoy
-      "adbusers"       # android development and emulation with adb
-      "libvirtd" "kvm" # Virtualization with KVM and qemu
+      "docker" # run docker without sudo
+      "audio" # direct audio device access (belt-and-suspenders with PipeWire)
+      "video" # GPU/video device access
+      "input" # input device access (needed for some Wayland compositors)
+      "disk" # disk operations, such as using ventoy
+      "adbusers" # android development and emulation with adb
+      "libvirtd"
+      "kvm" # Virtualization with KVM and qemu
     ];
   };
 
@@ -383,14 +390,14 @@
   # no manual copying needed.
   system.activationScripts.userAvatar = {
     text = ''
-      install -Dm644 ${../../modules/de/assets/default-gnome-avatar.jpg} \
-        /var/lib/AccountsService/icons/cypher-whisperer
-      # AccountsService also needs a config file pointing at the icon
-      mkdir -p /var/lib/AccountsService/users
-      cat > /var/lib/AccountsService/users/cypher-whisperer <<EOF
-  [User]
-  Icon=/var/lib/AccountsService/icons/cypher-whisperer
-  EOF
+          install -Dm644 ${../../modules/de/assets/default-gnome-avatar.jpg} \
+            /var/lib/AccountsService/icons/cypher-whisperer
+          # AccountsService also needs a config file pointing at the icon
+          mkdir -p /var/lib/AccountsService/users
+          cat > /var/lib/AccountsService/users/cypher-whisperer <<EOF
+      [User]
+      Icon=/var/lib/AccountsService/icons/cypher-whisperer
+      EOF
     '';
   };
 
@@ -412,68 +419,56 @@
   # PREREQUISITE: generate the blurred image once:
   #   nix-shell -p imagemagick --run \
   #     "convert modules/de/assets/default-gnome-bg.jpg -blur 0x18 modules/de/assets/default-gdm-bg.jpg"
-#  system.activationScripts.gdmBackground = {
-#    deps = [ "users" ];
-#    text = let
-#      gnomeShellGresource =
-#        "${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource";
-#      blurredBg = ../../modules/de/assets/default-gdm-bg.jpg;
-#      gresource = "${pkgs.glib.dev}/bin/gresource";
-#      glib-compile = "${pkgs.glib}/bin/glib-compile-resources";
-#    in ''
-#      # Bail out gracefully if tools aren't present rather than failing activation
-#      if [ ! -f ${gresource} ]; then
-#        echo "gdmBackground: gresource not found, skipping" >&2
-#        exit 0
-#      fi
-#
-#      WORKDIR=$(mktemp -d)
-#     trap "rm -rf $WORKDIR" EXIT
-#
-#      for r in $(${gresource} list ${gnomeShellGresource}); do
-#        rel=''${r#/org/gnome/shell/}
-#        mkdir -p "$WORKDIR/''${rel%/*}"
-#        ${gresource} extract ${gnomeShellGresource} "$r" \
-#          > "$WORKDIR/$rel"
-#      done
-#
-#      cp ${blurredBg} "$WORKDIR/theme/noise-texture.png"
-#
-#      mkdir -p /etc/gnome-shell-gdm-theme
-#      ${glib-compile} \
-#        --target="/etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource" \
-#        --sourcedir="$WORKDIR" \
-#        "$WORKDIR/gnome-shell-theme.gresource.xml"
-#    '';
-#  };
+  #system.activationScripts.gdmBackground = {
+  #  deps = [ "users" ];
+  #  text = let
+  #    gnomeShellGresource =
+  #      "${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource";
+  #    blurredBg = ../../modules/de/assets/default-gdm-bg.jpg;
+  #    gresource = "${pkgs.glib.dev}/bin/gresource";
+  #    glib-compile = "${pkgs.glib}/bin/glib-compile-resources";
+  #  in ''
+  #    # Bail out gracefully if tools aren't present rather than failing activation
+  #    if [ ! -f ${gresource} ]; then
+  #      echo "gdmBackground: gresource not found, skipping" >&2
+  #      exit 0
+  #    fi
 
-  # Point GDM's gnome-shell at the patched gresource.
-  # GDM respects GNOME_SHELL_SESSION_MODE and will find our file if it's in
-  # the search path. The cleanest way on NixOS is a udev rule or a GDM
-  # environment override via gdm's custom.conf.
-  # environment.etc."gdm/custom.conf".text = ''
-  #   [daemon]
-  #   [security]
-  #   [xdmcp]
-  #   [chooser]
-  #   [debug]
-  # '';
+  #    WORKDIR=$(mktemp -d)
+  #   trap "rm -rf $WORKDIR" EXIT
+
+  #    for r in $(${gresource} list ${gnomeShellGresource}); do
+  #      rel=''${r#/org/gnome/shell/}
+  #      mkdir -p "$WORKDIR/''${rel%/*}"
+  #      ${gresource} extract ${gnomeShellGresource} "$r" \
+  #        > "$WORKDIR/$rel"
+  #    done
+
+  #    cp ${blurredBg} "$WORKDIR/theme/noise-texture.png"
+
+  #    mkdir -p /etc/gnome-shell-gdm-theme
+  #    ${glib-compile} \
+  #      --target="/etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource" \
+  #      --sourcedir="$WORKDIR" \
+  #      "$WORKDIR/gnome-shell-theme.gresource.xml"
+  #  '';
+  #};
 
   # Override the GDM gnome-shell gresource path via an environment variable
   # injected into the GDM session.
   #systemd.services.gdm.environment = {
-  #  GNOME_SHELL_THEME_DIR = "/etc/gnome-shell-gdm-theme";
+  #GNOME_SHELL_THEME_DIR = "/etc/gnome-shell-gdm-theme";
 
-    # Honest note: The GNOME_SHELL_THEME_DIR env var approach may or may not be
-    # respected depending on your gnome-shell version — this is the part that's
-    # genuinely version-sensitive. If it doesn't take effect, the fallback is a
-    #  symlink override:
-    # ln -sf /etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource \
-    #   ${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource
-    #— but that writes into the store (read-only). The cleanest alternative at
-    # that point is a services.xserver.displayManager.gdm.extraConfig-style
-    # approach or a bind mount.
- # };
+  # Honest note: The GNOME_SHELL_THEME_DIR env var approach may or may not be
+  # respected depending on your gnome-shell version — this is the part that's
+  # genuinely version-sensitive. If it doesn't take effect, the fallback is a
+  #  symlink override:
+  # ln -sf /etc/gnome-shell-gdm-theme/gnome-shell-theme.gresource \
+  #   ${pkgs.gnome-shell}/share/gnome-shell/gnome-shell-theme.gresource
+  #— but that writes into the store (read-only). The cleanest alternative at
+  # that point is a services.xserver.displayManager.gdm.extraConfig-style
+  # approach or a bind mount.
+  #};
 
   # ─────────────────────────────────────────────────────────────────────────────
   # ZSH (SYSTEM LEVEL)
@@ -481,7 +476,6 @@
   # Setting the user shell to pkgs.zsh above requires zsh to be enabled at the
   # system level — NixOS won't add it to /etc/shells otherwise, which breaks login.
   programs.zsh.enable = true;
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # SYSTEM PACKAGES
@@ -493,19 +487,18 @@
   # What belongs here: tools needed before Home Manager runs, or tools that
   # genuinely require system-level installation.
   environment.systemPackages = with pkgs; [
-    git          # needed to clone the cypher-system flake repo itself
-    curl         # needed for initial Nix/HM bootstrap commands
-    vim          # emergency editor before HM applies neovim
+    git # needed to clone the cypher-system flake repo itself
+    curl # needed for initial Nix/HM bootstrap commands
+    vim # emergency editor before HM applies neovim
     home-manager # the home-manager CLI must be on the system PATH
-    os-prober    # For detecting other OSs in a multi-boot setup
+    os-prober # For detecting other OSs in a multi-boot setup
 
     # VIRTUALIZATION
     virt-manager # the standard GUI for managing KVM/QEMU VMs on Linux.
-    qemu-utils  # CLI tools for working with disk images (qemu-img, qemu-nbd, etc.)
+    qemu-utils # CLI tools for working with disk images (qemu-img, qemu-nbd, etc.)
 
-    glib  #  needed for gdmBackground activation script
+    glib # needed for gdmBackground activation script
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # FONTS (SYSTEM LEVEL)
@@ -518,7 +511,6 @@
     noto-fonts-color-emoji
     fira-code
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # SYSTEM STATE VERSION

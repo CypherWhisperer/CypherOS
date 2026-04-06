@@ -82,6 +82,9 @@ in
     ../../modules/apps/htop.nix
     ../../modules/apps/fastfetch.nix
     ../../modules/apps/vscode.nix
+    # GAMING
+    ../../modules/gaming/steam-data.nix
+    ../../modules/gaming/minecraft.nix
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -166,6 +169,8 @@ in
     android-studio # bare install — configure SDK via UI. (bundles emulator, SDK manager, AVD manager)
     android-tools # adb + fastboot — enable when you start using a device
     flutter # includes dart SDK
+    kotlin
+    # kotlin-language-server
 
     # LSP servers and formatters referenced in settings above
     nixd # Nix language server (nix.serverPath)
