@@ -306,7 +306,7 @@
       ".3" = "cd ../../..";
       ".4" = "cd ../../../..";
       ".5" = "cd ../../../../..";
-      "home" = "cd $HOME/DATA/";
+      "home" = "cd $HOME/DATA/FILES/";
       "proj" = "cd $HOME/DATA/FILES/PROJECTS";
       "docs" = "cd $HOME/Documents";
 
