@@ -108,6 +108,17 @@
         fi
       '')
 
+      ''
+        function _tree_wrapper() {
+          # if any arguments are passed, delegate to command tree; otherwise use eza
+          if (( $# > 0 )); then
+            command tree "$@"
+          else
+            eza --tree --icons
+          fi
+        }
+      ''
+
       # ── initExtra ─────────────────────────────────────────────────────────────
       # Everything else: environment variables, functions, keybinds, tool inits.
       # OMZ has already been sourced by this point (HM sources it before initExtra).
@@ -183,17 +194,6 @@
           eval $(keychain --quiet --eval id_ed25519)
         fi
 
-        # ── Terminal Startup: fastfetch ────────────────────────────────────────
-        # Only fire in interactive shells, not in scripts or SSH sessions without TTY.
-        # do_render checks the terminal emulator for image protocol support.
-        if [[ $- == *i* ]] && command -v fastfetch &>/dev/null; then
-          if do_render "image"; then
-            fastfetch --logo-type kitty  # kitty image protocol: crisp pixel-art logo
-          else
-            fastfetch                    # text logo fallback for other terminals
-          fi
-        fi
-
         # ── Custom Functions ───────────────────────────────────────────────────
 
         # do_render: detect whether the current terminal supports image rendering.
@@ -216,7 +216,16 @@
         # On Arch/Debian/Fedora, the OMZ command-not-found plugin handles this.
         # This function is a fallback for when no package manager hook fires.
         function command_not_found_handler {
-          local purple='\e[1;35m' bright='\e[0;1m' green='\e[1;32m' reset='\e[0m'
+          # BUG:
+          #   local purple='\e[1;35m' bright='\e[0;1m' green='\e[1;32m' reset='\e[0m'
+          #
+          # The escape sequences (\e[...]) are not being interpreted because printf
+          # in zsh doesn't expand \e by default — it's a bash-ism. Zsh's printf only
+          # expands standard C escapes (\n, \t, etc.), not \e.
+          #
+          # CORRECTED:
+          local purple=$'\e[1;35m' bright=$'\e[0;1m' green=$'\e[1;32m' reset=$'\e[0m'
+
           #printf "''${green}zsh''${reset}: command ''${purple}NOT''${reset} found: ''${bright}%s ''${reset}\n" "$1"
           printf "%szsh%s: command %sNOT%s found: %s%s%s\n" \
             "$green" "$reset" \
@@ -224,7 +233,8 @@
             "$bright" "$1" "$reset"
           # Hint toward nix-locate if available (useful on NixOS and Nix-on-Linux)
           if command -v nix-locate &>/dev/null; then
-            printf "''${bright}Try:''${reset} nix-locate bin/%s\n" "$1"
+            #printf "''${bright}Try:''${reset} nix-locate bin/%s\n" "$1"
+            printf "%sTry:%s nix-locate bin/%s\n" "$bright" "$reset" "$1"
           fi
           return 127
         }
@@ -295,6 +305,17 @@
         # history first, then completion engine — same as HyDE's setup
         export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
         export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20  # don't suggest for very long lines
+
+        # ── Terminal Startup: fastfetch ────────────────────────────────────────
+        # Only fire in interactive shells, not in scripts or SSH sessions without TTY.
+        # do_render checks the terminal emulator for image protocol support.
+        if [[ $- == *i* ]] && command -v fastfetch &>/dev/null; then
+          if do_render "image"; then
+            fastfetch --logo-type kitty  # kitty image protocol: crisp pixel-art logo
+          else
+            fastfetch                    # text logo fallback for other terminals
+          fi
+        fi
       ''
     ];
 
@@ -342,15 +363,7 @@
       "e" = "eza --icons";
 
       # "tree" = "eza --tree --icons 2>/dev/null || tree"; # <- Finicky
-      "tree" = ''
-        function() {
-          if [[ "$*" == *"-L"* || "$*" == *"-I"* ]]; then
-            command tree "$@"
-          else
-            eza --tree --icons "$@"
-          fi
-        }
-      '';
+      "tree" = "_tree_wrapper";
       "et" = "eza --tree --icons";
 
       # ── Nix / Home Manager ────────────────────────────────────────────────
