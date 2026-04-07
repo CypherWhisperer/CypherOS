@@ -280,6 +280,7 @@ in
 
     # ── Dev Tooling ───────────────────────────────────────────────────────────
     nodejs_20 # pinned to LTS; change to nodejs if you want latest
+    bun # Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one
     python3
     cmake
     pipx # install Python CLI tools in isolated envs
