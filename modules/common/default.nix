@@ -8,5 +8,14 @@
 }:
 
 {
-  # stub — not yet implemented
+  imports = [
+    ./cli.nix
+    ./dev.nix
+    ./security.nix
+    ./xdg.nix
+  ];
 }
+
+  {
+    # stub — not yet implemented
+  }

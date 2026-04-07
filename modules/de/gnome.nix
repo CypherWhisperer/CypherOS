@@ -85,6 +85,8 @@ in
     # GAMING
     ../../modules/gaming/steam-data.nix
     ../../modules/gaming/minecraft.nix
+    # XDG
+    ../../modules/common/xdg.nix
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
