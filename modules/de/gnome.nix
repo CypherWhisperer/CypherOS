@@ -287,6 +287,8 @@ in
     mkcert # generate locally-trusted TLS certs for dev
     docker-client # CLI only — the daemon itself is an OS-level concern
 
+    openssl # Cryptographic library that implements the SSL and TLS protocols
+
     # ── Security & Networking ─────────────────────────────────────────────────
     nmap
     wireshark
