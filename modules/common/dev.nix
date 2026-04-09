@@ -47,12 +47,13 @@
   home.packages = with pkgs; [
 
     # ── JavaScript / Node.js ──────────────────────────────────────────────────
-    nodejs          # Node.js runtime — provides `node` and `npm`
-    nodePackages.pnpm  # Fast, disk-efficient package manager (preferred over npm)
+    #nodejs          # Node.js runtime — provides `node` and `npm`
+    pnpm  # Fast, disk-efficient package manager (preferred over npm)
 
     # Prisma CLI — the `prisma` binary used by `bunx prisma`, `npx prisma`, etc.
     # Paired with prisma-engines below; nixpkgs keeps them version-aligned.
-    nodePackages.prisma
+    # nodePackages.prisma # <- nodePackages was  removed due to maintenance issues
+    prisma_7
 
     # Prisma engine binaries — Nix-packaged so no ELF download is attempted.
     # The four binaries exposed here cover all Prisma operations:
