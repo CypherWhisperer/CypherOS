@@ -87,6 +87,8 @@ in
     ../../modules/gaming/minecraft.nix
     # XDG
     ../../modules/common/xdg.nix
+    # DEV TOOLING
+    ../../modules/common/dev.nix
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
