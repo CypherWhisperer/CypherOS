@@ -153,6 +153,9 @@ in
     usbutils # Tools for working with USB devices, such as lsusb
     pciutils # Programs 4 inspecting & manipulating PCI devices configuration
 
+    # ── Run Windows Apps on Linux ────────────────────────────────────────────
+    winboat
+
     # ── Browsers ─────────────────────────────────────────────────────────────
     # brave # handled by ../apps/brave.nix
     firefox

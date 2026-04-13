@@ -120,8 +120,16 @@
   # in configs/editor/cypher-ide/ and run home-manager switch.
   # Do NOT edit files at ~/.config/profiles/gnome/cypher-ide/ directly.
   xdg.configFile."cypher-ide" = {
-    source   = ../../configs/editor/cypher-ide;
-    recursive = true;  # deploy the whole directory tree, not just a single file
+    #source   = ../../configs/editor/cypher-ide;
+    #recursive = true;  # deploy the whole directory tree, not just a single file
+
+    # mkOutOfStoreSymlink creates a direct symlink to the source path,
+    # NOT a copy in the Nix store. The deployed symlink points straight
+    # at your repo directory, which is a real mutable path on disk.
+    # This means edits to configs/editor/cypher-ide/ take effect
+    # immediately without home-manager switch.
+    source = config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/path/to/CypherOS/configs/editor/cypher-ide";
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
