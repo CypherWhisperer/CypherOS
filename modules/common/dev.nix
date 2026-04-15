@@ -183,6 +183,7 @@
     libgcc
     
     cmake
+    gcc
     vcpkg            # C++ Library Manager for Windows, Linux, and macOS   
 
     # ── Rust ──────────────────────────────────────────────────────────────────
