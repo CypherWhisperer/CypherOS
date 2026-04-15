@@ -1,11 +1,13 @@
 # imports all common sub-modules
 
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+#{
+#  config,
+#  pkgs,
+#  lib,
+#  ...
+#}:
+
+{ ... }:
 
 {
   imports = [
@@ -13,9 +15,13 @@
     ./dev.nix
     ./security.nix
     ./xdg.nix
+    ./productivity.nix
+    ./proton-ecosystem.nix
+    ./fonts.nix
+    ./disk-utils.nix
   ];
 }
 
-  {
-    # stub — not yet implemented
-  }
+#{
+  # stub — not yet implemented
+#}
