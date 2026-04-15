@@ -33,10 +33,16 @@ local lazy_ok = pcall(require, "lazy")
 if not lazy_ok then
   --fallback: not on rtp yet, try standard data path (non-NixOS usage)
 
+  -- One variable, set exactly once via whichever path succeeds first.
+  -- No nested local re-declarations — that was the scoping bug.
   local lazypath
+  
   -- Step 1: try to find the Nix-provided lazy.nvim in the current rtp.
   -- The Nix wrapper adds vimPlugins to rtp before init.lua runs, so we
   -- can search for lazy.nvim's init.lua across all current rtp entries.
+  -- i.e
+  -- programs.neovim.plugins in neovim.nix puts vimPlugins on rtp before
+  -- init.lua runs, so this will find it on NixOS.
   for _, rtp_entry in ipairs(vim.api.nvim_list_runtime_paths()) do
     if rtp_entry:match("lazy%.nvim$") then
       lazypath = rtp_entry
@@ -44,42 +50,48 @@ if not lazy_ok then
     end
   end
 
-  -- Step 2: if not found in rtp (non-NixOS), use the standard data path.
+  -- Step 2: if not found in rtp (non-NixOS) via Nix, fall back to standard
+  -- data path. 
+  -- This handles non-NixOS machines or configs that don't use the Nix plugin.
   if not lazypath then
-    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-  
-    if not (vim.uv or vim.loop).fs_stat(lazypath) then
-      -- Not installed at all — clone it (non-NixOS first launch)
-      vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
+    lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+  end
 
-      local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-      local result = vim.fn.system({ 
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "--branch=stable", 
-        lazyrepo, 
-        lazypath 
-      })
+  -- Third: if the data path also doesn't exist, clone it (true first launch).
+  if not (vim.uv or vim.loop).fs_stat(lazypath) then
+    -- Not installed at all — clone it (non-NixOS first launch)
+    vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
 
-      if vim.v.shell_error ~= 0 then
-        vim.api.nvim_echo({
-          { "Failed to clone lazy.nvim:\n", "ErrorMsg"},
-          { result,                         "WarningMsg" },
-          { "\nPress any key to exit...",   "Normal"},
-        }, true, {})
-        vim.fn.getchar()
-        os.exit(1)
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local result = vim.fn.system({ 
+      "git",
+      "clone",
+      "--filter=blob:none",
+      "--branch=stable", 
+      lazyrepo, 
+      lazypath 
+    })
 
-        -- prev
-        -- error("Failed to clone lazy.nvim:\n" .. result)
-      end
+    if vim.v.shell_error ~= 0 then
+      vim.api.nvim_echo({
+        { "Failed to clone lazy.nvim:\n", "ErrorMsg"},
+        { result,                         "WarningMsg" },
+        { "\nPress any key to exit...",   "Normal"},
+      }, true, {})
+      vim.fn.getchar()
+      os.exit(1)
+
+      -- prev
+      -- error("Failed to clone lazy.nvim:\n" .. result)
     end
   end
   
   -- Step 3: ensure lazypath is at the FRONT of rtp.
   -- vim.opt.rtp:prepend() is idempotent — safe to call even if already present.
   -- prepend to rtp so require("lazy") finds it.
+  --
+  -- Always prepend regardless of source (Nix or clone).
+  -- If it's already in rtp this is a no-op — safe to call unconditionally.
   vim.opt.rtp:prepend(lazypath)
 end
 

@@ -31,7 +31,7 @@ return {
     -- Load telescope when Neovim is fully initialized but not actively doing
     -- anything ("VeryLazy"). This avoids adding to startup time while still
     -- having telescope ready before you need it.
-    event = "VeryLazy",
+    --event = "VeryLazy",
 
     dependencies = {
       "nvim-lua/plenary.nvim",

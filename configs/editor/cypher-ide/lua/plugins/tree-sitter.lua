@@ -53,7 +53,8 @@ return {
   -- CORRECT PATTERN for NixOS / early-load plugins:
   -- `main` tells lazy.nvim which module to call .setup() on, and lazy handles
   -- the require() after rtp is configured. No `config = function()` needed.
-  main = "nvim-treesitter.configs",
+  main = "nvim-treesitter",
+  --main = "nvim-treesitter.configs",
   -- CORRECT require path: the configuration API is in the .configs submodule.
   -- require('nvim-treesitter') alone has no setup() — that's a common mistake.
 
