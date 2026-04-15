@@ -43,15 +43,6 @@
 }:
 
 {
-  home.packages = with pkgs; [
-  
-    # ── Gaming ───────────────────────────────────────────────────────────────
-    steam # unfree; includes steam-run and pressure-vessel
-    wine
-    winetricks
-
-  ];
-
   # ── Core Steam enablement ──────────────────────────────────────────────────
   #
   # programs.steam is a NixOS module (not HM) — it handles:
@@ -61,6 +52,7 @@
   #     Steam Controller, DualShock, etc.)
   #   - allowNonFree is handled separately in nixpkgs.config
   programs.steam = {
+    # unfree; includes steam-run and pressure-vessel
     enable = true;
 
     # Opens UDP 27036 for Steam Remote Play streaming to other devices on LAN.
@@ -117,6 +109,8 @@
     # MangoHud: Vulkan/OpenGL overlay showing FPS, frame times, GPU/CPU temps
     # and load. Enable per-game in Steam: MANGOHUD=1 %command%
     mangohud
+    wine
+    winetricks
   ];
 
   # ── Kernel-level gaming optimizations ─────────────────────────────────────
