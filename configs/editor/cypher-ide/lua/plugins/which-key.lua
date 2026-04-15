@@ -22,7 +22,7 @@ return {
 
   -- Load slightly after startup — which-key only activates when you start
   -- typing a key sequence, so there's no benefit to loading it at file-open.
-  event = "VeryLazy",
+  --event = "VeryLazy",
 
   config = function()
     local wk = require("which-key")

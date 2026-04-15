@@ -29,7 +29,7 @@ return {
   "alexghergh/nvim-tmux-navigation",
 
   -- Load early — pane navigation should work from the first keypress.
-  event = "VeryLazy",
+  --event = "VeryLazy",
 
   config = function()
     local K   = require("cide-keymaps")

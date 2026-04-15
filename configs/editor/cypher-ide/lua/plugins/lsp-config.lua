@@ -543,7 +543,7 @@ return {
         -- ── LINTERS (nvim-lint) ─────────────────────────────────────────
         "eslint_d",                    -- JS/TS (daemon, much faster than eslint)
         "pylint",                      -- Python
-        "luacheck",                    -- Lua
+        --"luacheck",                    -- Lua
         "shellcheck",                  -- Shell scripts
         "markdownlint",                -- Markdown
         "hadolint",                    -- Dockerfile
