@@ -76,13 +76,13 @@
   # Set to false (or remove the line) to exclude a subsystem from this host.
   # Useful when building a lighter config for a machine that doesn't need all tooling.
   devops.containers.enable  = true;  # Docker + Podman stacks, image tooling
-  devops.kubernetes.enable  = true;  # k3s service, kubectl, Helm, k3d, kind
+  devops.kubernetes.enable  = false;  # k3s service, kubectl, Helm, k3d, kind
   devops.databases.enable   = true;  # PostgreSQL + Redis services, DB GUIs
-  devops.iac.enable         = true;  # Terraform, OpenTofu, Ansible, Pulumi
-  devops.secrets.enable     = true;  # sops, age, gnupg, vault
+  devops.iac.enable         = false;  # Terraform, OpenTofu, Ansible, Pulumi
+  devops.secrets.enable     = false;  # sops, age, gnupg, vault
 
   # Virtualisation helpers toggle
-  virtualisation.helpers.enable = true;  # distrobox, winboat, vagrant, virt-viewer
+  virtualisation.helpers.enable = false;  # distrobox, winboat, vagrant, virt-viewer
 
   # ─────────────────────────────────────────────────────────────────────────────
   # BOOT LOADER
@@ -297,7 +297,7 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # VIRTUALISATION — KVM / QEMU / libvirt
   # ─────────────────────────────────────────────────────────────────────────────
-  virtualisation.kvm.enable = true;
+  #virtualisation.kvm.enable = true;
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)
   # ─────────────────────────────────────────────────────────────────────────────
@@ -521,17 +521,17 @@
     #fira-code
     nerd-fonts.fira-code        # Fira Code: 
     nerd-fonts.hack             # Hack: 
-    nerd-fonts.source-code-pro  # Source Code Pro: 
-    nerd-fonts.cascadia-code    # Cascadia Code: 
-    nerd-fonts.iosevka          # Iosevka: 
-    nerd-fonts.victor-mono      # Victor Mono: 
+    #nerd-fonts.source-code-pro  # Source Code Pro: 
+    #nerd-fonts.cascadia-code    # Cascadia Code: 
+    #nerd-fonts.iosevka          # Iosevka: 
+    #nerd-fonts.victor-mono      # Victor Mono: 
     nerd-fonts.jetbrains-mono   # JetBrains Mono: 
     nerd-fonts.lilex            # Lilex: 
     nerd-fonts.monaspace        # Monaspace: 
     nerd-fonts.noto             # Noto: 
     nerd-fonts.roboto-mono      # Roboto Mono: 
     nerd-fonts.ubuntu-mono      # Ubuntu Mono: 
-    nerd-fonts.meslo-lg         # Meslo LG: 
+    #nerd-fonts.meslo-lg         # Meslo LG: 
     nerd-fonts.sauce-code-pro   # Sauce Code Pro: 
   ];
 
