@@ -1,41 +1,74 @@
--- ─────────────────────────────────────────────────────────────────────────
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- lua/lazy_bootstrap.lua
 -- PACKAGE MANAGER: LAZY.NVIM
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- Bootstraps lazy.nvim on first launch, then sets it up.
+-- lazy.nvim is installed into XDG_DATA_HOME/nvim/lazy/lazy.nvim
+-- (resolves to ~/.local/share/nvim/lazy/lazy.nvim, which respects NVIM_APPNAME).
+-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 -- ─────────────────────────────────────────────────────────────────────────
--- Installs lazy.nvim into XDG_DATA_HOME/cypher-ide/lazy/lazy.nvim
--- on first launch if it isn't present. Subsequent launches use the cached copy.
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local result = vim.fn.system({ 
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "--branch=stable", 
-    lazyrepo, 
-    lazypath 
-  })
+-- LAZY.NVIM BOOTSTRAP
+-- ─────────────────────────────────────────────────────────────────────────
+-- Clone lazy.nvim if it isn't present. On subsequent launches, this block
+-- does nothing — the fs_stat check is essentially free. 
+--
+-- On NixOS, lazy.nvim is installed via Nix (pkgs.vimPlugins.lazy-nvim)
+-- and injected into Neovim's rtp automatically by the wrapper.
+-- We do NOT clone it from GitHub — Nix owns that dependency.
+--
+-- For non-NixOS fallback (e.g. if someone runs this config on a plain Linux
+-- machine), we keep the clone logic as a fallback below.
+-- ─────────────────────────────────────────────────────────────────────────
 
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { result,                         "WarningMsg" },
-      { "\nPress any key to exit...",    "Normal"},
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
+-- Check if lazy.nvim is already on rtp (Nix-provided path)
+local lazy_ok = pcall(require, "lazy")
 
-    -- prev
-    -- error("Failed to clone lazy.nvim:\n" .. result)
+if not lazy_ok then
+  --fallback: not on rtp yet, try standard data path (non-NixOS usage)
+  local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+
+  if not (vim.uv or vim.loop).fs_stat(lazypath) then
+    -- Not installed at all — clone it (non-NixOS first launch)
+    vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
+
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local result = vim.fn.system({ 
+      "git",
+      "clone",
+      "--filter=blob:none",
+      "--branch=stable", 
+      lazyrepo, 
+      lazypath 
+    })
+
+    if vim.v.shell_error ~= 0 then
+      vim.api.nvim_echo({
+        { "Failed to clone lazy.nvim:\n", "ErrorMsg"},
+        { result,                         "WarningMsg" },
+        { "\nPress any key to exit...",   "Normal"},
+      }, true, {})
+      vim.fn.getchar()
+      os.exit(1)
+
+      -- prev
+      -- error("Failed to clone lazy.nvim:\n" .. result)
+    end
   end
+  -- prepend to rtp so require("lazy") finds it.
+  vim.opt.rtp:prepend(lazypath)
 end
-vim.opt.rtp:prepend(lazypath)
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- LAZY.NVIM SETUP
--- ───────────────────────────────────────────────────────────────────────── 
--- Lazy.nvim setup function. This is what loads lazy.
--- The function takes in two tuples; one for the plugins and 
--- another for options/ settings. 
+-- ─────────────────────────────────────────────────────────────────────────
+-- lazy.setup() takes two arguments (tuples):
+--   1. Plugin source: a string → scans lua/<string>/ for plugin spec files
+--                    or a table → an inline plugin spec list.
+--   2. Options table: global lazy.nvim configuration.
+--
+-- IMPORTANT: the string MUST match the actual directory name under lua/.
+-- lua/plugins/ exists → "plugins" is correct.
 require("lazy").setup("plugins", {
 
   -- ── INSTALL ──────────────────────────────────────────────────────────

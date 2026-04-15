@@ -1,9 +1,13 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- GIT.LUA
+-- lua/plugins/git.lua
+-- GIT INTEGRATION
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- Two plugins, two complementary responsibilities:
 --   gitsigns  → in-buffer: hunk markers, staging, blame, navigation
 --   fugitive  → full git workflow: status, commit, push, log, diff
+--
+-- All keybindings are read from cide-keymaps.lua (the SSOT).
+-- To change a key, edit it there — not in this file.
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 return {
@@ -21,12 +25,12 @@ return {
   {
     "lewis6991/gitsigns.nvim",
 
-    -- Load when a file buffer opens — no point loading before a file exists
+    -- Load when a file buffer opens — no point loading before a file exists.
     event = { "BufReadPre", "BufNewFile" },
 
     opts = {
       signs = {
-        -- These are the characters shown in the sign column
+        -- Characters shown in the sign column for each change type.
         add          = { text = "│" },
         change       = { text = "│" },
         delete       = { text = "_" },
@@ -37,7 +41,7 @@ return {
 
       -- Show blame annotation at the end of the current line.
       -- Shows WHO changed this line and WHEN, inline. Off by default —
-      -- toggle it with <leader>tb (defined in the keymaps below).
+      -- toggle with <leader>tb (defined in on_attach below).
       current_line_blame = false,
       current_line_blame_opts = {
         virt_text         = true,
@@ -46,12 +50,17 @@ return {
         ignore_whitespace = false,
       },
 
-      -- on_attach: gitsigns fires this when attaching to a buffer,
-      -- same pattern as LspAttach. All keymaps go here so they're
-      -- buffer-local and only active in git-tracked files.
+      -- on_attach: gitsigns fires this when attaching to a buffer.
+      -- Same pattern as LspAttach — keymaps here are buffer-local,
+      -- so they only exist in git-tracked files.
       on_attach = function(bufnr)
+        -- Import the SSOT keymap table.
+        -- All key strings come from here — never hardcoded in this file.
+        local K  = require("cide-keymaps")
         local gs = package.loaded.gitsigns
 
+        -- Local helper to reduce repetition. Applies buffer-local, silent,
+        -- noremap opts automatically and surfaces the desc to which-key.
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, {
             buffer  = bufnr,
@@ -62,9 +71,10 @@ return {
         end
 
         -- ── HUNK NAVIGATION ────────────────────────────────────────────
-        -- Jump between changed hunks in the file.
         -- "Hunk" = a contiguous block of changed lines.
-        map("n", "]h", function()
+        -- The vim.wo.diff guard makes ]h / [h work correctly in diff
+        -- buffers (fugitive, git log) using Vim's built-in ]c / [c.
+        map("n", K.git.next_hunk, function()
           if vim.wo.diff then
             vim.cmd.normal({ "]c", bang = true })
           else
@@ -72,7 +82,7 @@ return {
           end
         end, "Git: next hunk")
 
-        map("n", "[h", function()
+        map("n", K.git.prev_hunk, function()
           if vim.wo.diff then
             vim.cmd.normal({ "[c", bang = true })
           else
@@ -82,44 +92,49 @@ return {
 
         -- ── STAGING ────────────────────────────────────────────────────
         -- Stage/unstage individual hunks without touching the terminal.
-        -- Stage = add to git's index (the "staging area" before commit).
-        map("n", "<leader>hs", gs.stage_hunk,   "Git: stage hunk")
-        map("n", "<leader>hr", gs.reset_hunk,   "Git: reset hunk")
-        map("n", "<leader>hu", gs.undo_stage_hunk, "Git: undo stage hunk")
+        -- "Stage" = add to git's index (the pre-commit staging area).
+        map("n", K.git.stage_hunk, gs.stage_hunk,      "Git: stage hunk")
+        map("n", K.git.reset_hunk, gs.reset_hunk,      "Git: reset hunk")
+        map("n", K.git.undo_stage, gs.undo_stage_hunk, "Git: undo stage hunk")
 
-        -- Visual mode: stage/reset only the selected lines within a hunk
-        map("v", "<leader>hs", function()
+        -- Visual mode: stage/reset only the lines selected within a hunk.
+        map("v", K.git.stage_hunk, function()
           gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end, "Git: stage selected lines")
-        map("v", "<leader>hr", function()
+        map("v", K.git.reset_hunk, function()
           gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end, "Git: reset selected lines")
 
-        -- Stage or reset the entire file at once
-        map("n", "<leader>hS", gs.stage_buffer,  "Git: stage entire buffer")
-        map("n", "<leader>hR", gs.reset_buffer,  "Git: reset entire buffer")
+        -- Stage or reset the entire file buffer at once.
+        map("n", K.git.stage_buffer, gs.stage_buffer, "Git: stage entire buffer")
+        map("n", K.git.reset_buffer, gs.reset_buffer, "Git: reset entire buffer")
 
         -- ── INSPECTION ─────────────────────────────────────────────────
-        -- Preview the diff of the hunk under cursor in a floating window
-        map("n", "<leader>hp", gs.preview_hunk,  "Git: preview hunk diff")
-        -- Show full git blame for the current line in a floating window
-        map("n", "<leader>hb", function()
+        -- Preview the diff of the hunk under cursor in a floating window.
+        map("n", K.git.preview_hunk, gs.preview_hunk, "Git: preview hunk diff")
+
+        -- Blame for the current line — full = shows the full commit message.
+        map("n", K.git.blame_line, function()
           gs.blame_line({ full = true })
         end, "Git: blame current line (full)")
-        -- Toggle the inline EOL blame annotation on/off
-        map("n", "<leader>tb", gs.toggle_current_line_blame, "Git: toggle inline blame")
-        -- Show a diff of the buffer against the index (staged version)
-        map("n", "<leader>hd", gs.diffthis,      "Git: diff buffer against index")
-        -- Show a diff against HEAD (last commit)
-        map("n", "<leader>hD", function()
+
+        -- Toggle the inline EOL blame annotation for the current line.
+        map("n", K.git.toggle_blame, gs.toggle_current_line_blame, "Git: toggle inline blame")
+
+        -- Diff the buffer against the index (what's staged).
+        map("n", K.git.diff_index, gs.diffthis, "Git: diff buffer against index")
+
+        -- Diff the buffer against HEAD (last commit). "~" = one commit back.
+        map("n", K.git.diff_head, function()
           gs.diffthis("~")
         end, "Git: diff buffer against HEAD")
-        -- Toggle showing deleted lines as virtual text above the deletion point
-        map("n", "<leader>td", gs.toggle_deleted, "Git: toggle deleted lines display")
+
+        -- Toggle showing deleted lines as virtual text above the deletion point.
+        map("n", K.git.toggle_deleted, gs.toggle_deleted, "Git: toggle deleted lines display")
 
         -- ── TEXT OBJECT ────────────────────────────────────────────────
         -- "ih" = "inner hunk" — select the changed lines of a hunk.
-        -- Use with operators: "vih" visually selects a hunk, "dih" deletes it.
+        -- Works with operators: "vih" selects a hunk, "dih" deletes it, etc.
         map({ "o", "x" }, "ih", ":<C-u>Gitsigns select_hunk<CR>", "Git: select hunk (text object)")
       end,
     },
@@ -129,29 +144,34 @@ return {
   -- FUGITIVE — full git workflow inside Neovim
   -- ──────────────────────────────────────────────────────────────────────────
   -- Fugitive turns Neovim into a complete git client. The core interface
-  -- is :Git (or :G for short) which opens a status window from which you
-  -- can stage, commit, push, pull, and more without leaving the editor.
+  -- is :Git (or :G) which opens a status window where you can stage,
+  -- commit, push, pull, and navigate history without leaving the editor.
   --
   -- Key fugitive concepts:
-  --   :Git          → the status window (stage files with 's', commit with 'cc')
+  --   :Git          → status window (s=stage, u=unstage, cc=commit, P=push)
   --   :Git diff     → diff the working tree
   --   :Git log      → browsable commit log
-  --   :Git blame    → blame view for the whole file (not just current line)
+  --   :Git blame    → whole-file blame view (different from gitsigns line blame)
   --   :GBrowse      → open the current file/line on GitHub/GitLab in browser
-  --   :Gread        → replace buffer with the git index version of the file
+  --   :Gread        → replace buffer with git index version of the file
   --   :Gwrite       → stage the current file (equivalent to git add)
   {
     "tpope/vim-fugitive",
 
-    -- Load when any git-related command is called, or when opening a file.
-    -- cmd lazy-loads on the listed commands; event covers the status window.
+    -- cmd: lazy-loads fugitive when one of these commands is first called.
+    -- event: also load when a buffer opens (needed for status window triggers).
     cmd   = { "Git", "G", "Gdiffsplit", "Gread", "Gwrite", "GBrowse" },
     event = { "BufReadPre" },
 
     config = function()
-      -- Fugitive doesn't need a setup() call — it works out of the box.
-      -- We just add keymaps here.
+      -- Fugitive needs no setup() call — it works out of the box.
+      -- This config block only adds keymaps.
 
+      -- Import the SSOT keymap table.
+      local K = require("cide-keymaps")
+
+      -- Fugitive keymaps are GLOBAL (not buffer-local) because you need to
+      -- trigger the status window from any buffer, not just git-tracked ones.
       local function map(lhs, rhs, desc)
         vim.keymap.set("n", lhs, rhs, {
           noremap = true,
@@ -161,21 +181,14 @@ return {
       end
 
       -- Open the git status window — the main fugitive interface.
-      -- Inside it: press ? to see all available keymaps.
-      -- Common ones: s=stage, u=unstage, cc=commit, P=push, p=pull
-      map("<leader>gs", "<cmd>Git<cr>",                "Git: open status window (fugitive)")
-      -- Quick commit (opens commit message buffer)
-      map("<leader>gc", "<cmd>Git commit<cr>",          "Git: commit")
-      -- Push to remote
-      map("<leader>gp", "<cmd>Git push<cr>",            "Git: push")
-      -- Pull from remote
-      map("<leader>gl", "<cmd>Git pull<cr>",            "Git: pull")
-      -- Browsable git log
-      map("<leader>gL", "<cmd>Git log --oneline<cr>",   "Git: log (oneline)")
-      -- Side-by-side diff split for current file
-      map("<leader>gd", "<cmd>Gdiffsplit<cr>",          "Git: diff split current file")
-      -- Blame view for the whole file (different from gitsigns line blame)
-      map("<leader>gb", "<cmd>Git blame<cr>",           "Git: blame view (whole file)")
+      -- Inside the window: press ? to see all available keymaps.
+      map(K.git.status,     "<cmd>Git<cr>",                "Git: open status window (fugitive)")
+      map(K.git.commit,     "<cmd>Git commit<cr>",          "Git: commit")
+      map(K.git.push,       "<cmd>Git push<cr>",            "Git: push")
+      map(K.git.pull,       "<cmd>Git pull<cr>",            "Git: pull")
+      map(K.git.log,        "<cmd>Git log --oneline<cr>",   "Git: log (oneline)")
+      map(K.git.diff_split, "<cmd>Gdiffsplit<cr>",          "Git: diff split current file")
+      map(K.git.blame_file, "<cmd>Git blame<cr>",           "Git: blame view (whole file)")
     end,
   },
 

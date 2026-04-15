@@ -1,18 +1,18 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- lua/plugins/linting-and-formatting.lua
 -- FORMATTING AND LINTING
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- Handles two separate concerns:
---   1. FORMATTING  → conform.nvim  (runs Prettier, Stylua, Black, etc.)
---   2. LINTING     → nvim-lint     (runs ESLint, Pylint, etc.)
+-- Two separate plugins for two fundamentally different operations:
+--   1. FORMATTING  → conform.nvim  (rewrites files to match a style)
+--   2. LINTING     → nvim-lint     (analyzes files for problems → diagnostics)
 --
--- WHY NOT none-ls?
---   none-ls (null-ls successor) works by pretending to be an LSP server and
---   piping formatter/linter output through the LSP protocol. It works, but
---   it's architectural overhead — a fake server process running inside Neovim
---   just to relay CLI tool output. conform.nvim and nvim-lint do the same jobs
---   directly with no indirection, less memory, and better behavior
---   (conform preserves cursor position and folds; none-ls replaces the whole buffer).
---   The entire community (LazyVim, kickstart.nvim) has migrated to this pair.
+-- WHY NOT none-ls (null-ls)?
+--   none-ls (null-ls successor) pretends to be an LSP server to relay formatter/linter output
+--   through the LSP protocol. It's architectural overhead — a fake server
+--   process just to relay CLI output. conform.nvim and nvim-lint do the same
+--   jobs directly with less memory and better behavior (conform preserves
+--   cursor position and folds; none-ls replaces the whole buffer).
+--   The community (LazyVim, kickstart.nvim) has migrated to this pair.
 --
 -- WHY TWO PLUGINS instead of one?
 --   Formatting and linting are fundamentally different operations:
@@ -21,6 +21,8 @@
 --     • Linting: "analyze this file for problems" — runs as you type/save, produces
 --       diagnostics (the red/yellow underlines you already see from LSP).
 --   Keeping them separate means you can disable one without touching the other.
+--
+-- All keybindings read from cide-keymaps.lua (the SSOT).
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 return {
@@ -28,26 +30,27 @@ return {
   -- ──────────────────────────────────────────────────────────────────────────
   -- CONFORM.NVIM — Formatter
   -- ──────────────────────────────────────────────────────────────────────────
-  -- conform runs external formatter binaries (Prettier, Stylua, Black, etc.)
-  -- and applies their output to your buffer. Unlike none-ls, it computes a
-  -- minimal diff — only the changed lines are replaced — so your cursor
+  -- Runs external formatter binaries (Prettier, Stylua, Black, etc.)
+  -- and applies their output to your buffer. Unlike none-ls it
+  -- computes a minimal diff — only changed lines are replaced — so cursor
   -- position, folds, and undo history are preserved after formatting.
   {
     "stevearc/conform.nvim",
 
-    -- lazy-load: only activate when a real file buffer is opened.
+    -- Lazy-load: only activate when a real file buffer is opened.
     -- BufReadPre = before reading an existing file into a buffer.
-    -- BufNewFile  = when creating a brand-new file.
+    -- BufNewFile  = when creating a new file.
     -- This means conform doesn't load at all if you open Neovim with no file.
     event = { "BufReadPre", "BufNewFile" },
 
     config = function()
       local conform = require("conform")
+      local K       = require("cide-keymaps")
 
       conform.setup({
-        -- ── FORMATTERS BY FILETYPE ──────────────────────────────────────
-        -- Maps a filetype → list of formatters to run, in order.
-        -- If a formatter isn't installed, conform skips it gracefully.
+        -- ── FORMATTERS BY FILETYPE ────────────────────────────────────
+        -- Maps filetype → list of formatters. Formatters run sequentially.
+        -- If a formatter isn't installed, conform skips it gracefully.        
         -- You can list multiple formatters per type; they run sequentially
         -- (e.g. isort sorts imports first, then black formats the rest).
         formatters_by_ft = {
@@ -68,37 +71,33 @@ return {
           markdown        = { "prettier" },
           graphql         = { "prettier" },
 
-          -- Lua (this very config file!)
-          -- stylua is the standard Lua formatter; install via Mason: :MasonInstall stylua
+          -- Lua         
+          -- stylua is the standard Lua formatter; installed via Mason: :MasonInstall stylua
           lua             = { "stylua" },
 
           -- Python: isort fixes import order first, then black formats everything.
-          -- Install via Mason: :MasonInstall isort black
           python          = { "isort", "black" },
 
-          -- Shell scripts
-          -- Install via Mason: :MasonInstall shfmt
+          -- Shell
           sh              = { "shfmt" },
           bash            = { "shfmt" },
           zsh             = { "shfmt" },
 
-          -- Go has gofmt built into the language toolchain, but goimports also
-          -- auto-manages import statements. Install: :MasonInstall goimports
+          -- Go: goimports manages imports + formats; gofmt is Go's official formatter.
           go              = { "goimports", "gofmt" },
 
-          -- Rust: rustfmt is the official formatter, ships with the Rust toolchain.
-          -- conform can find it automatically if cargo is on your PATH.
+          -- Rust: rustfmt ships with the Rust toolchain. conform finds it via cargo.
           rust            = { "rustfmt" },
 
           -- SQL
-          -- Install via Mason: :MasonInstall sql-formatter
           sql             = { "sql_formatter" },
 
-          -- Nix (relevant to your CypherOS / NixOS work)
-          -- Install via Mason: :MasonInstall nixfmt
+          -- Nix (CypherOS / NixOS work)
           nix             = { "nixfmt" },
 
-          -- Fallback: if no filetype-specific formatter is configured,
+          -- Fallback: for any filetype with no formatter configured,
+          -- trim trailing whitespace — safe for any file type.
+          --
           -- try to use any formatter the attached LSP server provides.
           -- The "*" key means "all filetypes".
           -- ["*"] = { "inject" },   -- uncomment to use LSP formatter as last resort
@@ -108,42 +107,43 @@ return {
           ["_"]           = { "trim_whitespace" },
         },
 
-        -- ── FORMAT ON SAVE ──────────────────────────────────────────────
-        -- This is the "auto-format when you hit :w" behavior.
-        -- lsp_fallback = true: if no conform formatter is found for this filetype,
+        -- ── FORMAT ON SAVE ────────────────────────────────────────────
+        -- Auto-formats the file when you write with :w.
+        -- lsp_fallback: if no conform formatter is configured for this filetype,
         -- fall back to the LSP server's built-in formatter (if it has one).
+        -- timeout_ms: abort if the formatter takes longer than 1 second.
         format_on_save = {
-          timeout_ms   = 1000,   -- abort if formatter takes longer than 1 second
-          lsp_fallback = true,   -- use LSP formatter if no conform formatter configured
+          timeout_ms   = 1000, -- abort if formatter takes longer than 1 second
+          lsp_fallback = true, -- use LSP formatter if no conform formatter configured
         },
 
-        -- ── FORMATTER-SPECIFIC OPTIONS ──────────────────────────────────
+        -- ── FORMATTER-SPECIFIC OPTIONS ────────────────────────────────     
         -- Override settings for individual formatters here.
         -- These are passed directly to the formatter binary.
         formatters = {
-          -- prettier: don't let conform set the --tab-width flag;
-          -- let your project's .prettierrc file control that instead.
+          -- Let the project's .prettierrc control tab width and other style.
+          -- prose-wrap = always: wrap markdown prose at printWidth (cleaner diffs).
           prettier = {
             prepend_args = { "--prose-wrap", "always" },
           },
-          -- shfmt: use 2-space indentation for shell scripts
+          -- shfmt: 2-space indentation for shell scripts.
           shfmt = {
             prepend_args = { "-i", "2" },
           },
         },
       })
 
-      -- ── MANUAL FORMAT KEYMAP ──────────────────────────────────────────
-      -- <leader>mp = "manual prettier" (or think of it as "format")
-      -- This triggers formatting on demand, without waiting for a save.
-      -- async = true so Neovim doesn't freeze on slow formatters.
-      vim.keymap.set({ "n", "v" }, "<leader>mp", function()
+      -- ── MANUAL FORMAT KEYMAP ────────────────────────────────────────
+      -- Trigger formatting on demand without waiting for a save.
+      -- Works in normal mode (whole file) and visual mode (selection).
+      -- async = true: Neovim stays responsive while the formatter runs.
+      vim.keymap.set({ "n", "v" }, K.format.manual_format, function()
         conform.format({
           lsp_fallback = true,
           async        = true,
           timeout_ms   = 1000,
         })
-      end, { desc = "Format: run conform on current buffer/selection", noremap = true, silent = true })
+      end, { desc = "Format: run conform on buffer/selection", noremap = true, silent = true })
 
     end,
   },
@@ -151,32 +151,33 @@ return {
   -- ──────────────────────────────────────────────────────────────────────────
   -- NVIM-LINT — Linter
   -- ──────────────────────────────────────────────────────────────────────────
-  -- nvim-lint runs external linter binaries (ESLint, Pylint, Luacheck, etc.)
-  -- and feeds their output into Neovim's diagnostic system — the same system
-  -- that LSP uses for errors and warnings. This means lint results appear with
-  -- the same signs, virtual text, and keymaps you already configured in lsp.lua.
+  -- Runs external linter binaries and feeds their output into Neovim's
+  -- diagnostic system — the same system LSP uses for errors and warnings.
+  -- Lint results appear with the same signs, virtual text, and keymaps
+  -- already configured in lsp-config.lua.
   --
-  -- Note: your LSP servers (ts_ls, pyright, lua_ls) already provide SOME
-  -- diagnostics. nvim-lint adds the linter's perspective on top — for example,
-  -- ts_ls handles TypeScript type errors, while ESLint handles style/rule violations.
-  -- They complement each other rather than conflict.
+  -- NOTE: LSP servers (ts_ls, pyright, lua_ls) already provide SOME diagnostics.
+  -- nvim-lint adds the linter's perspective on top:
+  --   ts_ls   → TypeScript type errors
+  --   eslint_d → style rules and lint violations
+  -- They complement, not conflict with, each other.
   {
     "mfussenegger/nvim-lint",
-
     -- Same lazy-load strategy as conform: only load when a buffer is opened.
     event = { "BufReadPre", "BufNewFile" },
 
     config = function()
       local lint = require("lint")
+      local K    = require("cide-keymaps")
 
-      -- ── LINTERS BY FILETYPE ───────────────────────────────────────────
+      -- ── LINTERS BY FILETYPE ──────────────────────────────────────────
+      -- The KEY is the filetype (e.g. "markdown"), NOT the linter name.
       -- Maps filetype → list of linters to run.
-      -- Install all of these via Mason before they'll work.
-      -- :MasonInstall eslint_d pylint luacheck shellcheck markdownlint
+      -- Installed via Mason 
       lint.linters_by_ft = {
         -- JavaScript / TypeScript
-        -- eslint_d is the daemon version of ESLint — starts once, stays running.
-        -- Much faster than cold-starting ESLint on every lint trigger.
+        -- eslint_d is the daemon version: starts once, stays running.
+        -- Much faster than cold-starting eslint on every lint trigger.
         javascript      = { "eslint_d" },
         typescript      = { "eslint_d" },
         javascriptreact = { "eslint_d" },
@@ -188,49 +189,52 @@ return {
         python          = { "pylint" },
 
         -- Lua
-        -- luacheck checks for undefined globals, unused variables, etc.
+        -- luacheck checks for undefined globals, unused variables, etc.       
         lua             = { "luacheck" },
 
-        -- Shell
+        -- Shell        
         -- shellcheck is the gold standard for bash/sh linting.
         sh              = { "shellcheck" },
         bash            = { "shellcheck" },
 
-        -- Markdown
-        markdownlint    = { "markdownlint" },
+        -- Markdown — key is "markdown" (the filetype), value is the linter name
+        markdown        = { "markdownlint" },
 
         -- Docker
         dockerfile      = { "hadolint" },
 
-        -- Nix
+        -- Nix: runs `nix-instantiate --parse`.
+        -- Consider:
+        --   "statix"  -> style checks OR/AND
+        --   "deadnix" -> dead code.
         nix             = { "nix" },
       }
 
-      -- ── LINT TRIGGER AUTOCMD ──────────────────────────────────────────
-      -- nvim-lint doesn't lint automatically — you have to tell it when to run.
-      -- This autocmd runs the linter on these events:
+      -- ── LINT TRIGGER AUTOCMD ────────────────────────────────────────
+      -- nvim-lint doesn't auto-lint — you tell it when to run.
+      -- These events cover the most useful trigger points:
       --
-      --   BufEnter     → when you switch to a buffer (catches files already open)
-      --   BufWritePost → after saving (catches changes you just wrote)
-      --   InsertLeave  → when you leave insert mode (near-realtime feedback)
+      --   BufEnter     → switching to a buffer catches already-open files
+      --   BufWritePost → after saving catches changes you just wrote
+      --   InsertLeave  → leaving insert mode gives near-realtime feedback
       --
-      -- We intentionally don't use TextChanged (fires on every keystroke) because
-      -- that would spawn a new linter process on every single character you type.
+      -- TextChanged (every keystroke) is intentionally excluded — it would
+      -- spawn a new linter process on every character you type.
       local lint_augroup = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
 
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
         group    = lint_augroup,
         callback = function()
-          -- try_lint() checks if a linter is configured for the current filetype
-          -- and runs it. If no linter is configured, it does nothing silently.
+          -- try_lint() checks if a linter is configured for the current filetype.
+          -- If none is configured, it does nothing silently — safe to call always.
           lint.try_lint()
         end,
       })
 
-      -- ── MANUAL LINT KEYMAP ────────────────────────────────────────────
+      -- ── MANUAL LINT KEYMAP ──────────────────────────────────────────     
       -- Trigger linting on demand. Useful if you want to check a file without
       -- waiting for a save or a mode change.
-      vim.keymap.set("n", "<leader>ml", function()
+      vim.keymap.set("n", K.format.manual_lint, function()
         lint.try_lint()
       end, { desc = "Lint: trigger linter on current buffer", noremap = true, silent = true })
 
