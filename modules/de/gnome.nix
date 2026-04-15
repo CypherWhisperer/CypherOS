@@ -186,6 +186,13 @@ in
     kubectl # Kubernetes CLI (vs-kubernetes.kubectl-path)
     vcpkg # C++ Library Manager for Windows, Linux, and macOS
 
+    libgcc
+    gnumake
+    lua
+    zig
+    rustup
+    go
+
     # ── Workflow and Automation ──────────────────────────────────────────────
     #n8n  # NOTE: the install memory intensive (keeps failing on my side).
 
