@@ -67,11 +67,11 @@ in
 
 {
   imports = [
-    # APPS 
+    # APPS
     ../apps
     # GAMING
     ../gaming
-    # COMMON PACKAGES  
+    # COMMON PACKAGES
     ../common
   ];
 
@@ -79,7 +79,7 @@ in
   # UNFREE PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
   # Some packages (spotify, obsidian, steam, etc.) carry proprietary licenses.
-1  # Nix refuses to build or install them unless you explicitly permit this.
+  # Nix refuses to build or install them unless you explicitly permit this.
   # Scoping it here keeps the allowance contained to this Home Manager config.
   #nixpkgs.config.allowUnfree = true; # the declaration on configuration.nix suffices
 

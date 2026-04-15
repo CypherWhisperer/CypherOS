@@ -9,7 +9,7 @@
 #   block with: virtualisation.kvm.enable = true;
 #   See modules/virtualisation/default.nix for the extraction checklist.
 
-{ config, pkgs, lib, ... }
+{ config, pkgs, lib, ... }:
 
 {
   environment.systemPackages = with pkgs; [
