@@ -67,35 +67,19 @@ in
 
 {
   imports = [
-    ../../modules/apps/brave.nix
-    ../../modules/apps/claude.nix
-    ../../modules/apps/obsidian.nix
-    ../../modules/apps/zsh.nix
-    ../../modules/apps/git.nix
-    ../../modules/apps/ssh.nix
-    ../../modules/apps/kitty.nix
-    ../../modules/apps/ghostty.nix
-    ../../modules/apps/tmux.nix
-    ../../modules/apps/neovim.nix
-    ../../modules/apps/vim.nix
-    ../../modules/apps/btop.nix
-    ../../modules/apps/htop.nix
-    ../../modules/apps/fastfetch.nix
-    ../../modules/apps/vscode.nix
+    # APPS 
+    ../apps
     # GAMING
-    ../../modules/gaming/steam-data.nix
-    ../../modules/gaming/minecraft.nix
-    # XDG
-    ../../modules/common/xdg.nix
-    # DEV TOOLING
-    ../../modules/common/dev.nix
+    ../gaming
+    # COMMON PACKAGES  
+    ../common
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
   # Some packages (spotify, obsidian, steam, etc.) carry proprietary licenses.
-  # Nix refuses to build or install them unless you explicitly permit this.
+1  # Nix refuses to build or install them unless you explicitly permit this.
   # Scoping it here keeps the allowance contained to this Home Manager config.
   #nixpkgs.config.allowUnfree = true; # the declaration on configuration.nix suffices
 
@@ -138,189 +122,6 @@ in
 
     # blur-my-shell covers the core blur use case (panel, overview, appfolder).
     gnome-extension-manager
-
-    # ── VENTOY   ─────────────────────────────────────────────────────────────
-    ventoy
-    #ventoy-full
-    #ventoy-full-qt  # GUI supported qt version
-    #ventoy-full-gtk # GUI supported gtk version
-    exfatprogs # exFAT filesystem userspace utilities
-    dosfstools # Utilities for creating and checking FAT and VFAT file systems
-    ntfs3g # FUSE-based NTFS driver with full write support
-    parted # Create, destroy, resize, check, and copy partitions
-    gparted # Graphical disk partitioning tool
-    util-linux # Set of system utilities for Linux
-    usbutils # Tools for working with USB devices, such as lsusb
-    pciutils # Programs 4 inspecting & manipulating PCI devices configuration
-
-    # ── Run Windows Apps on Linux ────────────────────────────────────────────
-    winboat
-
-    # ── Browsers ─────────────────────────────────────────────────────────────
-    # brave # handled by ../apps/brave.nix
-    firefox
-
-    # ── Terminals ────────────────────────────────────────────────────────────
-    # INSTALLED VIA programs.[] -> (kitty,ghostty)
-
-    # ── Editors & IDEs ───────────────────────────────────────────────────────
-    # INSTALLED VIA programs.[] -> (neovim, vscode)
-    antigravity
-    #antigravity-fhs
-    code-cursor
-    jetbrains.webstorm
-
-    # ────── Development ──────────────────────────────────────────────────────
-
-    # ANDROID
-    android-studio # bare install — configure SDK via UI. (bundles emulator, SDK manager, AVD manager)
-    android-tools # adb + fastboot — enable when you start using a device
-    flutter # includes dart SDK
-    kotlin
-    # kotlin-language-server
-
-    # LSP servers and formatters referenced in settings above
-    nixd # Nix language server (nix.serverPath)
-    nixfmt-rfc-style # Nix formatter (nix.serverSettings.nixd.formatting.command)
-    shellcheck # Bash linting (shellcheck.executablePath)
-    kubectl # Kubernetes CLI (vs-kubernetes.kubectl-path)
-    vcpkg # C++ Library Manager for Windows, Linux, and macOS
-
-    libgcc
-    gnumake
-    lua
-    zig
-    rustup
-    go
-
-    # ── Workflow and Automation ──────────────────────────────────────────────
-    #n8n  # NOTE: the install memory intensive (keeps failing on my side).
-
-    # ── System Design ────────────────────────────────────────────────────────
-    drawio
-    staruml
-
-    # ── Communication ────────────────────────────────────────────────────────
-    discord
-    whatsapp-electron # Electron wrapper around Whatsapp
-    whatsapp-chat-exporter # WhatsApp database parser
-
-    # ── Notes & Productivity ─────────────────────────────────────────────────
-    # INSTALLED VIA programs.[] -> (obsidian # unfree)
-    libreoffice
-    keepassxc
-
-    # ── Creative Suite ───────────────────────────────────────────────────────
-    #houdini
-    gimp
-    inkscape
-    blender
-    krita
-    kdePackages.kdenlive
-    audacity
-    obs-studio
-    penpot-desktop
-    figma-linux
-    figma-agent
-
-    # ── Media ────────────────────────────────────────────────────────────────
-    vlc
-    spotify # unfree
-    clapper
-
-    # ── Proton Ecosystem ─────────────────────────────────────────────────────
-    proton-vpn
-    proton-pass
-    protonmail-desktop
-    megasync
-    #protonmail-bridge-gui
-    #protonmail-bridge
-
-    # ── Gaming ───────────────────────────────────────────────────────────────
-    steam # unfree; includes steam-run and pressure-vessel
-    wine
-    winetricks
-
-    # ── CLI Tooling ───────────────────────────────────────────────────────────
-    # INSTALLED VIA programs.[] -> (tmux, zsh, git)
-    fzf # fuzzy finder — pipes, history search, file selection
-    ripgrep # rg: fast grep replacement, respects .gitignore
-    bat # cat with syntax highlighting and line numbers
-    fd # find replacement: simpler syntax, faster
-    fastfetch # system info display (neofetch successor)
-    btop # interactive resource monitor
-    htop # lighter resource monitor
-    tree # directory tree display
-    ranger # vim-keyed terminal file manager
-    fish
-    nushell
-    ## ────────────── ZSH ──────────────────────────────
-    pkgs.zsh-powerlevel10k # the p10k theme itself
-    pkgs.keychain # SSH agent manager
-    pkgs.eza # modern ls replacement (used in aliases)
-    # Once hooked into your shell direnv is looking for an .envrc file in your
-    # current directory before every prompt. If found it will load the exported
-    # environment variables from that bash script into your current environment,
-    # and unload them if the .envrc is not reachable from the current path anymore.
-    # In short, this little tool allows you to have project-specific environment
-    # variables.
-    direnv
-    ## ────────────────────────────────────────────────
-
-    ## ────────────── GIT ─────────────────────────────────────────────────────
-    git-lfs
-    delta # git pager (pulled in by programs.git.delta but good to be explicit)
-    ## ────────────────────────────────────────────────────────────────────────
-    curl
-    wget
-    pass # password-store: GPG-backed password manager
-    rsync
-    keychain # SSH/GPG key agent manager across sessions
-    lf
-    yazi # checkout yaziPlugins.[plugin] for yazi plugins
-    #yaziPlugins.mediainfo
-    #yaziPlugins.time-travel
-    #yaziPlugins.[git, gitui, lazygit, vcs-files]
-    #yaziPlugins.[starship,no-status, mediainfo, bookmarks, smartpaste,
-    #    full-border, wl-clipboard, yatline-catppuccin, relative-motions,
-    #    rich-preview, recycle-bin, smart-enter, toggle-pane
-    # ] # CUSTOMIZATION
-    #
-    #yaziPlugins.sudo
-    #yaziPlugins.[rsync, chmod
-    #yaziPlugins.[ouch,lsar, compress] # archive related
-
-    # ── Dev Tooling ───────────────────────────────────────────────────────────
-    nodejs_20 # pinned to LTS; change to nodejs if you want latest
-    bun # Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one
-    python3
-    cmake
-    pipx # install Python CLI tools in isolated envs
-    mkcert # generate locally-trusted TLS certs for dev
-    docker-client # CLI only — the daemon itself is an OS-level concern
-
-    openssl # Cryptographic library that implements the SSL and TLS protocols
-
-    # ── Security & Networking ─────────────────────────────────────────────────
-    nmap
-    wireshark
-    tor
-    tcpdump
-    strace
-    gobuster
-
-    # ── Fonts ────────────────────────────────────────────────────────────────
-    # Cantarell: GNOME's default UI font — declared here for non-NixOS hosts.
-    # On NixOS it comes in via the GNOME system packages automatically.
-    cantarell-fonts
-    fira-code
-    noto-fonts-color-emoji # basic
-    #noto-fonts-cjk-sans
-    #noto-fonts-extra
-    nerd-fonts.roboto-mono
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.caskaydia-cove # font for kitty + ghostty
-
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
