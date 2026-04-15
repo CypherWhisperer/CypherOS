@@ -7,7 +7,7 @@
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 return {
-  "gooloid/alpha-nvim",
+  "goolord/alpha-nvim",
   dependencies = { "nvim-tree/nvim-web-devicons" },
 
   -- Load only when Neovim opens with no file (the typical startup screen case).
