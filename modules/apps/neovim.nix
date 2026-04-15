@@ -99,7 +99,7 @@
     # CypherIDE uses lazy.nvim (declared in init.lua) to manage its own plugins.
     # Beware Mixing Nix-managed and lazy.nvim-managed plugins in the same config
     #causes load order conflicts.
-    plugins = with pkgs.vimPlugins [
+    plugins = with pkgs.vimPlugins; [
       # Install lazy.nvim via Nix so the bootstrap git clone is never needed.
       # lazy.nvim will still manage all other plugins itself at runtime.
       lazy-nvim
@@ -120,6 +120,7 @@
     #    }
     #  })
     # '';
+
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -139,8 +140,8 @@
   # in configs/editor/cypher-ide/ and run home-manager switch.
   # Do NOT edit files at ~/.config/profiles/gnome/cypher-ide/ directly.
   xdg.configFile."cypher-ide" = {
-    source = ../../configs/editor/cypher-ide;
-    recursive = true; # deploy the whole directory tree, not just a single file
+    #source = ../../configs/editor/cypher-ide;
+    #recursive = true; # deploy the whole directory tree, not just a single file
 
     # mkOutOfStoreSymlink creates a direct symlink to the source path,
     # NOT a copy in the Nix store. The deployed symlink points straight
@@ -148,8 +149,8 @@
     # This means edits to configs/editor/cypher-ide/ take effect
     # immediately without home-manager switch.
     #
-    #source = config.lib.file.mkOutOfStoreSymlink
-    # "${config.home.homeDirectory}/CYPHER_OS/configs/editor/cypher-ide";
+    source = config.lib.file.mkOutOfStoreSymlink
+     "${config.home.homeDirectory}/CYPHER_OS/configs/editor/cypher-ide";
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
