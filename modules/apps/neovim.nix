@@ -40,7 +40,12 @@
 #   Clone it with: nvim-add mini-ref https://github.com/echasnovski/mini.nvim
 #   No launch alias is generated — browse its source as a library reference.
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ─────────────────────────────────────────────────────────────────────────────
@@ -53,8 +58,8 @@
     # This is separate from the vim notepad (modules/apps/vim.nix) —
     # that module installs actual vim for the `v` alias.
     # These aliases exist so scripts or muscle memory that types `vi` still works.
-    viAlias  = false;  # vim.nix owns `v`; don't shadow it
-    vimAlias = false;  # same reasoning
+    viAlias = false; # vim.nix owns `v`; don't shadow it
+    vimAlias = false; # same reasoning
 
     # withNodeJs / withPython3 / withRuby:
     # These embed provider support directly into the Neovim build.
@@ -63,44 +68,58 @@
     # Python3: required by any plugin using the pynvim RPC provider.
     #   Enable — low cost, prevents cryptic errors when a plugin needs it.
     # Ruby: almost no modern plugins require this. Off.
-    withNodeJs  = true;
+    withNodeJs = true;
     withPython3 = true;
-    withRuby    = false;
+    withRuby = false;
 
     # extraPackages: tools that must be on PATH when Neovim runs.
     # These are injected into Neovim's wrapper PATH — not your shell PATH.
     # Covers tools that Mason (inside CypherIDE) or telescope.nvim call out to.
     extraPackages = with pkgs; [
       # Telescope dependencies
-      ripgrep    # telescope live_grep backend
-      fd         # telescope file finder backend
+      ripgrep # telescope live_grep backend
+      fd # telescope file finder backend
 
       # Clipboard providers (Wayland-first, X11 fallback — matches zsh.nix choice)
-      wl-clipboard  # wl-copy / wl-paste
-      xclip         # fallback for X11 / XWayland sessions
+      wl-clipboard # wl-copy / wl-paste
+      xclip # fallback for X11 / XWayland sessions
 
       # Tree-sitter CLI — needed by nvim-treesitter to compile parsers
       # (CypherIDE uses lazy.nvim + nvim-treesitter which calls this at runtime)
       tree-sitter
 
       # Mason's external tool installers need these in PATH
-      unzip   # many Mason packages are distributed as zip archives
+      unzip # many Mason packages are distributed as zip archives
       wget
       curl
       git
     ];
 
-    # plugins: intentionally empty.
+    # plugins:
     # CypherIDE uses lazy.nvim (declared in init.lua) to manage its own plugins.
-    # Mixing Nix-managed and lazy.nvim-managed plugins in the same config causes
-    # load order conflicts. Keep Nix out of the plugin layer for CypherIDE.
-    plugins = [];
+    # Beware Mixing Nix-managed and lazy.nvim-managed plugins in the same config
+    #causes load order conflicts.
+    plugins = with pkgs.vimPlugins [
+      # Install lazy.nvim via Nix so the bootstrap git clone is never needed.
+      # lazy.nvim will still manage all other plugins itself at runtime.
+      lazy-nvim
+    ];
 
     # extraConfig: intentionally empty.
     # CypherIDE's init.lua lives in configs/editor/cypher-ide/ and is deployed
     # via xdg.configFile below. Don't put Lua here — it would be prepended to
     # every NVIM_APPNAME config, including the distros.
     extraConfig = "";
+
+    # If ever needed:
+    # extraLuaConfig = ''
+    #  require("lazy").setup({
+    #    spec = {
+    #     { "nvim-treesitter/nvim-treesitter", opts = { ensure_installed = { "bash", "cmake" } } },
+    #     -- Add other plugins here
+    #    }
+    #  })
+    # '';
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -120,16 +139,17 @@
   # in configs/editor/cypher-ide/ and run home-manager switch.
   # Do NOT edit files at ~/.config/profiles/gnome/cypher-ide/ directly.
   xdg.configFile."cypher-ide" = {
-    #source   = ../../configs/editor/cypher-ide;
-    #recursive = true;  # deploy the whole directory tree, not just a single file
+    source = ../../configs/editor/cypher-ide;
+    recursive = true; # deploy the whole directory tree, not just a single file
 
     # mkOutOfStoreSymlink creates a direct symlink to the source path,
     # NOT a copy in the Nix store. The deployed symlink points straight
     # at your repo directory, which is a real mutable path on disk.
     # This means edits to configs/editor/cypher-ide/ take effect
     # immediately without home-manager switch.
-    source = config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/path/to/CypherOS/configs/editor/cypher-ide";
+    #
+    #source = config.lib.file.mkOutOfStoreSymlink
+    # "${config.home.homeDirectory}/CYPHER_OS/configs/editor/cypher-ide";
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -143,12 +163,12 @@
   # empty (or minimal) so there's no accidental default config to fall back on.
   # Every launch is explicit.
   home.shellAliases = {
-    "cide"   = "NVIM_APPNAME=cypher-ide nvim";
+    "cide" = "NVIM_APPNAME=cypher-ide nvim";
     "nvchad" = "NVIM_APPNAME=nvchad nvim";
-    "lazy"   = "NVIM_APPNAME=lazy nvim";
-    "astro"  = "NVIM_APPNAME=astro nvim";
-    "kick"   = "NVIM_APPNAME=kick nvim";
-    "lunar"  = "NVIM_APPNAME=lunar nvim";
+    "lazy" = "NVIM_APPNAME=lazy nvim";
+    "astro" = "NVIM_APPNAME=astro nvim";
+    "kick" = "NVIM_APPNAME=kick nvim";
+    "lunar" = "NVIM_APPNAME=lunar nvim";
     # mini-ref has no launch alias intentionally — it's a reference library,
     # not a usable editor config. Browse it at ~/.config/profiles/gnome/mini-ref/
   };
