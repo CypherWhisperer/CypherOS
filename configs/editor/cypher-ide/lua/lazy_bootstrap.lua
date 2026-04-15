@@ -19,6 +19,12 @@
 --
 -- For non-NixOS fallback (e.g. if someone runs this config on a plain Linux
 -- machine), we keep the clone logic as a fallback below.
+--
+-- Strategy:
+--   1. Nix installs lazy-nvim into the wrapper rtp via programs.neovim.plugins.
+--      We find it there and prepend its path explicitly before calling setup().
+--   2. If not found via Nix (non-NixOS machine), fall back to cloning.
+--   3. Never use rtp.reset = true — that would wipe the Nix-injected path.
 -- ─────────────────────────────────────────────────────────────────────────
 
 -- Check if lazy.nvim is already on rtp (Nix-provided path)
@@ -26,35 +32,53 @@ local lazy_ok = pcall(require, "lazy")
 
 if not lazy_ok then
   --fallback: not on rtp yet, try standard data path (non-NixOS usage)
-  local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
-  if not (vim.uv or vim.loop).fs_stat(lazypath) then
-    -- Not installed at all — clone it (non-NixOS first launch)
-    vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
-
-    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-    local result = vim.fn.system({ 
-      "git",
-      "clone",
-      "--filter=blob:none",
-      "--branch=stable", 
-      lazyrepo, 
-      lazypath 
-    })
-
-    if vim.v.shell_error ~= 0 then
-      vim.api.nvim_echo({
-        { "Failed to clone lazy.nvim:\n", "ErrorMsg"},
-        { result,                         "WarningMsg" },
-        { "\nPress any key to exit...",   "Normal"},
-      }, true, {})
-      vim.fn.getchar()
-      os.exit(1)
-
-      -- prev
-      -- error("Failed to clone lazy.nvim:\n" .. result)
+  local lazypath
+  -- Step 1: try to find the Nix-provided lazy.nvim in the current rtp.
+  -- The Nix wrapper adds vimPlugins to rtp before init.lua runs, so we
+  -- can search for lazy.nvim's init.lua across all current rtp entries.
+  for _, rtp_entry in ipairs(vim.api.nvim_list_runtime_paths()) do
+    if rtp_entry:match("lazy%.nvim$") then
+      lazypath = rtp_entry
+      break
     end
   end
+
+  -- Step 2: if not found in rtp (non-NixOS), use the standard data path.
+  if not lazypath then
+    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+  
+    if not (vim.uv or vim.loop).fs_stat(lazypath) then
+      -- Not installed at all — clone it (non-NixOS first launch)
+      vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
+
+      local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+      local result = vim.fn.system({ 
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "--branch=stable", 
+        lazyrepo, 
+        lazypath 
+      })
+
+      if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+          { "Failed to clone lazy.nvim:\n", "ErrorMsg"},
+          { result,                         "WarningMsg" },
+          { "\nPress any key to exit...",   "Normal"},
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+
+        -- prev
+        -- error("Failed to clone lazy.nvim:\n" .. result)
+      end
+    end
+  end
+  
+  -- Step 3: ensure lazypath is at the FRONT of rtp.
+  -- vim.opt.rtp:prepend() is idempotent — safe to call even if already present.
   -- prepend to rtp so require("lazy") finds it.
   vim.opt.rtp:prepend(lazypath)
 end
@@ -135,10 +159,16 @@ require("lazy").setup("plugins", {
     reset_packpath = true,   -- reset packpath to only include lazy-managed paths,
                              -- preventing accidental loading of system-installed plugins
     rtp = {
-      reset = true,          -- reset rtp to a clean minimal set
+      reset = false,         -- when set to true: reset rtp to a clean minimal set
                              -- prevents system/distro plugins from leaking in —
                              -- important on NixOS where system Neovim plugins could
                              -- otherwise interfere with your managed setup
+                             -- Set to false tho after some issues with loading lazy
+                             --
+                             -- NOTE: reset = false is intentional and important on NixOS.
+                             -- reset = true would wipe the Nix-injected rtp entries (lazy-nvim,
+                             -- neovim runtime files from the Nix store) before setup completes,
+                             -- causing require("lazy") itself to fail on the internal reload.
       disabled_plugins = {
         -- Built-in plugins you never use. Disabling them shaves startup time.
         -- These are safe to disable in a lazy.nvim-managed config.
