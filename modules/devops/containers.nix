@@ -42,12 +42,16 @@
 #   dive --version
 #   trivy --version
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # ── Module Option ────────────────────────────────────────────────────────────
-  options.devops.containers.enable = lib.mkEnableOption
-    "container tooling (Docker, Podman, image inspection, scanning)";
+  options.devops.containers.enable = lib.mkEnableOption "container tooling (Docker, Podman, image inspection, scanning)";
 
   config = lib.mkIf config.devops.containers.enable {
     # ─────────────────────────────────────────────────────────────────────────────
@@ -101,7 +105,7 @@
       # Podman. When Docker IS running, Docker wins (PATH ordering).
       # Set to false if you find the ambiguity confusing; you can always type
       # `podman` explicitly.
-      dockerCompat = true;
+      #dockerCompat = true;
 
       # defaultNetwork.settings.dns_enabled: enables DNS resolution between
       # containers in the default network. Without this, containers can't
