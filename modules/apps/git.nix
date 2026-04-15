@@ -18,6 +18,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  home.packages = with pkgs; [
+    ## ────────────── GIT ─────────────────────────────────────────────────────
+    git-lfs
+    delta # git pager (pulled in by programs.git.delta but good to be explicit)
+  ];
+
   programs.git = {
     enable = true;
 

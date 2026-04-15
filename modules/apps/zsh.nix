@@ -35,6 +35,19 @@
 }:
 
 {
+  home.packages = with pkgs; [
+    ## ────────────── ZSH ──────────────────────────────
+    pkgs.zsh-powerlevel10k # the p10k theme itself
+    pkgs.keychain # SSH agent manager
+    pkgs.eza # modern ls replacement (used in aliases)
+    # Once hooked into your shell direnv is looking for an .envrc file in your
+    # current directory before every prompt. If found it will load the exported
+    # environment variables from that bash script into your current environment,
+    # and unload them if the .envrc is not reachable from the current path anymore.
+    # In short, this little tool allows you to have project-specific environment
+    # variables.
+    direnv   
+  ];
   # ─────────────────────────────────────────────────────────────────────────────
   # ZSH CORE
   # ─────────────────────────────────────────────────────────────────────────────

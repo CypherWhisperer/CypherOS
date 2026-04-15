@@ -43,6 +43,15 @@
 }:
 
 {
+  home.packages = with pkgs; [
+  
+    # ── Gaming ───────────────────────────────────────────────────────────────
+    steam # unfree; includes steam-run and pressure-vessel
+    wine
+    winetricks
+
+  ];
+
   # ── Core Steam enablement ──────────────────────────────────────────────────
   #
   # programs.steam is a NixOS module (not HM) — it handles:
