@@ -21,17 +21,17 @@
     #fira-code
     nerd-fonts.fira-code        # Fira Code: 
     nerd-fonts.hack             # Hack: 
-    nerd-fonts.source-code-pro  # Source Code Pro: 
-    nerd-fonts.cascadia-code    # Cascadia Code: 
-    nerd-fonts.iosevka          # Iosevka: 
-    nerd-fonts.victor-mono      # Victor Mono: 
+    #nerd-fonts.source-code-pro  # Source Code Pro: 
+    #nerd-fonts.cascadia-code    # Cascadia Code: 
+    #nerd-fonts.iosevka          # Iosevka: 
+    #nerd-fonts.victor-mono      # Victor Mono: 
     nerd-fonts.jetbrains-mono   # JetBrains Mono: 
     nerd-fonts.lilex            # Lilex: 
     nerd-fonts.monaspace        # Monaspace: 
     nerd-fonts.noto             # Noto: 
     nerd-fonts.roboto-mono      # Roboto Mono: 
     nerd-fonts.ubuntu-mono      # Ubuntu Mono: 
-    nerd-fonts.meslo-lg         # Meslo LG: 
+    #nerd-fonts.meslo-lg         # Meslo LG: 
     nerd-fonts.sauce-code-pro   # Sauce Code Pro: 
   ];
 }
