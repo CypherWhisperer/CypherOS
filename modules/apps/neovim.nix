@@ -93,6 +93,11 @@
       wget
       curl
       git
+
+      # For building telescope-fzf-native
+      gnumake
+      gcc
+      libgcc
     ];
 
     # plugins:
@@ -149,8 +154,7 @@
     # This means edits to configs/editor/cypher-ide/ take effect
     # immediately without home-manager switch.
     #
-    source = config.lib.file.mkOutOfStoreSymlink
-     "${config.home.homeDirectory}/CYPHER_OS/configs/editor/cypher-ide";
+    source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/CYPHER_OS/configs/editor/cypher-ide";
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
