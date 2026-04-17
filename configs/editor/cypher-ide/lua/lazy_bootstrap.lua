@@ -58,7 +58,18 @@ if not lazy_ok then
   end
 
   -- Third: if the data path also doesn't exist, clone it (true first launch).
-  if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  --
+  -- As a concequence of an incident of a corrupt lazy clone that prevented 
+  -- Neovim from loading the plugins and configuration (lazy not being there 
+  -- due to the corrupt clone) the below guard was established:
+  --
+  -- This catches the corrupt-clone scenario (directory present, working tree absent)
+  -- and ensures re-cloning is triggered whenever the actual Lua source is missing,
+  -- regardless of whether the directory exists.
+  local lazy_main = lazypath .. "/lua/lazy/init.lua" 
+
+  if not (vim.uv or vim.loop).fs_stat(lazy_main) then -- <-  from lazypath -> lazy_main
+
     -- Not installed at all — clone it (non-NixOS first launch)
     vim.notify("Bootstrapping lazy.nvim...", vim.log.levels.INFO)
 
