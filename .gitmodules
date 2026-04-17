@@ -1,0 +1,3 @@
+[submodule "configs/editor/cypher-ide"]
+	path = configs/editor/cypher-ide
+	url = git@github.com:CypherWhisperer/CypherIDE
