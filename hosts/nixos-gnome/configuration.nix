@@ -57,15 +57,15 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
-  
-    # ── Feature Modules ──────────────────────────────────────────────────────  
+
+    # ── Feature Modules ──────────────────────────────────────────────────────
     ../../modules/gaming/steam.nix
     # DevOps module subtree: containers, kubernetes, databases, iac, secrets.
     # Each subsystem is toggled individually below via devops.<n>.enable.
     ../../modules/devops
 
     # Virtualisation helpers: distrobox, winboat, vagrant, virt-viewer.
-    ../../modules/virtualisation  
+    ../../modules/virtualisation
     ../../modules/virtualisation/kvm.nix
   ];
 
@@ -75,14 +75,14 @@
   # Each line here activates an entire devops subsystem defined in modules/devops/.
   # Set to false (or remove the line) to exclude a subsystem from this host.
   # Useful when building a lighter config for a machine that doesn't need all tooling.
-  devops.containers.enable  = true;  # Docker + Podman stacks, image tooling
-  devops.kubernetes.enable  = false;  # k3s service, kubectl, Helm, k3d, kind
-  devops.databases.enable   = true;  # PostgreSQL + Redis services, DB GUIs
-  devops.iac.enable         = false;  # Terraform, OpenTofu, Ansible, Pulumi
-  devops.secrets.enable     = false;  # sops, age, gnupg, vault
+  devops.containers.enable = true; # Docker + Podman stacks, image tooling
+  devops.kubernetes.enable = false; # k3s service, kubectl, Helm, k3d, kind
+  devops.databases.enable = true; # PostgreSQL + Redis services, DB GUIs
+  devops.iac.enable = false; # Terraform, OpenTofu, Ansible, Pulumi
+  devops.secrets.enable = false; # sops, age, gnupg, vault
 
   # Virtualisation helpers toggle
-  virtualisation.helpers.enable = false;  # distrobox, winboat, vagrant, virt-viewer
+  virtualisation.helpers.enable = false; # distrobox, winboat, vagrant, virt-viewer
 
   # ─────────────────────────────────────────────────────────────────────────────
   # BOOT LOADER
@@ -109,6 +109,47 @@
   # btrfs is built into the mainline kernel — no extra module needed.
   # Add any hardware-specific modules here if required.
   # boot.kernelModules = [ ];
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # ZRAM
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Creates a compressed in-memory swap device. Sits in front of the disk
+  # swapfile in the kernel's swap priority hierarchy — memory pressure hits
+  # ZRAM first, disk swapfile only if ZRAM fills up.
+  #
+  # memoryPercent: how much of total RAM ZRAM may use BEFORE compression.
+  # At 50% on 8GB = 4GB uncompressed input. With zstd typically achieving
+  # 2:1 to 3:1 compression, that's effectively 8-12GB of swap headroom
+  # before the disk swapfile is touched.
+  #
+  # algorithm: zstd is the best default — better compression ratio than lz4
+  # with acceptable CPU overhead. On your i7-7th gen the decompression cost
+  # is negligible compared to a disk read.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+    algorithm = "zstd";
+  };
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # SWAP
+  # ─────────────────────────────────────────────────────────────────────────────
+  # The @swap BTRFS subvolume is mounted at /swap (declared in hardware-configuration.nix).
+  # The swapfile was created during install (fallocate -l 10G + mkswap).
+  # Declaring it here makes NixOS activate it at boot via systemd.
+  #
+  # BTRFS swapfiles have one hard requirement: the file must live on a subvolume
+  # with Copy-on-Write disabled (chattr +C).
+  # This, I handle in my disk setup bash script
+  # on @swap — so this is safe.
+  swapDevices = [
+    {
+      device = "/swap/swapfile";
+      # size is informational here — the file is already sized at 10G on disk,
+      # courtesy of the disk setup script
+      # NixOS won't resize it; it just activates it.
+    }
+  ];
 
   # ─────────────────────────────────────────────────────────────────────────────
   # VENTOY AND OTHER FILESYSTEMS
@@ -148,15 +189,15 @@
 
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
-    LC_ADDRESS        = "en_US.UTF-8";
+    LC_ADDRESS = "en_US.UTF-8";
     LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT    = "en_US.UTF-8";
-    LC_MONETARY       = "en_US.UTF-8";
-    LC_NAME           = "en_US.UTF-8";
-    LC_NUMERIC        = "en_US.UTF-8";
-    LC_PAPER          = "en_US.UTF-8";
-    LC_TELEPHONE      = "en_US.UTF-8";
-    LC_TIME           = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -235,18 +276,18 @@
   #
   # Everything listed here would otherwise be installed system-wide automatically.
   environment.gnome.excludePackages = with pkgs; [
-    gnome-tour      # first-run tour wizard — not needed
-    yelp            # GNOME help browser — documentation you'll never open
-    totem           # GNOME Videos — you use vlc
-    gnome-maps      # GNOME Maps
-    gnome-weather   # GNOME Weather widget
-    gnome-contacts  # GNOME Contacts
-    gnome-music     # GNOME Music — you use spotify
-    epiphany        # GNOME Web (built-in browser) — you use brave/firefox
-    geary           # GNOME Mail client — you use proton-mail
+    gnome-tour # first-run tour wizard — not needed
+    yelp # GNOME help browser — documentation you'll never open
+    totem # GNOME Videos — you use vlc
+    gnome-maps # GNOME Maps
+    gnome-weather # GNOME Weather widget
+    gnome-contacts # GNOME Contacts
+    gnome-music # GNOME Music — you use spotify
+    epiphany # GNOME Web (built-in browser) — you use brave/firefox
+    geary # GNOME Mail client — you use proton-mail
     gnome-calendar
-    simple-scan     # scanner app — keep if thou have a scanner, exclude if not
-    gnome-clocks    # keep or exclude based on preference
+    simple-scan # scanner app — keep if thou have a scanner, exclude if not
+    gnome-clocks # keep or exclude based on preference
     # gnome-characters   # character/emoji picker — borderline useful
   ];
 
@@ -266,11 +307,11 @@
   services.pulseaudio.enable = false; # PipeWire replaces PulseAudio
 
   services.pipewire = {
-    enable              = true;
-    alsa.enable         = true;         # ALSA compatibility layer
-    alsa.support32Bit   = true;         # 32-bit ALSA support (needed for Steam/Wine)
-    pulse.enable        = true;         # PulseAudio compatibility layer
-    wireplumber.enable  = true;
+    enable = true;
+    alsa.enable = true; # ALSA compatibility layer
+    alsa.support32Bit = true; # 32-bit ALSA support (needed for Steam/Wine)
+    pulse.enable = true; # PulseAudio compatibility layer
+    wireplumber.enable = true;
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -298,6 +339,7 @@
   # VIRTUALISATION — KVM / QEMU / libvirt
   # ─────────────────────────────────────────────────────────────────────────────
   #virtualisation.kvm.enable = true;
+
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)
   # ─────────────────────────────────────────────────────────────────────────────
@@ -332,13 +374,79 @@
       "nix-command"
       "flakes"
     ];
+
     # trusted-users allows cypher-whisperer to run nix as a trusted user —
     # necessary for `home-manager switch` to work with the multi-user daemon.
     trusted-users = [
       "root"
       "cypher-whisperer"
     ];
+
+    # ── Build resource ceiling ────────────────────────────────────────────────
+    # 2 parallel jobs × 2 cores each = 4 cores max during any build.
+    # Leaves 4 coreds headroom for GNOME + system processes.
+    # NOTE: Update accordingly. Tune accordingly (max-jobs=4, cores=4)
+    #       according to specific hardware specs
+    # e.g for 16GB+, bump both to 4.
+    #
+    # max-jobs: how many derivations Nix builds IN PARALLEL.
+    # Default is "auto" which means one per CPU core — on your i7-7th gen
+    # (4c/8t) that's 8 parallel builds. On 8GB RAM that's a death sentence
+    # when each job is a Go binary. Setting to 2 means at most 2 derivations
+    # build simultaneously.
+    max-jobs = 2;
+
+    # cores: how many CPU cores each individual build job may use.
+    # Nix passes this as $NIX_BUILD_CORES to the builder. Setting to 2
+    # means each job gets 2 cores max, so worst case: 2 jobs × 2 cores = 4
+    # cores in use, leaving headroom for your DE.
+    cores = 2;
+
+    # ── Binary cache ──────────────────────────────────────────────────────────
+    # substituters: where Nix looks for pre-built binaries.
+    # Explicitly declaring cache.nixos.org and a trusted public key ensures
+    # it's always consulted even in edge cases. On nixos-unstable the cache
+    # lags — packages built in the last few hours may not have a substitute
+    # yet, triggering a source build.
+    substituters = [
+      "https://cache.nixos.org"
+    ];
+
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
+
+    # ── Substitute-or-fail ────────────────────────────────────────────────────
+    # Do NOT silently fall back to a source build on cache miss or network error.
+    # Forces an explicit decision when a binary isn't cached yet.
+    #
+    # Instead of silently falling into a RAM-crushing source build on cache miss,
+    # Nix will hard-error and tell which package has no substitute.
+    # Then you make an explicit decision rather
+    #
+    # To override for a specific rebuild when you're ready to let it build:
+    #   sudo nixos-rebuild switch --flake .#nixos-gnome --option fallback true
+    #
+    # This is the "tell me, don't surprise me" setting.
+    fallback = false;
   };
+
+  # ── Build daemon scheduling ───────────────────────────────────────────────────
+  # Runs the Nix daemon at idle CPU and I/O priority. Builds happen in the
+  # background without competing with DE sessions for responsiveness.
+  #
+  # Deprioritises the Nix daemon for both CPU and disk I/O.
+  # Builds proceed in the background without competing with active session.
+  #
+  # daemonCPUSchedPolicy: runs the Nix build daemon at a lower CPU scheduling
+  # priority (idle = only runs when nothing else wants the CPU).
+  # "idle" is aggressive throttling — good for keeping the DE responsive.
+  # "batch" is a softer alternative if idle feels too slow on a quiet machine.
+  nix.daemonCPUSchedPolicy = "idle";
+
+  # daemonIOSchedClass: same idea but for disk I/O. The build daemon won't
+  # starve your DE's disk reads during a build.
+  nix.daemonIOSchedClass = "idle";
 
   # ─────────────────────────────────────────────────────────────────────────────
   # USER ACCOUNT
@@ -483,17 +591,17 @@
   # SYSTEM PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
   # Packages listed here are installed system-wide (available to all users,
-  # in the system PATH). 
+  # in the system PATH).
   # Keep this minimal — user-space apps belong in Home Manager, not here.
   #
   # What belongs here: tools needed before Home Manager runs, or tools that
   # genuinely require system-level installation.
   environment.systemPackages = with pkgs; [
-    git          # needed to clone the cypher-system flake repo itself
-    curl         # needed for initial Nix/HM bootstrap commands
-    vim          # emergency editor before HM applies neovim
+    git # needed to clone the cypher-system flake repo itself
+    curl # needed for initial Nix/HM bootstrap commands
+    vim # emergency editor before HM applies neovim
     home-manager # the home-manager CLI must be on the system PATH
-    os-prober    # for detecting other OSs in a multi-boot setup
+    os-prober # for detecting other OSs in a multi-boot setup
 
     glib # needed for gdmBackground activation script
   ];
@@ -508,31 +616,31 @@
   fonts.packages = with pkgs; [
     cantarell-fonts
     noto-fonts
-    noto-fonts-color-emoji 
+    noto-fonts-color-emoji
     #(nerdfonts.override {
-    #  fonts = ["JetBrainsMono"];  
+    #  fonts = ["JetBrainsMono"];
     # })
-    # As of November 2024, the nerdfonts package has been separated into 
+    # As of November 2024, the nerdfonts package has been separated into
     # individual packages under the namespace nerd-fonts. If your system throws
-    # errors or warnings about terminus-nerdfont being redundant, you should 
+    # errors or warnings about terminus-nerdfont being redundant, you should
     # replace the override method with the specific package:
     nerd-fonts.jetbrains-mono
 
     #fira-code
-    nerd-fonts.fira-code        # Fira Code: 
-    nerd-fonts.hack             # Hack: 
-    #nerd-fonts.source-code-pro  # Source Code Pro: 
-    #nerd-fonts.cascadia-code    # Cascadia Code: 
-    #nerd-fonts.iosevka          # Iosevka: 
-    #nerd-fonts.victor-mono      # Victor Mono: 
-    nerd-fonts.jetbrains-mono   # JetBrains Mono: 
-    nerd-fonts.lilex            # Lilex: 
-    nerd-fonts.monaspace        # Monaspace: 
-    nerd-fonts.noto             # Noto: 
-    nerd-fonts.roboto-mono      # Roboto Mono: 
-    nerd-fonts.ubuntu-mono      # Ubuntu Mono: 
-    #nerd-fonts.meslo-lg         # Meslo LG: 
-    nerd-fonts.sauce-code-pro   # Sauce Code Pro: 
+    nerd-fonts.fira-code # Fira Code:
+    nerd-fonts.hack # Hack:
+    #nerd-fonts.source-code-pro  # Source Code Pro:
+    #nerd-fonts.cascadia-code    # Cascadia Code:
+    #nerd-fonts.iosevka          # Iosevka:
+    #nerd-fonts.victor-mono      # Victor Mono:
+    nerd-fonts.jetbrains-mono # JetBrains Mono:
+    nerd-fonts.lilex # Lilex:
+    nerd-fonts.monaspace # Monaspace:
+    nerd-fonts.noto # Noto:
+    nerd-fonts.roboto-mono # Roboto Mono:
+    nerd-fonts.ubuntu-mono # Ubuntu Mono:
+    #nerd-fonts.meslo-lg         # Meslo LG:
+    nerd-fonts.sauce-code-pro # Sauce Code Pro:
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
