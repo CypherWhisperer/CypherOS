@@ -57,6 +57,7 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
+    ../../modules/users/cypher-whisperer.nix
   ];
 
 

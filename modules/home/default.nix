@@ -26,9 +26,10 @@
     ../de        # declares cypher-os.de.{gnome,plasma,hyprland}.enable
     ../dm        # declares cypher-os.dm.{gdm,sddm}.enable
     ../apps      # declares cypher-os.apps.* options + wires app modules
-    #../gaming    # declares cypher-os.gaming.enable
-    #../devops    # declares cypher-os.devops.enable
-    #../virtualisation
+    ../gaming    # declares cypher-os.gaming.enable
+    ../devops    # declares cypher-os.devops.enable
+    ../virtualisation
+    # imported directly in configuration.nix for now.
     #../users     # declares the cypher-whisperer user identity
   ];
 
