@@ -1,0 +1,9 @@
+{ ... }:
+
+{
+  imports = [
+    ./gnome
+    # ./hyprland
+    # ./plasma
+  ];
+}

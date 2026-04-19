@@ -43,10 +43,15 @@
 
 {
   # ── Module Option ────────────────────────────────────────────────────────────
-  options.virtualisation.helpers.enable = lib.mkEnableOption
+  options.cypher-os.virtualisation.helpers.enable = lib.mkEnableOption
     "virtualisation helpers (distrobox, winboat, vagrant, virt-viewer)";
 
-  config = lib.mkIf config.virtualisation.helpers.enable {
+  config = lib.mkIf (
+    config.cypher-os.profile.desktop.enable &&
+    config.cypher-os.virtualisation.helpers.enable ) {
+
+    imports = [ ./kvm.nix ];
+    cypher-os.virtualisation.helpers.kvm.enable = lib.mkDefault true;
 
     environment.systemPackages = with pkgs; [
 

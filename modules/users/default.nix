@@ -1,0 +1,7 @@
+{ ... }:
+
+{
+  Imports = [
+    ./cypher-whisperer.nix
+  ];
+}

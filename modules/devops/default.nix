@@ -38,14 +38,40 @@
 #   2. Add it to the imports list below
 #   3. Add its enable option to your host configuration
 
-{ ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  imports = [
-    ./containers.nix
-    ./kubernetes.nix
-    ./databases.nix
-    ./iac.nix
-    ./secrets.nix
-  ];
+  options = {
+    cypher-os.devops.enable = {
+      enable = lib.mkEnableOption "Enable DevOps infrastructure";
+    };
+  };
+
+  config = lib.mkIf config.cypher-os.devops.enable  {
+    imports = [
+      ./containers.nix
+      ./kubernetes.nix
+      ./databases.nix
+      ./iac.nix
+      ./secrets.nix
+    ];
+
+    # Enable the options from the imported modules.
+    # ─────────────────────────────────────────────────────────────────────────────
+    # DEVOPS MODULE TOGGLES
+    # ─────────────────────────────────────────────────────────────────────────────
+    # Each line here activates an entire devops subsystem defined in modules/devops/.
+    # Set to false (or remove the line) to exclude a subsystem from this host.
+    # Useful when building a lighter config for a machine that doesn't need all tooling.
+    cypher-os.devops.containers.enable = lib.mkDefault true; # Docker + Podman stacks, image tooling
+    cypher-os.devops.kubernetes.enable = lib.mkDefault true; # k3s service, kubectl, Helm, k3d, kind
+    cypher-os.devops.databases.enable = lib.mkDefault true; # PostgreSQL + Redis services, DB GUIs
+    cypher-os.devops.iac.enable = lib.mkDefault true; # Terraform, OpenTofu, Ansible, Pulumi
+    cypher-os.devops.secrets.enable = lib.mkDefault true; # sops, age, gnupg, vault
+  };
 }

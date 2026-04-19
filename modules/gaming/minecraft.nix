@@ -51,30 +51,35 @@
 }:
 
 {
-  home.packages = [
-    # ── Option A: Prism Launcher (recommended) ──────────────────────────────
+  options.cypher-os.gaming.minecraft.enable = lib.mkEnableOption "Enable Minecraft and related gaming infrastructure";
 
-    # Prism with extra Java runtimes declared explicitly — avoids Prism's
-    # "download Java for me" behavior which conflicts with Nix store paths.
-    (pkgs.prismlauncher.override {
-      jdks = with pkgs; [
-        # Java 21 — MC 1.20.5+ (current recommended)
-        temurin-bin-21
-        # Java 17 — MC 1.18–1.20.4
-        temurin-bin-17
-        # Java 8 — legacy MC versions < 1.17
-        temurin-bin-8
-      ];
-    })
+  config = lib.mkIf config.cypher-os.gaming.minecraft.enable {
 
-    # ── Option B: ATLauncher (swap in if you prefer modpack-centric workflow) ─
-    # Uncomment this block and comment out Option A to use ATLauncher instead.
-    # Note: ATLauncher tries to install its own JRE into
-    #   ~/.local/share/ATLauncher/runtimes/
-    # Override this in ATLauncher: Settings > Java/Minecraft > Java Path →
-    #   point to a Nix store Java binary (find it with: which java)
-    #   and disable "Use Java Provided By Minecraft".
-    #
-    # pkgs.atlauncher
-  ];
+    home.packages = [
+      # ── Option A: Prism Launcher (recommended) ──────────────────────────────
+
+      # Prism with extra Java runtimes declared explicitly — avoids Prism's
+      # "download Java for me" behavior which conflicts with Nix store paths.
+      (pkgs.prismlauncher.override {
+        jdks = with pkgs; [
+          # Java 21 — MC 1.20.5+ (current recommended)
+          temurin-bin-21
+          # Java 17 — MC 1.18–1.20.4
+          temurin-bin-17
+          # Java 8 — legacy MC versions < 1.17
+          temurin-bin-8
+        ];
+      })
+
+      # ── Option B: ATLauncher (swap in if you prefer modpack-centric workflow) ─
+      # Uncomment this block and comment out Option A to use ATLauncher instead.
+      # Note: ATLauncher tries to install its own JRE into
+      #   ~/.local/share/ATLauncher/runtimes/
+      # Override this in ATLauncher: Settings > Java/Minecraft > Java Path →
+      #   point to a Nix store Java binary (find it with: which java)
+      #   and disable "Use Java Provided By Minecraft".
+      #
+      # pkgs.atlauncher
+    ];
+  };
 }

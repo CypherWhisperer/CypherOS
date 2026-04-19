@@ -50,14 +50,14 @@
 
 {
   # ── Module Option ────────────────────────────────────────────────────────────
-  options.devops.databases.enable = lib.mkEnableOption
+  options.cypher-os.devops.databases.enable = lib.mkEnableOption
     "local development database services (PostgreSQL, Redis, SQLite, MongoDB tools)";
 
-  config = lib.mkIf config.devops.databases.enable {
+  config = lib.mkIf config.cypher-os.devops.databases.enable {
 
     # ── PostgreSQL ─────────────────────────────────────────────────────────────
     # The most capable open-source Relational DBMS. Prisma-based Next.js projects
-    # can target this locally 
+    # can target this locally
     #
     # The NixOS postgresql module manages:
     #   - The PostgreSQL data directory (/var/lib/postgresql/<version>/)

@@ -43,82 +43,92 @@
 }:
 
 {
-  # ── Core Steam enablement ──────────────────────────────────────────────────
-  #
-  # programs.steam is a NixOS module (not HM) — it handles:
-  #   - The Steam package itself
-  #   - 32-bit library support (hardware.opengl.driSupport32Bit et al.)
-  #   - hardware.steam-hardware for controller udev rules (Valve Index,
-  #     Steam Controller, DualShock, etc.)
-  #   - allowNonFree is handled separately in nixpkgs.config
-  programs.steam = {
-    # unfree; includes steam-run and pressure-vessel
-    enable = true;
+  options.cypher-os.gaming.steam.enable = lib.mkEnableOption "Enable Steam and gaming infrastructure";
 
-    # Opens UDP 27036 for Steam Remote Play streaming to other devices on LAN.
-    # Disable if you don't use this feature.
-    remotePlay.openFirewall = true;
+  config = lib.mkIf config.cypher-os.gaming.steam.enable {
 
-    # Opens TCP/UDP 27040 for Steam local network game transfers (fast local
-    # game installs from another PC on the same network).
-    localNetworkGameTransfers.openFirewall = true;
-
-    # Declaratively pin the set of extra Proton compatibility layers available
-    # to Steam. proton-ge-bin is the community "GloriousEggroll" build which
-    # adds patches for games that upstream Proton doesn't cover yet (anti-cheat
-    # exceptions, Windows media codec support, etc.).
-    #
-    # Note: proton-ge-bin comes from nixpkgs; for the absolute latest GE builds
-    # before they land in nixpkgs, use protonup-qt imperatively (see below).
-    extraCompatPackages = with pkgs; [
-      proton-ge-bin
+    # Importing the steam-data.nix Home Manager module
+    imports = [
+      ./steam-data.nix
     ];
 
-    # Uncomment to add extra libraries into Steam's FHS environment if a game
-    # refuses to launch due to missing .so files. Common candidates:
-    #   pkgs.libgdiplus   — .NET/Mono games
-    #   pkgs.mono         — same
-    #   pkgs.SDL2         — older SDL2 games
-    # extraLibraries = p: with p; [ ];
-  };
-
-  # ── GameMode ──────────────────────────────────────────────────────────────
-  #
-  # Feral's GameMode daemon: games that support it (or that you launch via
-  # gamemoderun) request a temporary performance profile — CPU governor →
-  # performance, GPU overclocking hints, scheduler tuning. Reverts on exit.
-  # Steam launch option to enable per-game: gamemoderun %command%
-  programs.gamemode.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    # ── steam-run ─────────────────────────────────────────────────────────────
+    # ── Core Steam enablement ──────────────────────────────────────────────────
     #
-    # FHS-compatible chroot environment for running native Linux game binaries
-    # that expect a standard filesystem layout (glibc at /lib, etc.). NixOS's
-    # Nix store layout breaks these assumptions; steam-run wraps them correctly.
+    # programs.steam is a NixOS module (not HM) — it handles:
+    #   - The Steam package itself
+    #   - 32-bit library support (hardware.opengl.driSupport32Bit et al.)
+    #   - hardware.steam-hardware for controller udev rules (Valve Index,
+    #     Steam Controller, DualShock, etc.)
+    #   - allowNonFree is handled separately in nixpkgs.config
+    programs.steam = {
+      # unfree; includes steam-run and pressure-vessel
+      enable = true;
+
+      # Opens UDP 27036 for Steam Remote Play streaming to other devices on LAN.
+      # Disable if you don't use this feature.
+      remotePlay.openFirewall = true;
+
+      # Opens TCP/UDP 27040 for Steam local network game transfers (fast local
+      # game installs from another PC on the same network).
+      localNetworkGameTransfers.openFirewall = true;
+
+      # Declaratively pin the set of extra Proton compatibility layers available
+      # to Steam. proton-ge-bin is the community "GloriousEggroll" build which
+      # adds patches for games that upstream Proton doesn't cover yet (anti-cheat
+      # exceptions, Windows media codec support, etc.).
+      #
+      # Note: proton-ge-bin comes from nixpkgs; for the absolute latest GE builds
+      # before they land in nixpkgs, use protonup-qt imperatively (see below).
+      extraCompatPackages = with pkgs; [
+        proton-ge-bin
+      ];
+
+      # Uncomment to add extra libraries into Steam's FHS environment if a game
+      # refuses to launch due to missing .so files. Common candidates:
+      #   pkgs.libgdiplus   — .NET/Mono games
+      #   pkgs.mono         — same
+      #   pkgs.SDL2         — older SDL2 games
+      # extraLibraries = p: with p; [ ];
+    };
+
+    # ── GameMode ──────────────────────────────────────────────────────────────
     #
-    # Usage: steam-run ./NFS_MW_binary   or   steam-run %command% in Steam
-    # NFS MW specifically may need this if its binary isn't a Steam-managed title.
-    steam-run
+    # Feral's GameMode daemon: games that support it (or that you launch via
+    # gamemoderun) request a temporary performance profile — CPU governor →
+    # performance, GPU overclocking hints, scheduler tuning. Reverts on exit.
+    # Steam launch option to enable per-game: gamemoderun %command%
+    programs.gamemode.enable = true;
 
-    # ProtonUp-Qt: GUI to install/remove Proton GE, Wine GE, and other
-    # compatibility tool versions into ~/.steam/root/compatibilitytools.d/.
-    # Use this for GE versions not yet in nixpkgs, or for Wine-based launchers.
-    protonup-qt
+    environment.systemPackages = with pkgs; [
+      # ── steam-run ─────────────────────────────────────────────────────────────
+      #
+      # FHS-compatible chroot environment for running native Linux game binaries
+      # that expect a standard filesystem layout (glibc at /lib, etc.). NixOS's
+      # Nix store layout breaks these assumptions; steam-run wraps them correctly.
+      #
+      # Usage: steam-run ./NFS_MW_binary   or   steam-run %command% in Steam
+      # NFS MW specifically may need this if its binary isn't a Steam-managed title.
+      steam-run
 
-    # MangoHud: Vulkan/OpenGL overlay showing FPS, frame times, GPU/CPU temps
-    # and load. Enable per-game in Steam: MANGOHUD=1 %command%
-    mangohud
-    wine
-    winetricks
-  ];
+      # ProtonUp-Qt: GUI to install/remove Proton GE, Wine GE, and other
+      # compatibility tool versions into ~/.steam/root/compatibilitytools.d/.
+      # Use this for GE versions not yet in nixpkgs, or for Wine-based launchers.
+      protonup-qt
 
-  # ── Kernel-level gaming optimizations ─────────────────────────────────────
-  #
-  # vm.max_map_count: Steam (and some games like CS2, Elden Ring) require a
-  # higher max memory map count than the kernel default of 65530.
-  # 2147483642 is the value Valve recommends; Steam itself will warn if it's too low.
-  boot.kernel.sysctl = {
-    "vm.max_map_count" = 2147483642;
+      # MangoHud: Vulkan/OpenGL overlay showing FPS, frame times, GPU/CPU temps
+      # and load. Enable per-game in Steam: MANGOHUD=1 %command%
+      mangohud
+      wine
+      winetricks
+    ];
+
+    # ── Kernel-level gaming optimizations ─────────────────────────────────────
+    #
+    # vm.max_map_count: Steam (and some games like CS2, Elden Ring) require a
+    # higher max memory map count than the kernel default of 65530.
+    # 2147483642 is the value Valve recommends; Steam itself will warn if it's too low.
+    boot.kernel.sysctl = {
+      "vm.max_map_count" = 2147483642;
+    };
   };
 }
