@@ -45,12 +45,11 @@
 {
   options.cypher-os.gaming.steam.enable = lib.mkEnableOption "Enable Steam and gaming infrastructure";
 
-  config = lib.mkIf config.cypher-os.gaming.steam.enable {
+  imports = [
+    # ./steam-data.nix  # Removed: this is HM-only, imported in steam-hm.nix
+  ];
 
-    # Importing the steam-data.nix Home Manager module
-    imports = [
-      ./steam-data.nix
-    ];
+  config = lib.mkIf config.cypher-os.gaming.steam.enable {
 
     # ── Core Steam enablement ──────────────────────────────────────────────────
     #

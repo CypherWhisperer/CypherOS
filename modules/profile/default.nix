@@ -17,20 +17,9 @@
 { config, lib, ... }:
 
 {
-  options = {
-
-    cypher-os.profile.desktop = {
-      enable = lib.mkEnableOption "CypherOS desktop profile (DE + DM + GUI apps)";
-      # Sets up a full desktop environment with apps and display manager.
-      # Override individual options in configuration.nix after setting this.
-    };
-
-    cypher-os.profile.server = {
-      enable = lib.mkEnableOption "CypherOS server profile (CLI + dev, no DE)";
-      # Minimal headless profile — no DE, no display manager, no GUI apps.
-    };
-
-  };
+  imports = [
+    ./options.nix
+  ];
 
   config = lib.mkMerge [
     # ── Desktop profile defaults ───────────────────────────────────────────
@@ -56,12 +45,17 @@
       cypher-os.apps.dev.enable   = lib.mkDefault true;
       cypher-os.apps.editor.enable    = lib.mkDefault true;
       cypher-os.apps.terminal.enable  = lib.mkDefault true;
-      cypher-os.apps.browsers.enable   = lib.mkDefault true;
+      cypher-os.apps.browser.enable   = lib.mkDefault true;
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
       cypher-os.devops.enable = lib.mkDefault true;
+      cypher-os.devops.containers.enable = lib.mkDefault true;
+      cypher-os.devops.kubernetes.enable = lib.mkDefault true;
+      cypher-os.devops.databases.enable  = lib.mkDefault true;
+      cypher-os.devops.iac.enable        = lib.mkDefault true;
+      cypher-os.devops.secrets.enable    = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # VIRTUALISATION HELPERS TOGGLE
       # ─────────────────────────────────────────────────────────────────────────────
@@ -88,6 +82,11 @@
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
       cypher-os.devops.enable = lib.mkDefault true;
+      cypher-os.devops.containers.enable = lib.mkDefault true;
+      cypher-os.devops.kubernetes.enable = lib.mkDefault true;
+      cypher-os.devops.databases.enable  = lib.mkDefault true;
+      cypher-os.devops.iac.enable        = lib.mkDefault true;
+      cypher-os.devops.secrets.enable    = lib.mkDefault true;
     })
   ];
 }

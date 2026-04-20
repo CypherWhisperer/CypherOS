@@ -50,10 +50,9 @@
 }:
 
 {
-  # ── Module Option ────────────────────────────────────────────────────────────
-  options.cypher-os.devops.containers.enable = lib.mkEnableOption "container tooling (Docker, Podman, image inspection, scanning)";
-
-  config = lib.mkIf config.cypher-os.devops.containers.enable {
+  config = lib.mkIf (
+    config.cypher-os.devops.enable &&
+    config.cypher-os.devops.containers.enable ) {
     # ─────────────────────────────────────────────────────────────────────────────
     # DOCKER
     # ─────────────────────────────────────────────────────────────────────────────

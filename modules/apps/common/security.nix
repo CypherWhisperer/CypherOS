@@ -2,9 +2,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.common.security.enable =
-    lib.mkEnableOption "CypherOS Common Security-Oriented Applications";
-
   config = lib.mkMerge [
     (lib.mkIf config.cypher-os.apps.common.security.enable {
 

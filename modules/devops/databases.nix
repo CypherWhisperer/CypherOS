@@ -49,11 +49,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ── Module Option ────────────────────────────────────────────────────────────
-  options.cypher-os.devops.databases.enable = lib.mkEnableOption
-    "local development database services (PostgreSQL, Redis, SQLite, MongoDB tools)";
-
-  config = lib.mkIf config.cypher-os.devops.databases.enable {
+  config = lib.mkIf (
+    config.cypher-os.devops.enable &&
+    config.cypher-os.devops.databases.enable ) {
 
     # ── PostgreSQL ─────────────────────────────────────────────────────────────
     # The most capable open-source Relational DBMS. Prisma-based Next.js projects

@@ -31,9 +31,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.dev.ssh.enable = lib.mkEnableOption "Enable SSH client configuration";
-
-  config = lib.mkIf config.cypher-os.apps.dev.ssh.enable ) {
+  config = lib.mkIf (
+    config.cypher-os.apps.dev.enable &&
+    config.cypher-os.apps.dev.ssh.enable ) {
 
     programs.ssh = {
       enable = true;

@@ -58,11 +58,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ── Module Option ────────────────────────────────────────────────────────────
-  options.cypher-os.devops.kubernetes.enable = lib.mkEnableOption
-    "Kubernetes tooling (k3s, kubectl, Helm, k3d, kind, cluster utilities)";
-
-  config = lib.mkIf config.cypher-os.devops.kubernetes.enable {
+  config = lib.mkIf (
+    config.cypher-os.devops.enable &&
+    config.cypher-os.devops.kubernetes.enable ) {
 
     # ── k3s Service ────────────────────────────────────────────────────────────
     # k3s runs as a system service. This makes it start on boot and be managed

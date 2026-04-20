@@ -18,9 +18,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.dev.git.enable = lib.mkEnableOption "Git Version Control System";
-
-  config = lib.mkIf config.cypher-os.apps.dev.git.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.dev.enable &&
+    config.cypher-os.apps.dev.git.enable ) {
 
     home.packages = with pkgs; [
       ## ────────────── GIT ─────────────────────────────────────────────────────

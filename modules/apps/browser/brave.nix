@@ -74,9 +74,9 @@ let
 
 in
 {
-  options.cypher-os.apps.browser.brave.enable = lib.mkEnableOption "Enable Brave browser";
-
-  config = lib.mkIf config.cypher-os.apps.browser.brave.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.browser.enable &&
+    config.cypher-os.apps.browser.brave.enable ) {
 
       # ── Package ───────────────────────────────────────────────────────────────
       home.packages = with pkgs; [ brave ];

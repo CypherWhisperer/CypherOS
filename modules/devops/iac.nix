@@ -36,11 +36,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ── Module Option ────────────────────────────────────────────────────────────
-  options.cypher-os.devops.iac.enable = lib.mkEnableOption
-    "Infrastructure as Code tooling (Terraform, OpenTofu, Ansible, Pulumi)";
-
-  config = lib.mkIf config.cypher-os.devops.iac.enable {
+  config = lib.mkIf (
+    config.cypher-os.devops.enable &&
+    config.cypher-os.devops.iac.enable ) {
 
     environment.systemPackages = with pkgs; [
 

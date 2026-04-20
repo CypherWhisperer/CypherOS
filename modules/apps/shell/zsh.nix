@@ -35,9 +35,9 @@
 }:
 
 {
-  options.cypher-os.apps.shell.zsh.enable = lib.mkEnableOption "Zsh shell environment for CypherOS";
-
-  config = lib.mkIf config.cypher-os.apps.shell.zsh.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.shell.enable &&
+    config.cypher-os.apps.shell.zsh.enable ) {
 
     home.packages = with pkgs; [
       ## ────────────── ZSH ──────────────────────────────

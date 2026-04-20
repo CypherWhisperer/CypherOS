@@ -15,9 +15,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.terminal.kitty.enable = lib.mkEnableOption "CypherOS Kitty terminal emulators";
-
-  config = lib.mkIf config.cypher-os.apps.terminal.kitty.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.terminal.enable &&
+    config.cypher-os.apps.terminal.kitty.enable ) {
 
     programs.kitty = {
       enable = true;

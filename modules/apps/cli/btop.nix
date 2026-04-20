@@ -32,9 +32,9 @@ let
 
 in
 {
-  options.cypher-os.apps.cli.btop.enable = lib.mkEnableOption "Enable btop CLI system monitor";
-
-  config = lib.mkIf config.cypher-os.apps.cli.btop.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.cli.enable &&
+    config.cypher-os.apps.cli.btop.enable ) {
 
       home.packages = with pkgs; [
         btop # interactive resource monitor

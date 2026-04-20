@@ -1,9 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.common.proton.enable =
-    lib.mkEnableOption "CypherOS Proton Ecosystem Applications";
-
   config = lib.mkIf (
     config.cypher-os.profile.desktop.enable &&
     config.cypher-os.apps.common.proton.enable ) {

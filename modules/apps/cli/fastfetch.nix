@@ -38,9 +38,9 @@
 }:
 
 {
-  options.cypher-os.apps.cli.fastfetch.enable = lib.mkEnableOption "Enable fastfetch system info display";
-
-  config = lib.mkIf config.cypher-os.apps.cli.fastfetch.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.cli.enable &&
+    config.cypher-os.apps.cli.fastfetch.enable) {
 
       home.packages = with pkgs; [
         fastfetch # system info display (neofetch successor)

@@ -21,9 +21,6 @@
 }:
 
 {
-  options.cypher-os.apps.common.xdg.enable =
-      lib.mkEnableOption "CypherOS Common XDG Configurations";
-
   config = lib.mkIf (
     config.cypher-os.apps.common.xdg.enable &&
     config.cypher-os.profile.desktop.enable ) {

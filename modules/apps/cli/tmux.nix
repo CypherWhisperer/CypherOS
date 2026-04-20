@@ -47,9 +47,9 @@ in
 
 
 {
-  options.cypher-os.apps.cli.tmux = lib.mkEnableOption "Enable tmux terminal multiplexer";
-
-  config = lib.mkIf config.cypher-os.apps.cli.tmux.enable{
+  config = lib.mkIf (
+    config.cypher-os.apps.cli.enable &&
+    config.cypher-os.apps.cli.tmux.enable ) {
 
       programs.tmux = {
         enable = true;

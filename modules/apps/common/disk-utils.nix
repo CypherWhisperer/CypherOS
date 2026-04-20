@@ -1,9 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.common.diskUtils.enable =
-      lib.mkEnableOption "CypherOS Common Disk Utilities";
-
   config = lib.mkMerge [
     (lib.mkIf config.cypher-os.apps.common.diskUtils.enable {
 

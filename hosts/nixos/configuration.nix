@@ -58,8 +58,12 @@
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
     ../../modules/users/cypher-whisperer.nix
+    ../../modules/gaming/steam.nix
+    ../../modules/devops/system.nix
+    ../../modules/virtualisation/system.nix
+    ../../modules/de/gnome/system.nix
+    ../../modules/dm/gdm/system.nix
   ];
-
 
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)
@@ -131,10 +135,12 @@
     # yet, triggering a source build.
     substituters = [
       "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
     ];
 
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Bg="
     ];
 
     # ── Substitute-or-fail ────────────────────────────────────────────────────

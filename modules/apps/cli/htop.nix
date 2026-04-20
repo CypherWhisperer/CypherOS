@@ -14,9 +14,9 @@
 }:
 
 {
-  options.cypher-os.apps.cli.htop.enable = lib.mkEnableOption "Enable htop process viewer";
-
-  config = lib.mkIf config.cypher-os.apps.cli.htop.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.cli.enable &&
+    config.cypher-os.apps.cli.htop.enable) {
 
       programs.htop = {  # lighter resource monitor
         enable = true;

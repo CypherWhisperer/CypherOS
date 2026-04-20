@@ -15,9 +15,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.productivity.obsidian.enable = lib.mkEnableOption "Obsidian Desktop App";
-
-  config = lib.mkIf config.cypher-os.apps.productivity.obsidian.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.productivity.enable &&
+    config.cypher-os.apps.productivity.obsidian.enable ) {
 
     programs.obsidian = {
       enable  = true;

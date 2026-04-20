@@ -27,9 +27,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.editor.vim.enable = lib.mkEnableOption "CypherOS Vim editor";
-
-  config = lib.mkIf config.cypher-os.apps.editor.vim.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.editor.enable &&
+    config.cypher-os.apps.editor.vim.enable ) {
 
     programs.vim = {
       enable = true;

@@ -630,9 +630,8 @@ let
 
 in
 {
-  options.cypher-os.apps.editor.vscode.enable = lib.mkEnableOption "CypherOS VSCode editor configuration";
-
   config = lib.mkIf (
+    config.cypher-os.apps.editor.enable &&
     config.cypher-os.profile.desktop.enable &&
     config.cypher-os.apps.editor.vscode.enable ) {
 

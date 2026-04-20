@@ -48,9 +48,9 @@
 }:
 
 {
-  options.cypher-os.apps.editor.neovim.enable = lib.mkEnableOption "CypherOS Neovim editor";
-
-  config = lib.mkIf config.cypher-os.apps.editor.neovim.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.editor.enable &&
+     config.cypher-os.apps.editor.neovim.enable ) {
 
     # ─────────────────────────────────────────────────────────────────────────────
     # NEOVIM BINARY

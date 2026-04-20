@@ -14,9 +14,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.terminal.ghostty.enable = lib.mkEnableOption "CypherOS Ghostty terminal emulator";
-
-  config = lib.mkIf config.cypher-os.apps.terminal.ghostty.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.terminal.enable &&
+    config.cypher-os.apps.terminal.ghostty.enable ) {
 
     programs.ghostty = {
       enable = true;

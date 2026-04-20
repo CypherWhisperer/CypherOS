@@ -13,9 +13,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.productivity.claude.enable = lib.mkEnableOption "Claude Desktop";
-
-  config = lib.mkIf config.cypher-os.apps.productivity.claude.enable {
+  config = lib.mkIf (
+    config.cypher-os.apps.productivity.enable &&
+    config.cypher-os.apps.productivity.claude.enable ) {
 
     # ── Package ──────────────────────────────────────────────────────────────
     # The package is injected into pkgs by the system-level overlay.

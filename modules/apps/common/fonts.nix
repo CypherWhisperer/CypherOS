@@ -1,9 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  options.cypher-os.apps.common.fonts.enable =
-      lib.mkEnableOption "CypherOS Common Fonts";
-
   config = lib.mkIf config.cypher-os.apps.common.fonts.enable {
 
     home.packages = with pkgs; [

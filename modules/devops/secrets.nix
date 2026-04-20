@@ -85,11 +85,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ── Module Option ────────────────────────────────────────────────────────────
-  options.cypher-os.devops.secrets.enable = lib.mkEnableOption
-    "secrets management tooling (sops-nix, age, Vault)";
-
-  config = lib.mkIf config.cypher-os.devops.secrets.enable {
+  config = lib.mkIf (
+    config.cypher-os.devops.enable &&
+    config.cypher-os.devops.secrets.enable ) {
 
     # ── sops-nix Configuration ─────────────────────────────────────────────────
     # sops.* options are provided by the sops-nix NixOS module, which must be
