@@ -7,13 +7,10 @@
 
 { lib, ... }:
 {
-  # ══════════════════════════════════════════════════════════════════════════
-  # OPTIONS — what this module exposes to the outside world
-  # ══════════════════════════════════════════════════════════════════════════
   options.cypher-os.de.gnome = {
-      enable = lib.mkEnableOption "GNOME desktop environment";
-      # Future options slot in here:
-      # extensions.enable = lib.mkEnableOption "GNOME Shell extensions";
-      # theme.accent = lib.mkOption { type = lib.types.str; default = "mauve"; ... };
+    enable = lib.mkEnableOption "GNOME desktop environment";
+    # Future options slot in here:
+    # extensions.enable = lib.mkEnableOption "GNOME Shell extensions";
+    # theme.accent = lib.mkOption { type = lib.types.str; default = "mauve"; ... };
   };
 }
