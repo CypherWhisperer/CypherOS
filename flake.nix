@@ -27,8 +27,28 @@
   #   "follows" is a flake mechanism that says "use the same nixpkgs input
   #   as the parent flake, don't fetch your own copy."
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11"; # stable channel
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; # unstable channel
+    # ─────────────────────────────────────────────────────────────────────────────
+    # STABLE CHANNEL
+    # ─────────────────────────────────────────────────────────────────────────────
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    # UNSTABLE CHANNEL
+    # ─────────────────────────────────────────────────────────────────────────────
+    # Instead of: nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # You pin to a specific commit where Hydra completed cleanly.
+    #
+    # To find a good commit:
+    #   1. Go to https://hydra.nixos.org/jobset/nixos/unstable/evals
+    #   2. Find the latest evaluation where the "tested" column shows ✔
+    #      (meaning ALL required test jobs passed)
+    #   3. Click it → note the nixpkgs commit hash
+    #   4. Paste it here
+    #
+    # Update periodically (weekly or when you need a new package version):
+    #   nix flake update
+    # But only update when you've verified Hydra has finished that commit.
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
       #url = "github:nix-community/home-manager/release-24.11";
