@@ -184,6 +184,13 @@
     #
     # This is the "tell me, don't surprise me" setting.
     fallback = false;
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Store Optimization
+    # ─────────────────────────────────────────────────────────────────────────
+    # Deduplicates identical files in /nix/store
+    # Saves space without deleting anything
+    auto-optimise-store = true;
   };
 
   # ── Build daemon scheduling ───────────────────────────────────────────────────
@@ -218,8 +225,45 @@
     grub.efiSupport = true;
     grub.device = "nodev";
     grub.useOSProber = false; # enable on a multiboot machine
+    # ─────────────────────────────────────────────────────────────────────────
+    # Bootloader Generation Retention
+    # ─────────────────────────────────────────────────────────────────────────
+    # CRITICAL:
+    # Number of system generations shown in GRUB.
+    # Increase this to avoid losing fallback states.
+    grub.configurationLimit = 10;
     efi.canTouchEfiVariables = true;
     efi.efiSysMountPoint = "/boot";
+  };
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Nix Garbage Collection (GC)
+  # ─────────────────────────────────────────────────────────────────────────
+  nix.gc = {
+    # ───────────────────────────────────────────────────────────────────────
+    # Optional: Extra Safety for Dev
+    # ───────────────────────────────────────────────────────────────────────
+    # This disables automatic GC entirely.
+    # You will need to manually run:
+    #   nix-collect-garbage -d
+    # Useful when you want FULL control over what gets deleted.
+    # Keep as false for heavy experimentation
+    automatic = false; # if true: Run GC automatically via systemd timer
+    #dates = "weekly";      # Frequency: "daily", "weekly", or cron syntax
+
+    # Retention policy:
+    # Keep anything newer than 7 days.
+    # This gives you a rollback window during active development.
+    options = "--delete-older-than 7d";
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Optional: Protect Against Accidental Pruning
+    # ─────────────────────────────────────────────────────────────────────────
+    #
+    # You can create GC roots manually for critical builds:
+    #   nix-store --add-root /nix/var/nix/gcroots/my-safe-system --realise <drv>
+    #
+    # Anything referenced by a GC root is NEVER deleted.
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
