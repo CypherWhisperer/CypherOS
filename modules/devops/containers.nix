@@ -50,9 +50,7 @@
 }:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.devops.enable &&
-    config.cypher-os.devops.containers.enable ) {
+  config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.containers.enable) {
     # ─────────────────────────────────────────────────────────────────────────────
     # DOCKER
     # ─────────────────────────────────────────────────────────────────────────────
@@ -91,6 +89,11 @@
         # with a systemd timer or `docker system prune` manually.
       };
     };
+
+    users.users.cypher-whisperer.extraGroups = [
+      "docker" # run docker without sudo
+      "podman" # rootless podman group (created by containers.nix)
+    ];
 
     # ── Podman Daemon ──────────────────────────────────────────────────────────
     # Daemonless by default — each `podman` invocation forks its own process.
