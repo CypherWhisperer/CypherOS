@@ -235,7 +235,12 @@
         # SKIP_SETCAP must be set. On a personal machine, grant it.
         "--cap-add=IPC_LOCK"
 
-        "--restart=unless-stopped"
+        # --restart is intentionally absent here.
+        # The NixOS oci-containers module uses --rm on `docker run` so systemd
+        # owns the container lifecycle. Docker's --restart and --rm are mutually
+        # exclusive. Restart behaviour is declared at the systemd unit level instead.
+        #
+        #"--restart=unless-stopped"
 
         # Memory ceiling — vault itself is lean, but give it room for caching
         "--memory=512m"

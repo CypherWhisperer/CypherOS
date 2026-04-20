@@ -96,7 +96,7 @@
     # Run n8n as an OCI container rather than a Nix derivation.
     # This bypasses the nixpkgs n8n package (which is broken on Hydra)
     # entirely. Docker images are fetched from Docker Hub — no Nix build.
-    virtualisation.oci-containers.backend = "docker";  # or "podman" for rootless
+    virtualisation.oci-containers.backend = "docker"; # or "podman" for rootless
     virtualisation.oci-containers.containers.n8n = {
       # -----------------------------------------------------------------------
       # Image
@@ -248,8 +248,12 @@
 
       # extraOptions passes additional flags directly to `docker run`.
       extraOptions = [
-        # Ensure the container restarts automatically if it crashes.
-        "--restart=unless-stopped"
+        # --restart is intentionally absent here.
+        # The NixOS oci-containers module uses --rm on `docker run` so systemd
+        # owns the container lifecycle. Docker's --restart and --rm are mutually
+        # exclusive. Restart behaviour is declared at the systemd unit level instead.
+        #"--restart=unless-stopped"  # Ensure the container restarts automatically if it crashes.
+        #
         # Set a memory ceiling to prevent n8n from consuming all RAM on your
         # 8GB machine if a workflow goes haywire.
         "--memory=1g"
