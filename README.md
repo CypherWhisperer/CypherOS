@@ -302,6 +302,7 @@ mkfs.btrfs -f /dev/sda2     # BTRFS partition
 | `@nixos-root` | `/`         | NixOS system root                                   |
 | `@home`       | `/home`     | Shared home directory — all OSs mount this          |
 | `@nix-store`  | `/nix`      | Shared Nix store — all OSs share installed packages |
+| `@swap`       | `/swap`     | Swap Partition                                      |
 
 The shared `@nix-store` is the key to the CypherOS architecture: packages built once are available to every OS that mounts `/nix`. Adding a second OS does not re-download or re-build anything already present.
 
@@ -460,3 +461,4 @@ SSH private keys (`~/.ssh/id_ed25519` etc.) are **never tracked in this reposito
 In the full CypherOS architecture, `@home` is shared across all OSs. This means SSH keys generated once are automatically available on every OS that mounts `@home` — no copying or re-generation required.
 
 The `identity/shadow` file is gitignored for the same reason — it contains password hashes.
+
