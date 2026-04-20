@@ -82,12 +82,19 @@
 #   sops --version
 #   vault --version
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.devops.enable &&
-    config.cypher-os.devops.secrets.enable ) {
+  imports = [
+    ./vault.nix
+  ];
+
+  config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.secrets.enable) {
 
     # ── sops-nix Configuration ─────────────────────────────────────────────────
     # sops.* options are provided by the sops-nix NixOS module, which must be
@@ -157,7 +164,31 @@
       # For a local Vault dev server: vault server -dev
       # Usage: vault kv put secret/my-app api_key=abc123
       #        vault kv get secret/my-app
-      vault
+      #
+      # Since hydra does not build the package due to a change in licensing,
+      # We have two options:
+      #   1. Build from source (compute and time)
+      #   2. Use the (container) 'hack'
+      # Currently going with option 2 - hence the import. Uncomment for build and run:
+      #
+      # Build vault in isolation — one job, two cores, explicitly allow the source build.
+      # Do this when the machine is idle
+      #      nix build nixpkgs#vault \
+      #        --option max-jobs 1 \
+      #        --option cores 2 \
+      #        --option fallback true \
+      #        --option sandbox true
+      #
+      #vault
+
+      # vault ≥ 1.15 is BSL/unfree. Hydra last built 1.14.8.
+      # If you need vault for secrets management, you have two real options:
+      # use the vault package with nixpkgs.config.allowUnfree = true and accept
+      # that it will build from source (it's Go, so it will compile, just takes time and RAM),
+      # or switch to bws (Bitwarden Secrets Manager CLI) or age/sops-nix for secrets
+      # management — both of which are fully free, Hydra-cached, and arguably better
+      # suited to a NixOS declarative workflow than vault anyway.
+      bws # Alternative to vault.
 
       mkcert # generate locally-trusted TLS certs for dev
     ];
