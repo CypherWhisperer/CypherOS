@@ -10,37 +10,167 @@ This repository is the single source of truth for the entire system. It is a Nix
 
 ```
 CypherOS/
-├── flake.nix                        # Entry point — defines all hosts and home configs
-├── flake.lock                       # Pinned input revisions — always commit this
+├── flake.nix                           # Entry point — defines all hosts and home configs
+├── flake.lock                          # Pinned input revisions — always commit this
 ├── hosts/
-│   ├── nixos-gnome/
-│   │   ├── configuration.nix        # NixOS system config (GNOME sub-task host)
-│   │   └── hardware-configuration.nix  # Machine-generated — gitignored
 │   ├── nixos/
-│   │   └── configuration.nix        # Future: full CypherOS NixOS host
+│   │   ├── configuration.nix           # Full CypherOS NixOS host
+│   │   └── hardware-configuration.nix  # Machine-generated
+│   │
 │   ├── arch/
-│   │   └── home.nix                 # Future: Arch Linux Home Manager config
+│   │   └── home.nix                    # Future: Arch Linux Home Manager config
+│   │
 │   ├── debian/
-│   │   └── home.nix                 # Future: Debian Home Manager config
+│   │   └── home.nix                    # Future: Debian Home Manager config
+│   │
 │   └── fedora/
-│       └── home.nix                 # Future: Fedora Home Manager config
+│       └── home.nix                    # Future: Fedora Home Manager config
+│
 ├── modules/
+│   ├── profile/
+│   │   ├── default.nix           # Entry Point for profile/
+│   │   └── options.nix           # Profile-Related options
+│   │
 │   ├── users/
-│   │   └── cypher-whisperer.nix     # Canonical user declaration
+│   │   ├── default.nix           # Entry Point for user/
+│   │   └── cypher-whisperer.nix  # Canonical user declaration
+│   │
+│   ├── home/
+│   │   └── default.nix        # Entry point for home/
+│   │
 │   ├── de/
-│   │   ├── gnome.nix                # GNOME — extensions, dconf, theming, packages
-│   │   ├── hyprland.nix             # Future: Hyprland
-│   │   └── plasma.nix               # Future: KDE Plasma
-│   ├── shell/
-│   │   └── default.nix              # Future: zsh, git, SSH, keychain
-│   ├── terminal/
-│   │   └── default.nix              # Future: kitty, ghostty config
-│   └── common/
-│       └── default.nix              # Future: shared packages across all hosts
+│   │   ├── default.nix        # Entry point for de/
+│   │   ├── assets             # DE-related assets (wallpaper, avatar img, ...)
+│   │   ├── gnome/
+│   │   │   ├── default.nix    # Gnome Entry point
+│   │   │   ├── options.nix    # Gnome-related options declaration.
+│   │   │   ├── system.nix     # System concerns (install, sys-level configs)
+│   │   │   └── hm.nix         # Home Manager Concerns
+│   │   │
+│   │   ├── hyprland/
+│   │   │   ├── default.nix    # Hyprland Entry point
+│   │   │   ├── options.nix    # Hyprland-related options declaration.
+│   │   │   ├── system.nix     # System concerns (install, sys-level configs)
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── celestia.nix   # Config Variant: Celstia Shell
+│   │   │   ├── hyde.nix       # Config Variant: HyDE
+│   │   │   └── vanilla.nix    # Config Variant: Vanilla
+│   │   │
+│   │   └── plasma/
+│   │       ├── default.nix    # KDE Plasma Entry point
+│   │       ├── options.nix    # KDE Plasma-related options declaration.
+│   │       ├── system.nix     # System concerns (install, sys-level configs)
+│   │       ├── hm.nix         # Home Manager Concerns
+│   │       ├── macos.nix      # Config Variant: Mac OS
+│   │       └── vanilla.nix    # Config Variant: Vanilla
+│   │
+│   ├── apps/
+│   │   ├── default.nix        # Entry point for apps/
+│   │   ├── options.nix        # cypher-os.apps.enable option declaration
+│   │   ├── browser/
+│   │   │   ├── default.nix    # Entry point for browser/
+│   │   │   ├── options.nix    # Browsers-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── brave.nix      # Brave Browser Install and Configuration
+│   │   │   └── firefox.nix    # Firefox Browser Install and Configuration
+│   │   │
+│   │   ├── cli/
+│   │   │   ├── default.nix    # Entry point for cli/
+│   │   │   ├── options.nix    # CLI-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── btop.nix       # btop Install and Configuration
+│   │   │   ├── htop.nix       # htop Install and Configuration
+│   │   │   ├── fastfetch.nix  # fastfetch Install and Configuration
+│   │   │   └── tmux.nix       # tmux Install and Configuration
+│   │   │
+│   │   ├── common/
+│   │   │   ├── default.nix           # Entry point for common/
+│   │   │   ├── options.nix           # common-related options declaration.
+│   │   │   ├── hm.nix                # Home Manager Concerns
+│   │   │   ├── disk-utils.nix        # Disk Utilities Install and Configuration
+│   │   │   ├── fonts.nix             # Fonts Install and Configuration
+│   │   │   ├── proton-ecosystem.nix  # Proton Ecosystem Install and Configuration
+│   │   │   ├── security.nix          # Security-Oriented Stack Install and Configuration
+│   │   │   └── xdg.nix               # XDG Configuration
+│   │   │
+│   │   ├── dev/
+│   │   │   ├── default.nix    # Entry point for dev/
+│   │   │   ├── options.nix    # Dev Stack-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── git.nix        # Git VCS Install and Configuration
+│   │   │   └── ssh.nix        # SSH Install and Configuration
+│   │   │
+│   │   ├── editor/
+│   │   │   ├── default.nix    # Entry point for editor/
+│   │   │   ├── options.nix    # Editor-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── vim.nix        # Vim Install and Configuration
+│   │   │   ├── neovim.nix     # Neovim Install and Configuration
+│   │   │   └── vscode.nix     # VSCode Install and Configuration
+│   │   │
+│   │   ├── productivity/
+│   │   │   ├── default.nix    # Entry point for productivity/
+│   │   │   ├── options.nix    # Productivity Stack-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   ├── claude.nix     # Claude Desktop Install and Configuration
+│   │   │   └── obsidian.nix   # Obsidian Install and Configuration
+│   │   │
+│   │   ├── shell/
+│   │   │   ├── default.nix    # Entry point for shell/
+│   │   │   ├── options.nix    # Shell-related options declaration.
+│   │   │   ├── hm.nix         # Home Manager Concerns
+│   │   │   └── zsh.nix        # zsh Install and Configuration
+│   │   │
+│   │   └── terminal/
+│   │       ├── default.nix    # Entry point for terminal/
+│   │       ├── options.nix    # Terminal-related options declaration.
+│   │       ├── hm.nix         # Home Manager Concerns
+│   │       ├── ghostty.nix    # ghostty Install and Configuration
+│   │       └── kitty.nix      # kitty Install and Configuration
+│   │
+│   ├── dm/
+│   │   ├── default.nix        # Entry point for de/
+│   │   ├── assets             # DM-related assets
+│   │   ├── gdm/
+│   │   │   ├── default.nix    # GDM Entry point
+│   │   │   ├── options.nix    # GDM-related options declaration.
+│   │   │   └── system.nix     # System concerns
+│   │   │
+│   │   └── sddm/
+│   │       ├── default.nix    # SDDM Entry point
+│   │       ├── options.nix    # SDDM-related options declaration.
+│   │       └── system.nix     # System concerns
+│   │
+│   ├── devops/
+│   │   ├── default.nix        # Entry point for devops/
+│   │   ├── options.nix        # DevOps-Related options declaration
+│   │   ├── system.nix         # DevOps System Level
+│   │   ├── containers.nix     # Containers Stack Definition and Configuration
+│   │   ├── databases.nix      # Databases Stack Definition and Configuration
+│   │   ├── kubernetes.nix     # Kubernetes Stack Definition and Configuration
+│   │   ├── secrets.nix        # Secrets mgmt Stack Definition and Configuration
+│   │   └── iac.nix            # IAC Stack Definition and Configuration
+│   │
+│   ├── virtualisation/
+│   │   ├── default.nix        # Entry point for virtualisation/
+│   │   ├── options.nix        # Virtualisation-Related options declaration
+│   │   └── system.nix         # Virtualisation System Level Concerns
+│   │
+│   └── gaming/
+│       ├── default.nix        # Entry point for gaming/
+│       ├── options.nix        # Gaming-Related options declaration
+│       ├── minecraft.nix      # Minecraft Launcher and configuration
+│       ├── steam-system.nix   # Steam System Level Concerns
+│       └── steam-hm.nix       # Steam Home Manager Level Concerns
+│
+├── configs/                   # Configurations
+│
+├── scripts/                   # Scripts
+│
 └── identity/
-    ├── passwd                        # Canonical extrausers passwd
-    ├── group                         # Canonical extrausers group
-    └── shadow                        # Gitignored — contains password hashes
+    ├── passwd                 # Canonical extrausers passwd
+    ├── group                  # Canonical extrausers group
+    └── shadow                 # Gitignored — contains password hashes
 ```
 
 ---
@@ -48,8 +178,6 @@ CypherOS/
 ## The `flake.lock` File
 
 The `flake.lock` file pins the exact commit revision of every flake input — `nixpkgs`, `home-manager`, and any future inputs. It is the mechanism that makes the configuration reproducible: two machines applying the same flake with the same `flake.lock` get identical results.
-
-**Always commit `flake.lock`.** It must live in the repository alongside `flake.nix`.
 
 ### Generating `flake.lock` for the first time
 
@@ -59,7 +187,7 @@ This must be done on a machine with a working Nix installation and reliable netw
 cd /path/to/CypherOS
 nix flake update --extra-experimental-features "nix-command flakes"
 git add flake.lock
-git commit -m "pin flake inputs"
+git commit -m "chore (flake.lock): pin flake inputs"
 git push
 ```
 
@@ -70,21 +198,18 @@ To pull in newer versions of `nixpkgs` or `home-manager`:
 ```bash
 nix flake update --extra-experimental-features "nix-command flakes"
 git add flake.lock
-git commit -m "update flake inputs $(date +%Y-%m-%d)"
+git commit -m "chore(flake): update flake inputs $(date +%Y-%m-%d)"
 ```
-
-> **Important:** Never run `nix flake update` inside the NixOS installer. The installer environment has DNS constraints that prevent the GitHub API calls required to resolve unanchored inputs. Always generate `flake.lock` on a working system first, commit it, then clone the repo in the installer.
 
 ---
 
 ## Installing NixOS — Step by Step
 
-This section documents the full installation procedure for the `nixos-gnome` host. Follow the steps in order.
+Installation Procedure
 
 ### Prerequisites
 
 - NixOS minimal ISO written to a USB drive
-- The `flake.lock` file committed and pushed to the repository
 - Network credentials available
 
 ---
@@ -170,47 +295,63 @@ mkfs.btrfs -f /dev/sda2     # BTRFS partition
 
 ### Step 4 — BTRFS Subvolumes
 
-Mount the top-level BTRFS filesystem to create subvolumes:
+#### **Subvolume rationale:**
 
-```bash
-mount /dev/sda2 /mnt
-```
-
-Create the subvolumes:
-
-```bash
-btrfs subvolume create /mnt/@nixos-root
-btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@nix-store
-```
-
-Unmount the top level:
-
-```bash
-umount /mnt
-```
-
-Mount everything in its final layout:
-
-```bash
-mount -o subvol=@nixos-root,compress=zstd,noatime /dev/sda2 /mnt
-mkdir -p /mnt/{boot,home,nix}
-mount /dev/sda1 /mnt/boot
-mount -o subvol=@home,compress=zstd,noatime /dev/sda2 /mnt/home
-mount -o subvol=@nix-store,noatime /dev/sda2 /mnt/nix
-```
-
-**Subvolume rationale:**
-
-| Subvolume | Mount Point | Purpose |
-|---|---|---|
-| `@nixos-root` | `/` | NixOS system root |
-| `@home` | `/home` | Shared home directory — all OSs mount this |
-| `@nix-store` | `/nix` | Shared Nix store — all OSs share installed packages |
+| Subvolume     | Mount Point | Purpose                                             |
+| ------------- | ----------- | --------------------------------------------------- |
+| `@nixos-root` | `/`         | NixOS system root                                   |
+| `@home`       | `/home`     | Shared home directory — all OSs mount this          |
+| `@nix-store`  | `/nix`      | Shared Nix store — all OSs share installed packages |
 
 The shared `@nix-store` is the key to the CypherOS architecture: packages built once are available to every OS that mounts `/nix`. Adding a second OS does not re-download or re-build anything already present.
 
----
+#### Install required Tools
+
+```bash
+nix-shell -p git neovim
+```
+
+This drops you into a temporary shell with `git` and `neovim` available via the live Nix daemon. Use `neovim` to edit configuration files if needed during the install.
+
+#### Clone the Repository
+
+```bash
+git clone https://github.com/CypherWhisperer/CypherOS CypherOS
+```
+
+> **On the git working tree:** `nixos-install` and `nixos-rebuild` require the flake path to be either a clean git tree or a path without git tracking. If you encounter a `git tree is dirty` warning that becomes an error, the options are:
+>
+> **Option A — Stage all changes before installing:**
+>
+> ```bash
+> cd /mnt/etc/nixos/CypherOS
+> git add -A
+> ```
+>
+> This is the cleanest approach during active development. Changes are staged (visible to Nix) without requiring a commit.
+>
+> **Option B — Use the `--impure` flag:**
+>
+> ```bash
+> nixos-install --flake /mnt/etc/nixos/CypherOS#nixos-gnome --impure
+> ```
+>
+> This tells Nix to allow dirty trees. Convenient but bypasses the reproducibility guarantee.
+>
+> **Option C — Separate tracked and working directories:**
+> Keep the canonical repo in a development directory (e.g. `~/CypherOS`) and sync to `/etc/nixos/CypherOS` via `rsync` before rebuilding:
+>
+> ```bash
+> rsync -av --delete ~/CypherOS/ /etc/nixos/CypherOS/
+> ```
+>
+> This works but adds a manual sync step. Not recommended as the primary workflow — stage changes (Option A) instead.
+
+#### Run the script to setup the disk accordingly
+
+```bash
+bash scripts/setup-disk.sh
+```
 
 ### Step 5 — Generate Hardware Configuration
 
@@ -223,53 +364,17 @@ This produces two files in `/mnt/etc/nixos/`:
 - `hardware-configuration.nix` — machine-specific: disk UUIDs, CPU, detected hardware. This is what you need.
 - `configuration.nix` — a generic template. Ignore it; this repository provides the real one.
 
----
-
-### Step 6 — Install Required Tools
+### Step 6 — Move CypherOS into the repo
 
 ```bash
-nix-shell -p git neovim
+mv CypherOS /mnt/ect/nixos/CypherOS
 ```
 
-This drops you into a temporary shell with `git` and `neovim` available via the live Nix daemon. Use `neovim` to edit configuration files if needed during the install.
-
----
-
-### Step 7 — Clone the Repository
+### Step 7 — Move Your Hardware Configuration
 
 ```bash
-git clone https://github.com/CypherWhisperer/CypherOS /mnt/etc/nixos/CypherOS
-```
-
-> **On the git working tree:** `nixos-install` and `nixos-rebuild` require the flake path to be either a clean git tree or a path without git tracking. If you encounter a `git tree is dirty` warning that becomes an error, the options are:
->
-> **Option A — Stage all changes before installing:**
-> ```bash
-> cd /mnt/etc/nixos/CypherOS
-> git add -A
-> ```
-> This is the cleanest approach during active development. Changes are staged (visible to Nix) without requiring a commit.
->
-> **Option B — Use the `--impure` flag:**
-> ```bash
-> nixos-install --flake /mnt/etc/nixos/CypherOS#nixos-gnome --impure
-> ```
-> This tells Nix to allow dirty trees. Convenient but bypasses the reproducibility guarantee.
->
-> **Option C — Separate tracked and working directories:**
-> Keep the canonical repo in a development directory (e.g. `~/CypherOS`) and sync to `/etc/nixos/CypherOS` via `rsync` before rebuilding:
-> ```bash
-> rsync -av --delete ~/CypherOS/ /etc/nixos/CypherOS/
-> ```
-> This works but adds a manual sync step. Not recommended as the primary workflow — stage changes (Option A) instead.
-
----
-
-### Step 8 — Copy Hardware Configuration
-
-```bash
-cp /mnt/etc/nixos/hardware-configuration.nix \
-   /mnt/etc/nixos/CypherOS/hosts/nixos-gnome/
+mv /mnt/etc/nixos/hardware-configuration.nix \
+   /mnt/etc/nixos/CypherOS/hosts/nixos/
 ```
 
 Stage it immediately:
@@ -279,36 +384,23 @@ cd /mnt/etc/nixos/CypherOS
 git add -A
 ```
 
-> `hardware-configuration.nix` is gitignored at the repository level. Staging it with `git add -A` makes it visible to Nix without committing it to the repository — this is intentional. The file is machine-specific and should not be tracked.
-
 ---
 
-### Step 9 — Fix Chroot DNS
-
-The `nixos-install` command runs Nix inside a chroot of `/mnt`. This chroot does not inherit the live environment's DNS configuration. Set it explicitly:
+### Step 8 — Install
 
 ```bash
-echo "nameserver 1.1.1.1" > /mnt/etc/resolv.conf
-echo "nameserver 8.8.8.8" >> /mnt/etc/resolv.conf
+nixos-install --flake /mnt/etc/nixos/CypherOS#cypher-nixos
 ```
 
----
+Nix will download and build the entire system closure. The install is dependent on connection quality and cache availability.
 
-### Step 10 — Install
-
-```bash
-nixos-install --flake /mnt/etc/nixos/CypherOS#nixos-gnome
-```
-
-Nix will download and build the entire system closure. On a good connection this takes 20–60 minutes depending on cache availability.
-
-> **On nixpkgs unstable:** Some packages on the unstable channel do not yet have pre-built binaries in the Nix binary cache (`cache.nixos.org`). For these, Nix falls back to building from source — this is why builds on unstable can occasionally take significantly longer than expected. If a build is taking hours, check whether a source compilation is in progress and consider whether that package is necessary.
+> **On nixpkgs unstable:** Some packages on the unstable channel do not yet have pre-built binaries in the Nix binary cache (`cache.nixos.org`). For these, Nix falls back to building from source — this is why builds on unstable can occasionally take significantly longer than expected. If a build is taking hours, check whether a source compilation is in progress and consider the package's necessity.
 
 When the install completes, you will be prompted to set a **root password**. Set one — it is required for emergency recovery.
 
 ---
 
-### Step 11 — Set User Password
+### Step 9 — Set User Password
 
 Before rebooting, set the password for `cypher-whisperer`:
 
@@ -318,11 +410,11 @@ passwd cypher-whisperer
 exit
 ```
 
-> NixOS does not set a default password for declared users. Skipping this step means the account will be locked and you will not be able to log in at GDM.
+> **NOTE:** NixOS does not set a default password for declared users. Skipping this step means the account will be locked and you will not be able to log in at GDM. Though there is a work around. on GDM (or andy Display Manager), hit (CTLR+ALT+[Any function Key (F1, F2, ....)]). This drops you in a TTY environment where you can log in as root and set the user password there.
 
 ---
 
-### Step 12 — Reboot
+### Step 10 — Reboot
 
 ```bash
 reboot
@@ -332,33 +424,24 @@ Remove the USB drive when the screen goes black during shutdown. The system will
 
 ---
 
-### Step 13 — Post-Boot
-
-Log in as `cypher-whisperer` at the GDM login screen.
-
-Copy your wallpaper to the expected path:
-
-```bash
-mkdir -p ~/.local/share/backgrounds
-cp /path/to/your/wallpaper.jpg ~/.local/share/backgrounds/cypher-wallpaper.jpg
-```
+### Step 11 — Post-Boot
 
 If any configuration changes are needed, edit the relevant module and rebuild without rebooting:
 
 ```bash
-sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#nixos-gnome
+sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#cypher-nixos
 ```
 
 ---
 
 ## Applying Changes After Install
 
-| Scenario | Command |
-|---|---|
-| Changed anything in the flake | `sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#nixos-gnome` |
-| Updated `flake.lock` inputs | `sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#nixos-gnome` |
-| Roll back to previous generation | `sudo nixos-rebuild switch --rollback` |
-| Clean up old generations | `sudo nix-collect-garbage -d && sudo nix store gc` |
+| Scenario                         | Command                                                             |
+| -------------------------------- | ------------------------------------------------------------------- |
+| Changed anything in the flake    | `sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#cypher-nixos` |
+| Updated `flake.lock` inputs      | `sudo nixos-rebuild switch --flake /etc/nixos/CypherOS#cypher-nixos` |
+| Roll back to previous generation | `sudo nixos-rebuild switch --rollback`                              |
+| Clean up old generations         | `sudo nix-collect-garbage -d && sudo nix store gc`                  |
 
 ---
 
@@ -372,7 +455,7 @@ Old generations hold references to packages that were removed in newer builds. R
 
 ## Secrets and SSH Keys
 
-SSH private keys (`~/.ssh/id_ed25519` etc.) are **never tracked in this repository**. The repository manages the SSH *configuration* (`~/.ssh/config`) declaratively via `programs.ssh` in Home Manager. The keys themselves live in `~/.ssh/` on the `@home` BTRFS subvolume.
+SSH private keys (`~/.ssh/id_ed25519` etc.) are **never tracked in this repository**. The repository manages the SSH _configuration_ (`~/.ssh/config`) declaratively via `programs.ssh` in Home Manager. The keys themselves live in `~/.ssh/` on the `@home` BTRFS subvolume.
 
 In the full CypherOS architecture, `@home` is shared across all OSs. This means SSH keys generated once are automatically available on every OS that mounts `@home` — no copying or re-generation required.
 
