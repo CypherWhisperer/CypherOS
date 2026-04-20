@@ -23,8 +23,6 @@
     extraGroups = [
       "wheel" # sudo access
       "networkmanager" # manage network connections without sudo
-      "docker" # run docker without sudo
-      "podman" # rootless podman group (created by containers.nix)
       "audio" # direct audio device access (belt-and-suspenders with PipeWire)
       "video" # GPU/video device access
       "input" # input device access (needed for some Wayland compositors)
