@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -6,7 +11,7 @@
     ./options.nix
   ];
 
-  config = lib.mkIf config.cypher-os.de.gnome.enable {
+  config = lib.mkIf (config.cypher-os.profile.desktop.enable && config.cypher-os.de.gnome.enable) {
 
     # desktopManager.gnome.enable pulls in gnome-shell, gnome-session,
     # gnome-control-center, nautilus, and the core GNOME session infrastructure.
