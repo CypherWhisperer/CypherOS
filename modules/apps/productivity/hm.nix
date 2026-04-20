@@ -1,9 +1,12 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.apps.enable &&
-    config.cypher-os.apps.productivity.enable ) {
+  config = lib.mkIf (config.cypher-os.apps.enable && config.cypher-os.apps.productivity.enable) {
 
     cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
     cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
@@ -42,7 +45,7 @@
       #signal-desktop # unfree, also doesn't work well in nixpkgs
 
       # ── Workflow and Automation ──────────────────────────────────────────────
-      n8n
+      #n8n  # now handled by modules/devops/n8n.nix
     ];
   };
 }
