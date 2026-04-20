@@ -96,7 +96,8 @@
     # Run n8n as an OCI container rather than a Nix derivation.
     # This bypasses the nixpkgs n8n package (which is broken on Hydra)
     # entirely. Docker images are fetched from Docker Hub — no Nix build.
-    virtualisation.oci-containers.n8n = {
+    virtualisation.oci-containers.backend = "docker";  # or "podman" for rootless
+    virtualisation.oci-containers.containers.n8n = {
       # -----------------------------------------------------------------------
       # Image
       # -----------------------------------------------------------------------
