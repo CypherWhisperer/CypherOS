@@ -34,19 +34,50 @@
       cypher-os.de.gnome.enable = lib.mkDefault true;
       cypher-os.dm.gdm.enable = lib.mkDefault true;
       cypher-os.gaming.enable = lib.mkDefault true;
+      cypher-os.gaming.steam.enable = lib.mkDefault true;
+      cypher-os.gaming.minecraft.enable = lib.mkDefault true;
 
       # apps is always set to true as a default. If you need to
       # override that as an emergency kill-switch, set it to false.
       # cypher-os.apps.enable = lib.mkDefault false;
 
       cypher-os.apps.common.enable = lib.mkDefault true;
+      cypher-os.apps.common.diskUtils.enable = lib.mkDefault true;
+      cypher-os.apps.common.fonts.enable = lib.mkDefault true;
+      cypher-os.apps.common.proton.enable = lib.mkDefault true;
+      cypher-os.apps.common.security.enable = lib.mkDefault true;
+      cypher-os.apps.common.xdg.enable = lib.mkDefault true;
+
       cypher-os.apps.shell.enable = lib.mkDefault true;
+      cypher-os.apps.shell.zsh.enable = lib.mkDefault true;
+
       cypher-os.apps.cli.enable = lib.mkDefault true;
+      cypher-os.apps.cli.btop.enable = lib.mkDefault true;
+      cypher-os.apps.cli.htop.enable = lib.mkDefault true;
+      cypher-os.apps.cli.tmux.enable = lib.mkDefault true;
+      cypher-os.apps.cli.fastfetch.enable = lib.mkDefault true;
+
       cypher-os.apps.dev.enable = lib.mkDefault true;
+      cypher-os.apps.dev.ssh.enable = lib.mkDefault true;
+      cypher-os.apps.dev.git.enable = lib.mkDefault true;
+
       cypher-os.apps.editor.enable = lib.mkDefault true;
+      cypher-os.apps.editor.vim.enable = lib.mkDefault true;
+      cypher-os.apps.editor.neovim.enable = lib.mkDefault true;
+      cypher-os.apps.editor.vscode.enable = lib.mkDefault true;
+
       cypher-os.apps.terminal.enable = lib.mkDefault true;
+      cypher-os.apps.terminal.ghostty.enable = lib.mkDefault true;
+      cypher-os.apps.terminal.kitty.enable = lib.mkDefault true;
+
       cypher-os.apps.browser.enable = lib.mkDefault true;
+      cypher-os.apps.browser.brave.enable = lib.mkDefault true;
+      cypher-os.apps.browser.firefox.enable = lib.mkDefault true;
+
       cypher-os.apps.productivity.enable = lib.mkDefault true;
+      cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
+      cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
+
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
