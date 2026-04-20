@@ -554,7 +554,7 @@
     os-prober # for detecting other OSs in a multi-boot setup
 
     glib # needed for gdmBackground activation script
-    hydra-checker # for checking the health of flake inputs and their updates
+    hydra-check # for checking the health of flake inputs and their updates
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
