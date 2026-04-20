@@ -51,10 +51,7 @@
 }:
 
 {
-  options.cypher-os.gaming.minecraft.enable = lib.mkEnableOption "Enable Minecraft and related gaming infrastructure";
-
-  config = lib.mkIf config.cypher-os.gaming.minecraft.enable {
-
+  config = lib.mkIf (config.cypher-os.gaming.enable && config.cypher-os.gaming.minecraft.enable) {
     home.packages = [
       # ── Option A: Prism Launcher (recommended) ──────────────────────────────
 

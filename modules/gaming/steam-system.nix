@@ -43,13 +43,12 @@
 }:
 
 {
-  options.cypher-os.gaming.steam.enable = lib.mkEnableOption "Enable Steam and gaming infrastructure";
-
   imports = [
-    # ./steam-data.nix  # Removed: this is HM-only, imported in steam-hm.nix
+    ../profile/options.nix
+    ./options.nix
   ];
 
-  config = lib.mkIf config.cypher-os.gaming.steam.enable {
+  config = lib.mkIf (config.cypher-os.gaming.enable && config.cypher-os.gaming.steam.enable) {
 
     # ── Core Steam enablement ──────────────────────────────────────────────────
     #
