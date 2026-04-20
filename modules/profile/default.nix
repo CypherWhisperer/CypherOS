@@ -39,13 +39,13 @@
       # override that as an emergency kill-switch, set it to false.
       # cypher-os.apps.enable = lib.mkDefault false;
 
-      cypher-os.apps.common.enable   = lib.mkDefault true;
-      cypher-os.apps.shell.enable     = lib.mkDefault true;
-      cypher-os.apps.cli.enable   = lib.mkDefault true;
-      cypher-os.apps.dev.enable   = lib.mkDefault true;
-      cypher-os.apps.editor.enable    = lib.mkDefault true;
-      cypher-os.apps.terminal.enable  = lib.mkDefault true;
-      cypher-os.apps.browser.enable   = lib.mkDefault true;
+      cypher-os.apps.common.enable = lib.mkDefault true;
+      cypher-os.apps.shell.enable = lib.mkDefault true;
+      cypher-os.apps.cli.enable = lib.mkDefault true;
+      cypher-os.apps.dev.enable = lib.mkDefault true;
+      cypher-os.apps.editor.enable = lib.mkDefault true;
+      cypher-os.apps.terminal.enable = lib.mkDefault true;
+      cypher-os.apps.browser.enable = lib.mkDefault true;
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
@@ -53,9 +53,10 @@
       cypher-os.devops.enable = lib.mkDefault true;
       cypher-os.devops.containers.enable = lib.mkDefault true;
       cypher-os.devops.kubernetes.enable = lib.mkDefault true;
-      cypher-os.devops.databases.enable  = lib.mkDefault true;
-      cypher-os.devops.iac.enable        = lib.mkDefault true;
-      cypher-os.devops.secrets.enable    = lib.mkDefault true;
+      cypher-os.devops.databases.enable = lib.mkDefault true;
+      cypher-os.devops.iac.enable = lib.mkDefault true;
+      cypher-os.devops.secrets.enable = lib.mkDefault true;
+      cypher-os.devops.n8n.enable = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # VIRTUALISATION HELPERS TOGGLE
       # ─────────────────────────────────────────────────────────────────────────────
@@ -72,11 +73,11 @@
 
       # GUI groups are absent — mkEnableOption defaults them to false already.
       # apps.enable stays true (its default) so group-level mkIf conditions fire.
-      cypher-os.apps.common.enable       = lib.mkDefault true;
-      cypher-os.apps.shell.enable        = lib.mkDefault true;
-      cypher-os.apps.cli.enable          = lib.mkDefault true;
-      cypher-os.apps.editor.enable       = lib.mkDefault true;
-      cypher-os.apps.dev.enable          = lib.mkDefault true;
+      cypher-os.apps.common.enable = lib.mkDefault true;
+      cypher-os.apps.shell.enable = lib.mkDefault true;
+      cypher-os.apps.cli.enable = lib.mkDefault true;
+      cypher-os.apps.editor.enable = lib.mkDefault true;
+      cypher-os.apps.dev.enable = lib.mkDefault true;
 
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
@@ -84,9 +85,9 @@
       cypher-os.devops.enable = lib.mkDefault true;
       cypher-os.devops.containers.enable = lib.mkDefault true;
       cypher-os.devops.kubernetes.enable = lib.mkDefault true;
-      cypher-os.devops.databases.enable  = lib.mkDefault true;
-      cypher-os.devops.iac.enable        = lib.mkDefault true;
-      cypher-os.devops.secrets.enable    = lib.mkDefault true;
+      cypher-os.devops.databases.enable = lib.mkDefault true;
+      cypher-os.devops.iac.enable = lib.mkDefault true;
+      cypher-os.devops.secrets.enable = lib.mkDefault true;
     })
   ];
 }

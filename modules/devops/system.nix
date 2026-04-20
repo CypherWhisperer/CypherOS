@@ -55,6 +55,7 @@
     ./databases.nix
     ./iac.nix
     ./secrets.nix
+    ./n8n.nix
   ];
 
   # config = lib.mkIf config.cypher-os.devops.enable  {

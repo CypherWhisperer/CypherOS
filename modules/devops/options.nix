@@ -16,5 +16,6 @@
     iac.enable = lib.mkEnableOption    "Infrastructure as Code tooling (Terraform, OpenTofu, Ansible, Pulumi)";
     kubernetes.enable = lib.mkEnableOption "Kubernetes tooling (k3s, kubectl, Helm, k3d, kind, cluster utilities)";
     secrets.enable = lib.mkEnableOption "secrets management tooling (sops-nix, age, Vault)";
+    n8n.enable = lib.mkEnableOption "n8n Automation tool";
   };
 }
