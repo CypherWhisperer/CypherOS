@@ -1,332 +1,274 @@
 # =============================================================================
-# CypherOS — DevOps :: n8n Workflow Automation
+# CypherOS — DevOps :: n8n Workflow Automation (OCI Container)
 # =============================================================================
 # modules/cypher-os/devops/n8n.nix
 #
-# n8n is a self-hostable, fair-code licensed workflow automation platform.
-# Think of it as a visual programming environment for connecting APIs,
-# services, and databases together — similar to Zapier or Make, but running
-# entirely on your own infrastructure with full data ownership.
+# The nixpkgs n8n package has been broken on Hydra since 2022 because the npm network
+# sandbox issue was never fully resolved in nixpkgs.
+# Our option: run n8n as a Docker container via virtualisation.oci-containers
+#  (sidesteps the Nix build entirely — this is how many NixOS users run n8n)
 #
-# Official docs : https://docs.n8n.io/hosting/
-# Env var ref   : https://docs.n8n.io/hosting/configuration/environment-variables/
 #
-# IMPORTANT — settings vs environment:
-#   An older version of the NixOS module used `services.n8n.settings`.
-#   That option has been REMOVED. All configuration now goes through
-#   `services.n8n.environment` as plain environment variable strings.
-#   Variables ending in `_FILE` are handled specially — see the secrets
-#   section below.
+# ARCHITECTURE DECISION (2024-03):
+#   The nixpkgs `pkgs.n8n` derivation has been broken on Hydra since 2022 due
+#   to n8n's npm monorepo requiring network access during build — which Nix's
+#   sandboxed build environment forbids. The last successful Hydra build was
+#   n8n-0.168.1 (March 2022). Current nixpkgs ships n8n v2.x with no binary.
+#
+#   Resolution: run n8n via `virtualisation.oci-containers`, which pulls the
+#   official Docker image from docker.n8n.io. The OCI image is built and
+#   signed by n8n GmbH — no source build occurs on our machine.
+#
+# DATA PERSISTENCE:
+#   Container data lives in /var/lib/n8n on the host, bind-mounted into the
+#   container at /home/node/.n8n. This directory survives container recreation
+#   and image upgrades. Back this up — it contains your workflows, credentials,
+#   and (if not externally managed) your encryption key.
+#
+# NETWORKING:
+#   n8n listens on 127.0.0.1:5678 — localhost only, not reachable from the
+#   network. Caddy (or Traefik) terminates TLS and proxies to this port.
+#   For local dev without a reverse proxy, change the port binding to
+#   "5678:5678" to expose it directly on all interfaces.
+#
+# UPGRADING:
+#   To upgrade n8n, change the image tag below, then run:
+#     sudo nixos-rebuild switch
+#   The new image is pulled automatically. If n8n introduces breaking changes
+#   between major versions, check https://docs.n8n.io/release-notes/ first.
+#   NEVER use `latest` for a production or data-bearing instance — you will
+#   get surprise major version upgrades.
 # =============================================================================
 
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
 {
   config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.n8n.enable) {
+    # =========================================================================
+    # Prerequisite: Docker daemon
+    # =========================================================================
+    # virtualisation.oci-containers with backend = "docker" requires Docker to
+    # be running. This enables the Docker daemon as a system service.
+    # All containers declared in this file run under this daemon.
+    #
+    # NOTE: If you prefer rootless containers (better security posture),
+    # switch backend to "podman" and enable virtualisation.podman instead.
+    # Podman is daemonless and rootless by default — better for a single-user
+    # workstation like CypherOS. The tradeoff: podman has subtly different
+    # networking behaviour (no host.docker.internal equivalent by default).
+    # =========================================================================
+    # NOTE: This is handled by ./containers.nix
+    #
+    #virtualisation.docker.enable = true;
+    #virtualisation.podman.enable = true;
+
+    # Add cypher-whisperer to the docker group so `docker` CLI works without sudo.
+    # WARNING: membership in the docker group is effectively equivalent to root
+    # access — anyone in this group can mount the host filesystem into a container.
+    # On a single-user machine this is acceptable. On a multi-user machine, use
+    # rootless podman instead.
+    # =========================================================================
+    # Also handled by ./containers.nix
+    #
+    # users.users.cypher-whisperer.extraGroups = [ "docker" ];
 
     # =========================================================================
-    # Core service declaration
+    # Persistent data directory
     # =========================================================================
-    # `services.n8n` is the upstream NixOS module (nixos/modules/services/misc/n8n.nix).
-    # It creates a hardened systemd unit running as a DynamicUser (ephemeral
-    # system user with no fixed UID, cannot write outside StateDirectory).
-    # Data lives in /var/lib/n8n by default.
+    # Create /var/lib/n8n on the host with correct ownership before the
+    # container first starts. Without this, Docker creates the directory as
+    # root, and n8n (which runs as UID 1000 "node" inside the container)
+    # cannot write to it — the service fails silently.
     # =========================================================================
-    services.n8n = {
+    systemd.tmpfiles.rules = [
+      # "d" = create directory if absent, set mode and owner
+      # 1000:1000 = UID/GID of the "node" user inside the n8n container
+      "d /var/lib/n8n 0750 1000 1000 -"
+    ];
 
-      enable = true;
-
+    # =========================================================================
+    # n8n OCI container
+    # =========================================================================
+    # Run n8n as an OCI container rather than a Nix derivation.
+    # This bypasses the nixpkgs n8n package (which is broken on Hydra)
+    # entirely. Docker images are fetched from Docker Hub — no Nix build.
+    virtualisation.oci-containers.n8n = {
       # -----------------------------------------------------------------------
-      # Package
+      # Image
       # -----------------------------------------------------------------------
-      # The default is `pkgs.n8n` from nixpkgs — the same one that was causing
-      # your OOM crash when listed in home.packages (because it built from
-      # source in the sandbox). The service module ships a pre-built binary,
-      # so that crash no longer applies here.
+      # Pin to a major version tag (e.g. "2") rather than "latest".
+      # This gives you automatic patch/minor updates within the major version
+      # while preventing surprise breaking changes across major boundaries.
       #
-      # Override only if you need a specific version pinned via an overlay, e.g.:
-      #   package = pkgs.n8n_0_235;
-      # -----------------------------------------------------------------------
-      package = pkgs.n8n;
-
-      # -----------------------------------------------------------------------
-      # Firewall
-      # -----------------------------------------------------------------------
-      # `false` = n8n is only reachable on localhost (127.0.0.1:5678).
-      # This is the right default when you plan to put a reverse proxy
-      # (Caddy, nginx, Traefik) in front of n8n, which you should do for
-      # any production or LAN-exposed setup.
+      # To upgrade to the next major version: change "2" → "3" after reading
+      # the n8n migration guide for that version.
       #
-      # Set to `true` only for quick local-network testing when you want to
-      # hit n8n directly from another machine without a proxy.
+      # Official image: https://hub.docker.com/r/n8nio/n8n
       # -----------------------------------------------------------------------
-      openFirewall = false;
+      image = "docker.n8n.io/n8nio/n8n:2";
 
       # -----------------------------------------------------------------------
-      # Custom community nodes
+      # Port binding
       # -----------------------------------------------------------------------
-      # n8n has an ecosystem of community-built node packages. On NixOS these
-      # must be declared here (not installed at runtime via the UI) because the
-      # Nix store is immutable. Each entry must be a Nix package that ships
-      # its node modules under `lib/node_modules/<pname>/`.
-      #
-      # Example (once such packages exist in nixpkgs or your own overlay):
-      #   customNodes = with pkgs; [
-      #     n8n-nodes-carbonejs   # Carbon.js node
-      #     n8n-nodes-imap        # IMAP email node
-      #   ];
-      #
-      # Note: Community node packaging in nixpkgs is still maturing (tracked in
-      # https://github.com/NixOS/nixpkgs/issues/435198). For now, leave empty.
+      # "127.0.0.1:5678:5678" = bind only on loopback. n8n is not directly
+      # reachable from the network — all external access goes through Caddy.
       # -----------------------------------------------------------------------
-      customNodes = [ ];
+      ports = [ "127.0.0.1:5678:5678" ];
+
+      # -----------------------------------------------------------------------
+      # Volumes
+      # -----------------------------------------------------------------------
+      volumes = [
+        # Host path : container path
+        # /var/lib/n8n contains: database.sqlite, .n8n/config (encryption key),
+        # workflow exports, and any files you save from workflows.
+        "/var/lib/n8n:/home/node/.n8n"
+
+        # Uncomment to expose a local directory to n8n for file-based workflows
+        # (e.g., reading CSVs, writing outputs). Maps to /files inside the container.
+        # "/var/lib/n8n/local-files:/files"
+      ];
 
       # -----------------------------------------------------------------------
       # Environment variables
       # -----------------------------------------------------------------------
-      # This attrset maps directly to systemd environment variables passed to
-      # the n8n process. All n8n configuration happens here.
-      #
-      # SECRETS PATTERN — variables ending in `_FILE`:
-      #   Any key that ends with `_FILE` is treated specially by the module:
-      #   the value is the path to a file containing the secret, and the module
-      #   loads it via systemd LoadCredential so the plaintext never appears in
-      #   /proc/<pid>/environ. Use agenix or sops-nix to manage those files.
-      #   Example:
-      #     N8N_ENCRYPTION_KEY_FILE = "/run/secrets/n8n-encryption-key";
+      # These mirror the environment block in your previous services.n8n config.
+      # See https://docs.n8n.io/hosting/configuration/environment-variables/
+      # for the full reference.
       # -----------------------------------------------------------------------
       environment = {
+        #N8N_HOST = "localhost";
 
-        # =====================================================================
-        # NETWORKING
-        # =====================================================================
-
-        # The port n8n's HTTP server binds to.
-        # If you change this, also update your reverse proxy upstream and
-        # openFirewall (if used). Default: 5678.
+        # --- Networking ---
         N8N_PORT = "5678";
+        N8N_LISTEN_ADDRESS = "0.0.0.0"; # Inside the container, listen on all
+        # interfaces — the host-side port binding
+        # above restricts external access.
 
-        # The listen address. "127.0.0.1" = localhost only (recommended behind
-        # a reverse proxy). "0.0.0.0" = all interfaces (only if openFirewall
-        # and direct access are intentional).
-        N8N_LISTEN_ADDRESS = "127.0.0.1";
-
-        # The public-facing URL n8n uses to build webhook URLs. Without this,
-        # webhook URLs will contain the internal 127.0.0.1 address which is
-        # useless for external triggers. Set this to whatever URL your reverse
-        # proxy exposes to the internet (or your LAN).
-        # Example: "https://n8n.pentara.tech/"
+        # The public URL n8n uses to build webhook URLs. Set this to your
+        # Caddy-exposed domain. Without it, webhook URLs will contain
+        # 127.0.0.1 which is useless for external triggers.
+        # For local dev, leave as localhost. For production, use your domain:
+        # WEBHOOK_URL = "https://n8n.yourdomain.com/";
         WEBHOOK_URL = "http://localhost:5678/";
 
-        # Protocol for the n8n editor URL. "http" is fine behind a TLS-
-        # terminating reverse proxy; change to "https" only if n8n itself is
-        # terminating TLS (unusual).
-        N8N_PROTOCOL = "http";
+        N8N_PROTOCOL = "http"; # http is correct — Caddy handles TLS termination
 
-        # =====================================================================
-        # TIMEZONE
-        # =====================================================================
-        # Used by the Schedule/Cron trigger node to interpret times correctly.
-        # The module defaults this to `config.time.timeZone` (your NixOS system
-        # timezone), so you usually don't need to set it explicitly. Override
-        # if n8n should run in a different timezone than your system.
-        # GENERIC_TIMEZONE = "Africa/Nairobi";
+        # --- Timezone ---
+        # Used by the Schedule/Cron trigger node.
+        GENERIC_TIMEZONE = "Africa/Nairobi";
+        TZ = "Africa/Nairobi";
 
-        # =====================================================================
-        # DATABASE
-        # =====================================================================
-        # n8n defaults to SQLite at /var/lib/n8n/database.sqlite — perfectly
-        # fine for personal use and small teams. Upgrade to PostgreSQL when:
-        #   - You need concurrent workflow executions at scale
-        #   - You want proper backups with pg_dump
-        #   - You're running n8n in a team/production context
-        #
-        # To switch to PostgreSQL, uncomment and fill in the block below, then
-        # also declare a `services.postgresql` service in your NixOS config.
-        # -----------------------------------------------------------------------
-        # DB_TYPE = "postgresdb";
-        # DB_POSTGRESDB_HOST = "localhost";
-        # DB_POSTGRESDB_PORT = "5432";
-        # DB_POSTGRESDB_DATABASE = "n8n";
-        # DB_POSTGRESDB_USER = "n8n";
-        # DB_POSTGRESDB_PASSWORD_FILE = "/run/secrets/n8n-db-password";
-        #   ↑ Use _FILE suffix so the password is loaded via systemd credential,
-        #     never stored in the Nix store or /proc/<pid>/environ.
+        # --- Security ---
+        # Enforce that n8n's settings.json has correct file permissions.
+        # Prevents accidental world-readable credential exposure.
+        N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS = "true";
 
-        # =====================================================================
-        # SECURITY & ENCRYPTION
-        # =====================================================================
+        # Encryption key for stored credentials.
+        # CRITICAL: Set this before first launch. If you start n8n without it,
+        # n8n generates a random key and stores it in /var/lib/n8n/.n8n/config.
+        # That is fine for development. For production, generate a key:
+        #   openssl rand -hex 32
+        # Then manage it with sops-nix and reference it as an environmentFile
+        # (see the secrets section below).
+        # N8N_ENCRYPTION_KEY = "your-key-here";  # ← NEVER do this
+        # Use environmentFiles instead (see below).
 
-        # The encryption key protects stored credentials (API keys, passwords,
-        # OAuth tokens) at rest in the database. If you lose this key, all
-        # stored credentials become unreadable and must be re-entered.
-        #
-        # CRITICAL: Set this to a file containing a strong random key BEFORE
-        # first launch. Generate one with:
-        #   openssl rand -hex 32 > /path/to/n8n-encryption-key
-        #   chmod 600 /path/to/n8n-encryption-key
-        #
-        # Then manage the file with agenix or sops-nix and point here:
-        # N8N_ENCRYPTION_KEY_FILE = "/run/secrets/n8n-encryption-key";
-        #
-        # If you don't set this, n8n generates a random key on first start and
-        # stores it in /var/lib/n8n/.n8n/config. That's okay for local dev but
-        # risky in production (the key is stored alongside the database).
-
-        # =====================================================================
-        # TELEMETRY & NOTIFICATIONS
-        # =====================================================================
-
-        # Disable anonymous usage telemetry sent to n8n GmbH. Respects your
-        # privacy. The only downside: "Ask AI" in the Code node requires this
-        # to be enabled (it's routed through n8n's own backend).
+        # --- Telemetry ---
         N8N_DIAGNOSTICS_ENABLED = "false";
-
-        # Disable n8n phoning home to check for new versions. Manage upgrades
-        # yourself through nixpkgs updates instead.
         N8N_VERSION_NOTIFICATIONS_ENABLED = "false";
 
-        # Disable the "Templates" feature that fetches workflow templates from
-        # n8n's cloud. Keeps the instance fully self-contained.
-        # N8N_TEMPLATES_ENABLED = "false";
+        # --- Runtime ---
+        # Enable the task runner (sandboxed Code node execution).
+        # The container image ships the runner binary, so this just enables it.
+        N8N_RUNNERS_ENABLED = "true";
+        NODE_ENV = "production";
 
-        # =====================================================================
-        # USER MANAGEMENT & AUTHENTICATION
-        # =====================================================================
-        # By default, n8n's first-run wizard creates an owner account.
-        # For a single-user instance that's sufficient. For team setups:
-
-        # Basic auth (simple, not recommended for production):
-        # N8N_BASIC_AUTH_ACTIVE = "true";
-        # N8N_BASIC_AUTH_USER = "admin";
-        # N8N_BASIC_AUTH_PASSWORD_FILE = "/run/secrets/n8n-basic-auth-password";
-
-        # JWT auth (better for API access):
-        # N8N_JWT_AUTH_ACTIVE = "true";
-        # N8N_JWT_AUTH_HEADER = "Authorization";
-        # N8N_JWT_AUTH_HEADER_VALUE_PREFIX = "Bearer ";
-        # N8N_JWT_SECRET_FILE = "/run/secrets/n8n-jwt-secret";
-
-        # SAML / LDAP / OIDC are enterprise features requiring an n8n license.
-
-        # =====================================================================
-        # EMAIL (SMTP)
-        # =====================================================================
-        # n8n sends emails for: password reset, user invitations, workflow
-        # error notifications. Without SMTP, these features silently fail.
-        # Configure with your SMTP provider (Resend, Postmark, Gmail, etc.)
-
-        # N8N_EMAIL_MODE = "smtp";
-        # N8N_SMTP_HOST = "smtp.resend.com";        # Your SMTP host
-        # N8N_SMTP_PORT = "587";                    # 587 = STARTTLS, 465 = SSL
-        # N8N_SMTP_USER = "resend";                 # SMTP username
-        # N8N_SMTP_PASS_FILE = "/run/secrets/n8n-smtp-pass";
-        # N8N_SMTP_SENDER = "n8n@pentara.tech";     # From address
-        # N8N_SMTP_SSL = "false";                   # true if port 465
-
-        # =====================================================================
-        # EXECUTION & PERFORMANCE
-        # =====================================================================
-
-        # How many workflow executions to save in the database.
-        # Higher = more history but larger DB. Default: 200.
-        # EXECUTIONS_DATA_MAX_AGE = "720";       # hours to keep (30 days)
-        # EXECUTIONS_DATA_PRUNE = "true";        # enable auto-pruning
-
-        # Max concurrent workflow executions. Default: not limited.
-        # On a small VM/single-core box, cap this to avoid overload.
-        # EXECUTIONS_PROCESS = "main";           # "main" or "own" process
-        # N8N_DEFAULT_CONCURRENCY = "10";
-
-        # =====================================================================
-        # LOGGING
-        # =====================================================================
-        # Log level: error | warn | info | verbose | debug
-        # Start with "info". Switch to "debug" when troubleshooting a workflow.
+        # --- Logging ---
         N8N_LOG_LEVEL = "info";
-
-        # Log output: "console" logs to journald (visible via `journalctl -u n8n`).
-        # "file" writes to a file; add N8N_LOG_FILE_LOCATION if using "file".
-        N8N_LOG_OUTPUT = "console";
+        N8N_LOG_OUTPUT = "console"; # journald picks this up: journalctl -u docker-n8n
 
         # =====================================================================
-        # EDITOR & UI
+        # DATABASE (commented — SQLite default is fine for personal use)
         # =====================================================================
+        # Uncomment to switch to PostgreSQL. Requires services.postgresql and
+        # a database/user created. Use environmentFiles for the password.
+        # DB_TYPE               = "postgresdb";
+        # DB_POSTGRESDB_HOST    = "host.docker.internal"; # reach host postgres
+        # DB_POSTGRESDB_PORT    = "5432";
+        # DB_POSTGRESDB_DATABASE = "n8n";
+        # DB_POSTGRESDB_USER    = "n8n";
+        # DB_POSTGRESDB_PASSWORD = "";  # ← use environmentFiles, not inline
 
-        # The hostname the editor uses to construct its own URLs internally.
-        # Usually not needed when WEBHOOK_URL is set correctly.
-        # N8N_HOST = "localhost";
+        # =====================================================================
+        # EMAIL / SMTP (commented — enable when you have SMTP credentials)
+        # =====================================================================
+        # N8N_EMAIL_MODE  = "smtp";
+        # N8N_SMTP_HOST   = "smtp.resend.com";
+        # N8N_SMTP_PORT   = "587";
+        # N8N_SMTP_USER   = "resend";
+        # N8N_SMTP_PASS   = "";        # ← use environmentFiles
+        # N8N_SMTP_SENDER = "n8n@pentara.tech";
+        # N8N_SMTP_SSL    = "false";
 
-        # Disable the "Community nodes" install tab in the UI (since on NixOS
-        # you manage them declaratively via `customNodes` above anyway).
-        # N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE = "false";
+        # =====================================================================
+        # AUTHENTICATION (commented — owner account on first run is sufficient)
+        # =====================================================================
+        # N8N_BASIC_AUTH_ACTIVE   = "true";
+        # N8N_BASIC_AUTH_USER     = "admin";
+        # N8N_BASIC_AUTH_PASSWORD = "";  # ← use environmentFiles
 
-      }; # end environment
+      };
 
       # -----------------------------------------------------------------------
-      # Task Runners (sandboxed Code node execution)
+      # Secrets via environmentFiles
       # -----------------------------------------------------------------------
-      # n8n's Code node (JavaScript/Python) can execute in two modes:
+      # `environmentFiles` is the correct NixOS oci-containers pattern for secrets.
+      # Each file is a plain KEY=VALUE file (same format as a .env file) that is
+      # loaded at container start. These files must NOT be in the Nix store
+      # (the store is world-readable). Manage them with sops-nix or agenix.
       #
-      #   internal (default): code runs directly in the n8n process. Simple
-      #     but risky — a malicious or buggy script can affect the whole service.
+      # Example file content (/run/secrets/n8n-env):
+      #   N8N_ENCRYPTION_KEY=abc123...
+      #   N8N_SMTP_PASS=hunter2
       #
-      #   external (task runners): code runs in isolated child processes managed
-      #     by the n8n-task-runner-launcher. Better security isolation.
-      #     Requires setting N8N_RUNNERS_AUTH_TOKEN_FILE.
-      #
-      # For a personal/dev setup, the default (internal, runners disabled) is
-      # fine. Enable task runners when you're running untrusted workflows or
-      # want stronger isolation guarantees.
+      # Uncomment once you have sops-nix or agenix wired up:
+      # environmentFiles = [ "/run/secrets/n8n-env" ];
       # -----------------------------------------------------------------------
-      taskRunners = {
 
-        # Set to `true` to enable external task runner sandboxing.
-        # When enabled you MUST also set:
-        #   services.n8n.environment.N8N_RUNNERS_AUTH_TOKEN_FILE
-        enable = false;
+      # -----------------------------------------------------------------------
+      # Container lifecycle
+      # -----------------------------------------------------------------------
+      autoStart = true; # Start with the system; restart on failure
 
-        # When taskRunners.enable = true, you can tune individual runners here.
-        # The module pre-configures javascript and python runners with sensible
-        # defaults. Override only what you need:
-        #
-        # runners = {
-        #   javascript = {
-        #     enable = true;
-        #     # command and healthCheckPort have working defaults — omit unless
-        #     # you need a custom binary path.
-        #     healthCheckPort = 5681;
-        #   };
-        #   python = {
-        #     # Disable Python runner if you don't use Python in Code nodes.
-        #     enable = false;
-        #   };
-        # };
-
-        # Environment variables passed to ALL task runner processes.
-        # environment = {
-        #   N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT = "15";   # seconds of idle before runner exits
-        #   N8N_RUNNERS_MAX_CONCURRENCY = "5";          # max parallel tasks per runner
-        # };
-
-      }; # end taskRunners
-
-    }; # end services.n8n
+      # extraOptions passes additional flags directly to `docker run`.
+      extraOptions = [
+        # Ensure the container restarts automatically if it crashes.
+        "--restart=unless-stopped"
+        # Set a memory ceiling to prevent n8n from consuming all RAM on your
+        # 8GB machine if a workflow goes haywire.
+        "--memory=1g"
+        "--memory-swap=1g" # Same as memory = no swap allowed beyond the limit
+      ];
+    }; # end containers.n8n
 
     # =========================================================================
-    # Reverse proxy (Caddy)
+    # Reverse proxy — Caddy (commented until you have a domain / need TLS)
     # =========================================================================
-    # This is commented out but structured for when you're ready to expose n8n
-    # over HTTPS. Caddy is the recommended choice for a Pentara/CypherOS stack
-    # because it handles TLS certificates automatically via ACME/Let's Encrypt.
+    # Caddy automatically provisions Let's Encrypt certificates. For local
+    # dev (localhost only), leave this commented and access n8n at
+    # http://localhost:5678 directly (you'll need to temporarily change the
+    # port binding above to "5678:5678").
     #
-    # Uncomment and adapt when you have a domain pointing to this machine.
-    # Also set WEBHOOK_URL above to "https://n8n.yourdomain.com/".
+    # When ready to expose over HTTPS:
+    #   1. Point a DNS A record at this machine
+    #   2. Uncomment this block
+    #   3. Change WEBHOOK_URL above to "https://n8n.yourdomain.com/"
+    #   4. Change the port binding back to "127.0.0.1:5678:5678"
     # -------------------------------------------------------------------------
     # services.caddy = {
     #   enable = true;
@@ -336,38 +278,37 @@
     #     '';
     #   };
     # };
-
-    # =========================================================================
-    # PostgreSQL (optional — for production database backend)
-    # =========================================================================
-    # If you switch DB_TYPE to "postgresdb" above, you need a local PostgreSQL
-    # instance. Uncomment this block and run:
-    #   sudo -u postgres createuser --pwprompt n8n
-    #   sudo -u postgres createdb --owner=n8n n8n
-    # -------------------------------------------------------------------------
-    # services.postgresql = {
-    #   enable = true;
-    #   ensureDatabases = [ "n8n" ];
-    #   ensureUsers = [{
-    #     name = "n8n";
-    #     ensureDBOwnership = true;
-    #   }];
-    # };
-
-    # =========================================================================
-    # Backup considerations (informational — not configuration)
-    # =========================================================================
-    # What to back up for a full n8n restore:
     #
-    #   SQLite:     /var/lib/n8n/database.sqlite
-    #               /var/lib/n8n/.n8n/config  ← contains encryption key if not
-    #                                           managed externally
-    #   PostgreSQL: pg_dump n8n > n8n_backup.sql
-    #   Secrets:    whatever manages your _FILE secrets (agenix repo, sops age key)
-    #   Export:     n8n also has a built-in "Export all workflows" in the UI.
-    #               Do this periodically — it produces a portable JSON you can
-    #               import into any n8n instance.
-    # =========================================================================
+    # ── OR keep your Traefik setup ────────────────────────────────────────────
+    # Your original compose.yaml used Traefik with ACME. If you want Traefik
+    # instead of Caddy, you can run Traefik itself as an oci-container alongside
+    # n8n. The Traefik container watches the Docker socket for labeled containers
+    # and automatically creates routes. Add to containers.traefik:
+    #
+    # virtualisation.oci-containers.containers.traefik = {
+    #   image = "traefik:v3";
+    #   ports = [ "80:80" "443:443" ];
+    #   volumes = [
+    #     "/var/run/docker.sock:/var/run/docker.sock:ro"
+    #     "/var/lib/traefik:/letsencrypt"
+    #   ];
+    #   cmd = [
+    #     "--providers.docker=true"
+    #     "--providers.docker.exposedbydefault=false"
+    #     "--entrypoints.web.address=:80"
+    #     "--entrypoints.websecure.address=:443"
+    #     "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+    #     "--certificatesresolvers.letsencrypt.acme.email=your@email.com"
+    #     "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    #   ];
+    # };
+    # Then add traefik labels to the n8n container via extraOptions:
+    # extraOptions = [
+    #   "--label=traefik.enable=true"
+    #   "--label=traefik.http.routers.n8n.rule=Host(`n8n.yourdomain.com`)"
+    #   "--label=traefik.http.routers.n8n.tls.certresolver=letsencrypt"
+    #   "--label=traefik.http.routers.n8n.entrypoints=websecure"
+    # ];
 
-  }; # end config
+  };
 }
