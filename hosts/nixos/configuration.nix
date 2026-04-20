@@ -137,13 +137,38 @@
     # lags — packages built in the last few hours may not have a substitute
     # yet, triggering a source build.
     substituters = [
-      "https://cache.nixos.org"
-      "https://nix-community.cachix.org"
+      "https://cache.nixos.org" # Official Hydra cache — free packages only
+      "https://nix-community.cachix.org" # Community packages — nix-community CI
+      # Garnix — builds nixpkgs aggressively,
+      # great coverage on nixos-unstable commits
+      "https://cache.garnix.io"
+      "https://nixpkgs-terraform.cachix.org" # Pre-built terraform BSL binaries
     ];
 
+    # ── Trusted public keys ───────────────────────────────────────────────────
+    # These are Ed25519 PUBLIC keys published by each cache operator.
+    # Security model: anyone can host a cache server, but Nix won't install
+    # anything from it unless it's signed by a key you explicitly declare here.
+    # These keys are published on each operator's docs/website — not secret.
+    #
+    # IMPORTANT: Keys are bit-for-bit exact. A single wrong character means
+    # every package from that cache falls back to a source build silently.
+    # Verify each key against the operator's official documentation.
+    #
+    # cache.nixos.org key:   https://nixos.org/manual/nix/stable/
+    # nix-community key:     https://app.cachix.org/cache/nix-community
+    # garnix key:            https://garnix.io/docs/caching
     trusted-public-keys = [
+      # The official NixOS cache key — DO NOT typo this
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Bg="
+
+      # nix-community key — verify this matches https://app.cachix.org/cache/nix-community
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+
+      # Garnix public key — from https://garnix.io/docs/caching
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+
+      "nixpkgs-terraform.cachix.org-1:GYPxe7A0BDFmQ0N3UBPwNtSBffFGhS0TkpJFnVBp2JA="
     ];
 
     # ── Substitute-or-fail ────────────────────────────────────────────────────
@@ -485,6 +510,7 @@
     os-prober # for detecting other OSs in a multi-boot setup
 
     glib # needed for gdmBackground activation script
+    hydra-checker # for checking the health of flake inputs and their updates
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────
