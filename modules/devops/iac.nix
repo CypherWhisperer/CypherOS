@@ -33,12 +33,43 @@
 #   pulumi version
 #   tflint --version
 
-{ config, pkgs, lib, ... }:
+# ARCHITECTURE DECISION — why opentofu, not terraform:
+#   Terraform >= 1.6 uses the HashiCorp BSL license. Hydra does not build
+#   BSL/unfree packages. The last Hydra binary was terraform-1.5.7 (Sept 2023).
+#   There will NEVER be a cache.nixos.org binary for any terraform >= 1.6.
+#
+#   opentofu is the Linux Foundation fork of Terraform (forked from 1.5.x,
+#   the last MPL-licensed version). It is:
+#   - CLI-compatible: `tofu` replaces `terraform`. All .tf files work as-is.
+#   - Built by Hydra: binaries available on cache.nixos.org — no source build.
+#   - Actively maintained: releases track terraform feature parity closely.
+#   - License: MPL 2.0 — fully free and open-source.
+#
+# WHY NOT DOCKER:
+#   terraform/opentofu is a CLI TOOL, not a server. It runs, does its work,
+#   and exits. Containerizing a CLI tool means: launch container → run command
+#   → destroy container. This is how CI pipelines use it. On a developer
+#   workstation it adds overhead with zero benefit. Install it directly.
+#
+# MIGRATION FROM TERRAFORM:
+#   If you have existing .tf files:
+#   1. Replace `terraform` with `tofu` in all commands
+#   2. Run `tofu init` — it re-downloads providers
+#   3. Everything else is identical
+#   For provider lock files (.terraform.lock.hcl), run `tofu providers lock`
+#   to regenerate them with opentofu-compatible hashes.
+# =============================================================================
+
 
 {
-  config = lib.mkIf (
-    config.cypher-os.devops.enable &&
-    config.cypher-os.devops.iac.enable ) {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+
+{
+  config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.iac.enable) {
 
     environment.systemPackages = with pkgs; [
 
@@ -48,13 +79,51 @@
       # Despite the license change, the ecosystem (providers, modules, tutorials)
       # is still overwhelmingly built around Terraform.
       # Usage: terraform init && terraform plan && terraform apply
-      terraform
+      #
+      # last successful build: terraform-1.5.7 in September 2023, which is exactly
+      # the last MPL-licensed version before the BSL switch. This confirms:
+      # Hydra (NixOS's CI system) stopped building terraform the moment it went unfree.
+      # No binary will ever appear for terraform ≥ 1.6 on cache.nixos.org.
+      #
+      # No third-party cache (including the terraform-cachix) reliably covers
+      # nixos-unstable's current revision. There is a path for opentofu.
+      # It is CLI-compatible, Hydra builds it, and you get a binary. Make this switch now.
+      #
+      # Build vault in isolation — one job, two cores, explicitly allow the source build.
+      # Do this when the machine is idle
+      #      nix build nixpkgs#vault \
+      #        --option max-jobs 1 \
+      #        --option cores 2 \
+      #        --option fallback true \
+      #        --option sandbox true
+      #
+      #terraform
 
       # ── OpenTofu ──────────────────────────────────────────────────────────────
-      # The FOSS fork of Terraform. CLI is `tofu`. HCL syntax is compatible.
+      # The free, hydra-cache FOSS fork of Terraform.
       # Prefer this for new personal projects — it won't get relicensed.
       # Note: invoked as `tofu`, not `terraform`, to avoid PATH collision.
+      # CLI is `tofu`. HCL syntax is compatible.
+      # CLI: `tofu init`, `tofu plan`, `tofu apply`, `tofu destroy`
       opentofu
+
+      # ── Supporting tools (all Hydra-cached) ──────────────────────────────
+      # tenv: version manager for opentofu/terraform/terragrunt.
+      # Allows pinning specific tool versions per project via .opentofu-version
+      # or .terraform-version files. Useful when working with multiple projects
+      # that require different opentofu versions.
+      # CLI: `tenv tofu install 1.9.0`, `tenv tofu use 1.9.0`
+      tenv
+
+      # terraform-docs: generates documentation from .tf files.
+      # Produces README tables of variables, outputs, and resources.
+      # CLI: `terraform-docs markdown . > README.md`
+      # terraform-docs
+
+      # tflint: linter for Terraform/OpenTofu HCL files.
+      # Catches errors and enforces best practices before apply.
+      # CLI: `tflint --init && tflint`
+      # tflint
 
       # ── Terragrunt ────────────────────────────────────────────────────────────
       # Thin wrapper around Terraform/OpenTofu that adds DRY configurations,
