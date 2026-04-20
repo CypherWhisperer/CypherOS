@@ -29,7 +29,8 @@
     # configuration.nix using a plain assignment (which beats mkDefault).
     #
     (lib.mkIf config.cypher-os.profile.desktop.enable {
-
+      # so that Gnome's Home Manager Module ca 'see' the option set.
+      cypher-os.de.gnome.enable = lib.mkDefault true;
       # mkDefault means these activate UNLESS configuration.nix overrides them.
       # Example override: set desktop.enable = true but gdm.enable = false
       # and sddm.enable = true → sddm wins, gdm stays off.
