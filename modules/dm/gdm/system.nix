@@ -9,7 +9,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -18,7 +17,7 @@
     ../../profile/options.nix
     ./options.nix
   ];
-  config = lib.mkIf config.cypher-os.dm.gdm.enable {
+  config = lib.mkIf (config.cypher-os.profile.desktop && config.cypher-os.dm.gdm.enable) {
     services.displayManager.gdm = {
       enable = true;
       wayland = true; # prefer Wayland sessions; GDM falls back to X11 if needed
