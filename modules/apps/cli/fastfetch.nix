@@ -51,7 +51,7 @@
       # Add or remove PNG files in configs/system/fastfetch/pngs/ and run
       # home-manager switch — they'll appear in the rotation automatically.
       xdg.configFile."fastfetch/pngs" = {
-        source = ../../../configs/system/fastfetch/pngs;
+        source = ../../../configs/cli/fastfetch/pngs;
         recursive = true;
       };
 

@@ -60,7 +60,7 @@ let
   # VSCode will load them from ~/.vscode/extensions/ as normal.
   # To update: install/update via VSCode UI, then copy the updated directory
   # back into configs/editor/vscode-extensions/ and commit.
-  extSrc = ../../../configs/editor/vscode-extensions;
+  extSrc = ../../../configs/editor/vscode/vscode-extensions;
   mkExtLink = dir: {
     name = ".vscode/extensions/${dir}";
     value = {
