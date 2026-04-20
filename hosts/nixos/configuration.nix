@@ -28,9 +28,7 @@
 #   home-manager switch --flake .#cypher-whisperer@nixos-gnome
 
 {
-  config,
   pkgs,
-  lib,
   inputs,
   ...
 }:
@@ -58,7 +56,7 @@
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
     ../../modules/users/cypher-whisperer.nix
-    ../../modules/gaming/steam.nix
+    ../../modules/gaming/steam-system.nix
     ../../modules/devops/system.nix
     ../../modules/virtualisation/system.nix
     ../../modules/de/gnome/system.nix
@@ -220,6 +218,7 @@
     enable = true;
     memoryPercent = 50;
     algorithm = "zstd";
+    #priority = 999;
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
