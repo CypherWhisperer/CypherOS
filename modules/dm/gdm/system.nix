@@ -13,11 +13,6 @@
 }:
 
 {
-  imports = [
-    ../../profile/options.nix
-    ./options.nix
-  ];
-
   config = lib.mkIf (config.cypher-os.profile.desktop.enable && config.cypher-os.dm.gdm.enable) {
     services.displayManager.gdm = {
       enable = true;

@@ -55,6 +55,9 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
+
+    ../../modules/profile/system.nix
+
     ../../modules/users/cypher-whisperer.nix
     ../../modules/gaming/steam-system.nix
     ../../modules/devops/system.nix
@@ -62,6 +65,8 @@
     ../../modules/de/gnome/system.nix
     ../../modules/dm/gdm/system.nix
   ];
+
+  cypher-os.profile.desktop.enable = true;
 
   # ─────────────────────────────────────────────────────────────────────────────
   # UNFREE PACKAGES (SYSTEM LEVEL)

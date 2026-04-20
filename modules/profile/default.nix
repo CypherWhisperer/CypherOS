@@ -14,6 +14,8 @@
 # IMPORTANT: No `imports` live here. All module imports are handled
 # unconditionally in modules/home/default.nix. This file only sets values.
 
+# HOME MANAGER CONCERNS
+
 { config, lib, ... }:
 
 {
@@ -31,10 +33,6 @@
       # mkDefault means these activate UNLESS configuration.nix overrides them.
       # Example override: set desktop.enable = true but gdm.enable = false
       # and sddm.enable = true → sddm wins, gdm stays off.
-      cypher-os.de.gnome.enable = lib.mkDefault true;
-      cypher-os.dm.gdm.enable = lib.mkDefault true;
-      cypher-os.gaming.enable = lib.mkDefault true;
-      cypher-os.gaming.steam.enable = lib.mkDefault true;
       cypher-os.gaming.minecraft.enable = lib.mkDefault true;
 
       # apps is always set to true as a default. If you need to
@@ -78,20 +76,6 @@
       cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
       cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
 
-      # ─────────────────────────────────────────────────────────────────────────────
-      # DEVOPS INFRASTRUCTURE
-      # ─────────────────────────────────────────────────────────────────────────────
-      cypher-os.devops.enable = lib.mkDefault true;
-      cypher-os.devops.containers.enable = lib.mkDefault true;
-      cypher-os.devops.kubernetes.enable = lib.mkDefault true;
-      cypher-os.devops.databases.enable = lib.mkDefault true;
-      cypher-os.devops.iac.enable = lib.mkDefault true;
-      cypher-os.devops.secrets.enable = lib.mkDefault true;
-      cypher-os.devops.n8n.enable = lib.mkDefault true;
-      # ─────────────────────────────────────────────────────────────────────────────
-      # VIRTUALISATION HELPERS TOGGLE
-      # ─────────────────────────────────────────────────────────────────────────────
-      cypher-os.virtualisation.helpers.enable = lib.mkDefault false;
     })
 
     # ── Server profile defaults ────────────────────────────────────────────
@@ -109,16 +93,6 @@
       cypher-os.apps.cli.enable = lib.mkDefault true;
       cypher-os.apps.editor.enable = lib.mkDefault true;
       cypher-os.apps.dev.enable = lib.mkDefault true;
-
-      # ─────────────────────────────────────────────────────────────────────────────
-      # DEVOPS INFRASTRUCTURE
-      # ─────────────────────────────────────────────────────────────────────────────
-      cypher-os.devops.enable = lib.mkDefault true;
-      cypher-os.devops.containers.enable = lib.mkDefault true;
-      cypher-os.devops.kubernetes.enable = lib.mkDefault true;
-      cypher-os.devops.databases.enable = lib.mkDefault true;
-      cypher-os.devops.iac.enable = lib.mkDefault true;
-      cypher-os.devops.secrets.enable = lib.mkDefault true;
     })
   ];
 }
