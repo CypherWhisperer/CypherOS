@@ -53,6 +53,22 @@
 }:
 
 let
+  # ── nix-vscode-extensions aliases ─────────────────────────────────────────
+  # These give us short names to reach the two registries.
+  #
+  # vscode-marketplace: Microsoft's official registry.
+  #   Use for extensions that are exclusive to it (proprietary, AI tools, etc.)
+  #
+  # open-vsx: The vendor-neutral open-source registry.
+  #   Prefer this when an extension is available on both — no Microsoft ToS
+  #   concerns, and the extension is byte-for-byte identical in most cases.
+  #
+  # IMPORTANT: publisher and extension names are ALWAYS fully lowercase
+  # in Nix attribute paths, even when the marketplace shows mixed case.
+  # e.g. "Prisma" publisher → prisma.prisma, "fwcd" → fwcd.kotlin
+  vscMkt = pkgs.nix-vscode-extensions.vscode-marketplace;
+  openVsx = pkgs.nix-vscode-extensions.open-vsx;
+
   # ── Marketplace Extensions (backup-based deployment) ──────────────────────
   # These extensions are deployed from the configs/editor/vscode-extensions/
   # backup rather than fetched from the marketplace via Nix.
@@ -99,217 +115,6 @@ let
     "13xforever.language-x86-64-assembly-3.1.4"
   ];
 
-  # ── Marketplace Extension Builder ─────────────────────────────────────────
-  # For extensions not in nixpkgs.
-  # Replace sha256 = lib.fakeHash with the value from the build error.
-  buildExt =
-    {
-      publisher,
-      name,
-      version,
-      sha256,
-    }:
-    pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-      mktplcRef = { inherit publisher name version; };
-      inherit sha256;
-    };
-
-  # ── Extensions not in nixpkgs ────────────────────────────────────────────
-  marketplaceExtensions = [
-    # AI / Code Review
-    # (buildExt {
-    # publisher = "coderabbit";
-    # name = "coderabbit-vscode";
-    # version = "0.7.5";
-    # sha256 = "sha256-fnM6vFxopCqGQnyMMfVYclwa20bWJSI1MTQ1N87JAic=";
-    # })
-    # (buildExt {
-    # publisher = "openai";
-    # name = "chatgpt";
-    # version = "0.4.69";
-    # sha256 = "sha256-9iIFRYSpXoravyBJK2KpTGKOv+K3z1yyILSlcwR2boM=";
-    # })
-
-    #Code runner
-    # (buildExt {
-    # publisher = "formulahendry";
-    # name = "code-runner";
-    # version = "0.12.2";
-    # sha256 = "sha256-TI5K6n3QfJwgFz5xhpdZ+yzi9VuYGcSzdBckZ68DsUQ=";
-    # })
-
-    #Theme
-    # (buildExt {
-    # publisher = "decaycs";
-    # name = "decay";
-    # version = "1.0.9";
-    # sha256 = "sha256-TwDq8K757CTFEBBBGbP5eOC5nMrQzgf/XYIHi9UCAkU=";
-    # })
-    # (buildExt {
-    # publisher = "nishantg96";
-    # name = "dark-decay-pro";
-    # version = "1.0.0";
-    # sha256 = "sha256-9m5lBdG3COn9MWb3KZ/rYUTpE0eKWn5F9c35smqmqxk=";
-    # })
-
-    #HTML
-    # (buildExt {
-    # publisher = "george-alisson";
-    # name = "html-preview-vscode";
-    # version = "0.2.5";
-    # sha256 = "sha256-1kjhNLFRUashPYko5F7p8gNwe+heT4wKAPZiJsTqgdg=";
-    # })
-    # (buildExt {
-    # publisher = "sidthesloth";
-    # name = "html5-boilerplate";
-    # version = "1.1.1";
-    # sha256 = "sha256-gLflPFwythZ0QDgDiXKGRleJlqvHAO34/VSTIWEJQNo=";
-    # })
-    # (buildExt {
-    # publisher = "riazxrazor";
-    # name = "html-to-jsx";
-    # version = "0.0.1";
-    # sha256 = "sha256-7LBILbqa6MSrVZ7xf5CZCgOFiaZl5bocVYt45VaJ+Vc=";
-    # })
-
-    #CSS
-    # (buildExt {
-    # publisher = "phoenisx";
-    # name = "cssvar";
-    # version = "2.6.5";
-    # sha256 = "sha256-nmi0T7fkP+mIqCYSbGiCqLIj5QOdMaZuNPrPNhpOk1c=";
-    # })
-
-    #SVG
-    # (buildExt {
-    # publisher = "henoc";
-    # name = "svgeditor";
-    # version = "2.9.0";
-    # sha256 = "sha256-29CA3ZoOXNj6lM1hqOwXOGEOLpaNkwKlRhiSQXKr3x8=";
-    # })
-    # (buildExt {
-    # publisher = "sidthesloth";
-    # name = "svg-snippets";
-    # version = "1.0.1";
-    # sha256 = "sha256-pkTNbUgYelc3y09o4NPz3xGQ2LNqKbpipmNmBkLdLhg=";
-    # })
-
-    #JavaScript / TypeScript / React
-    # (buildExt {
-    # publisher = "xabikos";
-    # name = "javascriptsnippets";
-    # version = "1.8.0";
-    # sha256 = "sha256-ht6Wm1X7zien+fjMv864qP+Oz4M6X6f2RXjrThURr6c=";
-    # })
-
-    # (buildExt {
-    # publisher = "dsznajder";
-    # name = "es7-react-js-snippets";
-    # version = "4.4.3";
-    # sha256 = "sha256-QF950JhvVIathAygva3wwUOzBLjBm7HE3Sgcp7f20Pc=";
-    # })
-    # (buildExt {
-    # publisher = "burkeholland";
-    # name = "simple-react-snippets";
-    # version = "1.2.8";
-    # sha256 = "sha256-zrRxJZHRqBMGVkd56Q+wDbCSFfl4X3Kta4sX8ecZmu8=";
-    # })
-    # (buildExt {
-    # publisher = "ms-vscode";
-    # name = "vscode-typescript-next";
-    # version = "5.8.20250207";
-    # sha256 = "sha256-QEoajJsIlS2fDwxcwcoPMAJGVDchQ7IdqAB3X1MyO7A=";
-    # })
-    # (buildExt {
-    # publisher = "jasonnutter";
-    # name = "search-node-modules";
-    # version = "1.3.0";
-    # sha256 = "sha256-X2CkCVF46McnXDlASlRHKixlAzR+hU4ys8A8JsbpfYI=";
-    # })
-    # (buildExt {
-    # publisher = "infeng";
-    # name = "vscode-react-typescript";
-    # version = "1.3.1";
-    # sha256 = "sha256-eaKtnKqPkCm/xxCzUOhHd536n3Y9MZWrVerIO2u/tro=";
-    # })
-    # (buildExt {
-    # publisher = "msjsdiag";
-    # name = "vscode-react-native";
-    # version = "1.13.0";
-    # sha256 = "sha256-zryzoO9sb1+Kszwup5EhnN/YDmAPz7TOQW9I/K28Fmg=";
-    # })
-    # (buildExt {
-    # publisher = "jawandarajbir";
-    # name = "react-vscode-extension-pack";
-    # version = "1.0.0";
-    # sha256 = "sha256-7XzTLhhx2i+nDpmR1Cjgn6Ngv+5ictLXo+kfAgNhFeM=";
-    # })
-
-    #Python
-    # (buildExt {
-    # publisher = "donjayamanne";
-    # name = "python-environment-manager";
-    # version = "1.2.7";
-    # sha256 = "sha256-w3csu6rJm/Z6invC/TR7tx6Aq5DD77VM62nem8/QMlg=";
-    # })
-    # (buildExt {
-    # publisher = "kevinrose";
-    # name = "vsc-python-indent";
-    # version = "1.19.0";
-    # sha256 = "sha256-gX0L416RXIQ9S4kFguEJJ7u4GSo7WbpifXmL/mWCU08=";
-    # })
-
-    #Rust
-    # (buildExt {
-    # publisher = "dustypomerleau";
-    # name = "rust-syntax";
-    # version = "0.6.1";
-    # sha256 = "sha256-o9iXPhwkimxoJc1dLdaJ8nByLIaJSpGX/nKELC26jGU=";
-    # })
-    # (buildExt {
-    # publisher = "1yib";
-    # name = "rust-bundle";
-    # version = "1.0.0";
-    # sha256 = "sha256-G2vHX9LBKmUhd5K3oKAojcfVIWydjPS03xkBW+cepaU=";
-    # })
-    # (buildExt {
-    # publisher = "swellaby";
-    # name = "rust-pack";
-    # version = "0.3.38";
-    # sha256 = "sha256-ykAi5qDJQaDAiPY5CSy3zO52wMQEzuY62UeN1y2M96o=";
-    # })
-
-    #Assembly
-    # (buildExt {
-    # publisher = "13xforever";
-    # name = "language-x86-64-assembly";
-    # version = "3.1.4";
-    # sha256 = "sha256-FJRDm1H3GLBfSKBSFgVspCjByy9m+j9OStlU+/pMfs8=";
-    # })
-
-    #SQL
-    # (buildExt {
-    # publisher = "mtxr";
-    # name = "sqltools";
-    # version = "0.28.3";
-    # sha256 = "sha256-bTrHAhj8uwzRIImziKsOizZf8+k3t+VrkOeZrFx7SH8=";
-    # })
-    # (buildExt {
-    # publisher = "mtxr";
-    # name = "sqltools-driver-pg";
-    # version = "0.5.2";
-    # sha256 = "sha256-fBBh8WhCZBoj+SvK+5i8Q6DsiHZ6wi+KASVAXPVKA6E=";
-    # })
-
-    #Mobile
-    # (buildExt {
-    # publisher = "fwcd";
-    # name = "kotlin";
-    # version = "0.2.34";
-    # sha256 = "sha256-03F6cHIA9Tx8IHbVswA8B58tB8aGd2iQi1i5+1e1p4k=";
-    # })
-  ];
-
   # ── Shared settings.json ──────────────────────────────────────────────────
   sharedSettings = {
 
@@ -319,7 +124,7 @@ let
     #
     # HyDE-era themes — uncomment to switch:
     # "workbench.colorTheme" = "Tokyo Night";          # tokyonight.tokyonight
-    "workbench.colorTheme" = "Catppuccin Mocha"; # catppuccin.catppuccin-vsc
+    # "workbench.colorTheme" = "Catppuccin Mocha"; # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Macchiato"; # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Frappé";    # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Latte";     # catppuccin.catppuccin-vsc
@@ -630,127 +435,211 @@ let
 
 in
 {
-  config = lib.mkIf (
-    config.cypher-os.apps.editor.enable &&
-    config.cypher-os.profile.desktop.enable &&
-    config.cypher-os.apps.editor.vscode.enable ) {
+  config =
+    lib.mkIf
+      (
+        config.cypher-os.apps.editor.enable
+        && config.cypher-os.profile.desktop.enable
+        && config.cypher-os.apps.editor.vscode.enable
+      )
+      {
 
-    # ── VSCode ──────────────────────────────────────────────────────────────────
-    programs.vscode = {
-      enable = true;
+        # ── VSCode ──────────────────────────────────────────────────────────────────
+        programs.vscode = {
+          enable = true;
 
-      # mutableExtensionsDir = false: prevents VSCode from writing to the
-      # extensions directory at runtime. All extensions come from Nix.
-      # Set to true if you want to install extensions manually alongside
-      # the Nix-managed ones (useful while evaluating new extensions).
-      mutableExtensionsDir = true; # true during active configuration phase
+          # mutableExtensionsDir = false: prevents VSCode from writing to the
+          # extensions directory at runtime. All extensions come from Nix.
+          # Set to true if you want to install extensions manually alongside
+          # the Nix-managed ones (useful while evaluating new extensions).
+          mutableExtensionsDir = true; # true during active configuration phase
 
-      # userSettings: written to VSCode's settings.json.
-      # Shared settings are merged here.
-      profiles.default.userSettings = sharedSettings;
+          # userSettings: written to VSCode's settings.json.
+          # Shared settings are merged here.
+          profiles.default.userSettings = sharedSettings;
 
-      profiles.default.extensions =
-        with pkgs.vscode-extensions;
-        [
-          # ── Theme ────────────────────────────────────────────────────────────
-          # Uncomment to install alongside (switch via workbench.colorTheme above):
-          # enkia.tokyo-night
-          catppuccin.catppuccin-vsc
-          # dracula-theme.theme-dracula
-          # zhuangtongfa.material-theme   # One Dark Pro
-          # jdinhlife.gruvbox
-          # arcticicestudio.nord-visual-studio-code
+          profiles.default.extensions =
+            with pkgs.vscode-extensions;
+            [
+              # ── Theme ────────────────────────────────────────────────────────────
+              # Uncomment to install alongside (switch via workbench.colorTheme above):
+              # enkia.tokyo-night
+              #catppuccin.catppuccin-vsc
+              # dracula-theme.theme-dracula
+              # zhuangtongfa.material-theme   # One Dark Pro
+              # jdinhlife.gruvbox
+              # arcticicestudio.nord-visual-studio-code
 
-          # ── General Productivity ─────────────────────────────────────────────
-          aaron-bond.better-comments
-          naumovs.color-highlight
-          christian-kohler.path-intellisense
-          christian-kohler.npm-intellisense
-          visualstudioexptteam.vscodeintellicode
-          visualstudioexptteam.intellicode-api-usage-examples
+              # ── General Productivity ─────────────────────────────────────────────
+              aaron-bond.better-comments
+              naumovs.color-highlight
+              christian-kohler.path-intellisense
+              christian-kohler.npm-intellisense
+              visualstudioexptteam.vscodeintellicode
+              visualstudioexptteam.intellicode-api-usage-examples
 
-          # ── Web / HTML / CSS ──────────────────────────────────────────────────
-          ecmel.vscode-html-css
-          ritwickdey.liveserver
+              # ── Web / HTML / CSS ──────────────────────────────────────────────────
+              ecmel.vscode-html-css
+              ritwickdey.liveserver
 
-          # ── JavaScript / TypeScript ───────────────────────────────────────────
-          dbaeumer.vscode-eslint
+              # ── Web: Prisma ───────────────────────────────────────────────────────────────
+              # Syntax highlighting, formatting, auto-completion, and jump-to-definition
+              # for .prisma schema files. In nixpkgs — no marketplace fetch needed.
+              prisma.prisma
 
-          # ── Vue / Svelte ──────────────────────────────────────────────────────
-          vue.volar # Vue 3 official language support
-          svelte.svelte-vscode # Svelte language support
+              # ── JavaScript / TypeScript ───────────────────────────────────────────
+              dbaeumer.vscode-eslint
 
-          # ── SVG ──────────────────────────────────────────────────────────────
-          jock.svg
+              # ── Vue / Svelte ──────────────────────────────────────────────────────
+              vue.volar # Vue 3 official language support
+              svelte.svelte-vscode # Svelte language support
 
-          # ── Python ───────────────────────────────────────────────────────────
-          ms-python.python
-          ms-python.vscode-pylance
-          ms-python.debugpy
-          njpwerner.autodocstring
-          batisteo.vscode-django
-          wholroyd.jinja
+              # ── SVG ──────────────────────────────────────────────────────────────
+              jock.svg
 
-          # ── Bash / Shell ─────────────────────────────────────────────────────
-          mads-hartmann.bash-ide-vscode # bash LSP (bash-language-server)
-          timonwong.shellcheck # ShellCheck linting integration
+              # ── Python ───────────────────────────────────────────────────────────
+              ms-python.python
+              ms-python.vscode-pylance
+              ms-python.debugpy
+              njpwerner.autodocstring
+              batisteo.vscode-django
+              wholroyd.jinja
 
-          # ── Lua ───────────────────────────────────────────────────────────────
-          sumneko.lua # Lua LSP — essential for CypherIDE config editing
+              # ── Bash / Shell ─────────────────────────────────────────────────────
+              mads-hartmann.bash-ide-vscode # bash LSP (bash-language-server)
+              timonwong.shellcheck # ShellCheck linting integration
 
-          # ── Nix ───────────────────────────────────────────────────────────────
-          # jnoortheen.nix-ide is referenced in language settings above.
-          # Adding it here makes the formatter actually available.
-          jnoortheen.nix-ide # Nix language support + nixd LSP integration
+              # ── Lua ───────────────────────────────────────────────────────────────
+              sumneko.lua # Lua LSP — essential for CypherIDE config editing
 
-          # ── Rust ─────────────────────────────────────────────────────────────
-          rust-lang.rust-analyzer
-          serayuzgur.crates # Cargo.toml dependency helper
-          tamasfe.even-better-toml # TOML syntax + validation
-          vadimcn.vscode-lldb # LLDB debugger for Rust/C/C++
+              # ── Nix ───────────────────────────────────────────────────────────────
+              # jnoortheen.nix-ide is referenced in language settings above.
+              # Adding it here makes the formatter actually available.
+              jnoortheen.nix-ide # Nix language support + nixd LSP integration
 
-          # ── C / C++ ──────────────────────────────────────────────────────────
-          ms-vscode.cpptools
-          ms-vscode.cpptools-extension-pack
-          ms-vscode.cmake-tools
-          twxs.cmake
+              # ── Rust ─────────────────────────────────────────────────────────────
+              rust-lang.rust-analyzer
+              serayuzgur.crates # Cargo.toml dependency helper
+              tamasfe.even-better-toml # TOML syntax + validation
+              vadimcn.vscode-lldb # LLDB debugger for Rust/C/C++
 
-          # ── Vim keybindings ──────────────────────────────────────────────────
-          #vscodevim.vim
+              # ── C / C++ ──────────────────────────────────────────────────────────
+              ms-vscode.cpptools
+              ms-vscode.cpptools-extension-pack
+              ms-vscode.cmake-tools
+              twxs.cmake
 
-          # ── Flutter / Dart ────────────────────────────────────────────────────
-          dart-code.flutter # Flutter tooling, hot reload, device management
-          dart-code.dart-code # Dart language support (flutter depends on this)
+              # ── Vim keybindings ──────────────────────────────────────────────────
+              #vscodevim.vim
 
-          # ── Mobile: React Native ──────────────────────────────────────────────
-          # msjsdiag.vscode-react-native is in marketplace tier (not in nixpkgs)
+              # ── Flutter / Dart ────────────────────────────────────────────────────
+              dart-code.flutter # Flutter tooling, hot reload, device management
+              dart-code.dart-code # Dart language support (flutter depends on this)
 
-          # ── DevOps: Docker ────────────────────────────────────────────────────
-          ms-azuretools.vscode-docker
-          ms-vscode-remote.remote-containers
-          # ── DevOps: Containers  ───────────────────────────────────────────────
-          ms-azuretools.vscode-containers
-          ms-vscode-remote.remote-containers
+              # ── Mobile: React Native ──────────────────────────────────────────────
+              # msjsdiag.vscode-react-native is in marketplace tier (not in nixpkgs)
 
-          # ── DevOps: Kubernetes ────────────────────────────────────────────────
-          ms-kubernetes-tools.vscode-kubernetes-tools
-          redhat.vscode-yaml # YAML support — used by k8s manifests, GH Actions
+              # ── DevOps: Docker ────────────────────────────────────────────────────
+              ms-azuretools.vscode-docker
+              ms-vscode-remote.remote-containers
+              # ── DevOps: Containers  ───────────────────────────────────────────────
+              ms-azuretools.vscode-containers
+              ms-vscode-remote.remote-containers
 
-          # ── DevOps: CI/CD ─────────────────────────────────────────────────────
-          github.vscode-github-actions
-        ]
-        ++ marketplaceExtensions;
-    };
+              # ── DevOps: Kubernetes ────────────────────────────────────────────────
+              ms-kubernetes-tools.vscode-kubernetes-tools
+              redhat.vscode-yaml # YAML support — used by k8s manifests, GH Actions
 
-    # Deploying the backup extension extensions
-    home.file = builtins.listToAttrs (map mkExtLink backupExtensions);
+              # ── DevOps: CI/CD ─────────────────────────────────────────────────────
+              github.vscode-github-actions
+            ]
+            ++ [
+               # ── Tier 2: nix-vscode-extensions (marketplace/open-vsx) ──────────────────
+               # Extensions not packaged in nixpkgs, sourced from nix-community/nix-vscode-extensions.
+               # No sha256 needed — hashes are pre-computed in the flake's JSON cache.
+               # To update all of these to their latest versions: nix flake update nix-vscode-extensions
+               #
+               # Naming convention: vscMkt.<publisher>.<extension-name> (all lowercase)
+               # Check Open VSX first (openVsx.*) — prefer it over vscMkt when available.
 
-    # ── Shared Settings Deployment ──────────────────────────────────────────────
-    # Deploy the same settings.json to Cursor and Antigravity.
-    # Both editors respect the XDG config path pattern.
-    # The JSON is generated from sharedSettings (same source as VSCode above).
-    xdg.configFile."Cursor/User/settings.json".text = builtins.toJSON sharedSettings;
+               # ── AI / Code Review ───────────────────────────────────────────────────────
+               vscMkt.coderabbit.coderabbit-vscode
+               vscMkt.openai.chatgpt
 
-    xdg.configFile."antigravity/User/settings.json".text = builtins.toJSON sharedSettings;
-  };
+               # ── Code Runner ────────────────────────────────────────────────────────────
+               vscMkt.formulahendry.code-runner
+
+               # ── Theme ──────────────────────────────────────────────────────────────────
+               # Catppuccin handled separately via catppuccin/nix flake module (see below)
+               vscMkt.decaycs.decay
+               vscMkt.nishantg96.dark-decay-pro
+
+               # ── HTML ───────────────────────────────────────────────────────────────────
+               vscMkt.george-alisson.html-preview-vscode
+               vscMkt.sidthesloth.html5-boilerplate
+               vscMkt.riazxrazor.html-to-jsx
+
+               # ── CSS ────────────────────────────────────────────────────────────────────
+               vscMkt.phoenisx.cssvar
+
+               # ── SVG ────────────────────────────────────────────────────────────────────
+               vscMkt.henoc.svgeditor
+               vscMkt.sidthesloth.svg-snippets
+
+               # ── JavaScript / TypeScript / React ────────────────────────────────────────
+               vscMkt.xabikos.javascriptsnippets
+               vscMkt.xabikos.reactsnippets
+               vscMkt.dsznajder.es7-react-js-snippets
+               vscMkt.burkeholland.simple-react-snippets
+               vscMkt.ms-vscode.vscode-typescript-next
+               vscMkt.jasonnutter.search-node-modules
+               vscMkt.infeng.vscode-react-typescript
+               vscMkt.msjsdiag.vscode-react-native
+               vscMkt.jawandarajbir.react-vscode-extension-pack
+
+               # ── Python ─────────────────────────────────────────────────────────────────
+               vscMkt.donjayamanne.python-environment-manager
+               vscMkt.kevinrose.vsc-python-indent
+
+               # ── Rust ───────────────────────────────────────────────────────────────────
+               vscMkt.dustypomerleau.rust-syntax
+               vscMkt.1yib.rust-bundle
+               vscMkt.swellaby.rust-pack
+
+               # ── Assembly ───────────────────────────────────────────────────────────────
+               vscMkt.13xforever.language-x86-64-assembly
+
+               # ── SQL ────────────────────────────────────────────────────────────────────
+               vscMkt.mtxr.sqltools
+               vscMkt.mtxr.sqltools-driver-pg
+
+               # ── Mobile: Kotlin ─────────────────────────────────────────────────────────
+               # Not in nixpkgs — sourced from nix-vscode-extensions.
+               vscMkt.fwcd.kotlin
+
+               # ── DevOps: Docker Compose ─────────────────────────────────────────────────
+               # p1c2u's Docker Compose extension — not in nixpkgs.
+               vscMkt.p1c2u.vscode-docker-compose
+
+               # ── DevOps: Docker Extension Pack (Jun Han) ────────────────────────────────
+               # The pack itself; ms-azuretools.vscode-docker is already in Tier 1 above.
+               vscMkt.formulahendry.vscode-docker
+
+               # ── AI: Claude Code ────────────────────────────────────────────────────────
+               # Anthropic's Claude Code extension — not in nixpkgs.
+               vscMkt.anthropic.claude-code
+             ];
+        };
+
+        # Deploying the backup extension extensions
+        home.file = builtins.listToAttrs (map mkExtLink backupExtensions);
+
+        # ── Shared Settings Deployment ──────────────────────────────────────────────
+        # Deploy the same settings.json to Cursor and Antigravity.
+        # Both editors respect the XDG config path pattern.
+        # The JSON is generated from sharedSettings (same source as VSCode above).
+        xdg.configFile."Cursor/User/settings.json".text = builtins.toJSON sharedSettings;
+
+        xdg.configFile."antigravity/User/settings.json".text = builtins.toJSON sharedSettings;
+      };
 }

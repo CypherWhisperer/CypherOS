@@ -84,6 +84,7 @@
   # in system config AND in Home Manager modules that receive the same pkgs.
   nixpkgs.overlays = [
     inputs.claude-desktop.overlays.default
+    inputs.nix-vscode-extensions.overlays.default
   ];
 
   # ─────────────────────────────────────────────────────────────────────────────

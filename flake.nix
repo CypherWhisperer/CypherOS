@@ -65,6 +65,19 @@
       url = "github:aaddrick/claude-desktop-debian";
       inputs.nixpkgs.follows = "nixpkgs"; # deduplicate — use our nixpkgs, not theirs
     };
+
+    # nix-community/nix-vscode-extensions
+    # Provides a declarative attrset of virtually every extension on the VS Code
+    # Marketplace and Open VSX registry, with pre-computed hashes.
+    # This is the escape hatch for extensions not packaged in nixpkgs — no manual
+    # sha256 hunting, no hash-mismatch failures at build time.
+    # Update all extension hashes in one shot with: nix flake update nix-vscode-extensions
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      # Deduplicate — use our nixpkgs revision, not the one nix-vscode-extensions
+      # would pull independently. Same reason as claude-desktop above.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -83,6 +96,7 @@
       nixpkgs,
       home-manager,
       claude-desktop,
+      nix-vscode-extensions,
       ...
     }@inputs:
     let
@@ -105,6 +119,15 @@
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        overlays = [
+          # Injects pkgs.nix-vscode-extensions into the package set.
+          # After this, any module receiving pkgs can access:
+          #   pkgs.nix-vscode-extensions.vscode-marketplace.<publisher>.<name>
+          #   pkgs.nix-vscode-extensions.open-vsx.<publisher>.<name>
+          # Publisher and extension names must be fully lowercase in Nix attribute
+          # paths, even if the marketplace shows mixed case.
+          nix-vscode-extensions.overlays.default
+        ];
       };
 
     in
