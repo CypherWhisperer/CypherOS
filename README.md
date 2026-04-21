@@ -317,7 +317,7 @@ This drops you into a temporary shell with `git` and `neovim` available via the 
 #### Clone the Repository
 
 ```bash
-git clone https://github.com/CypherWhisperer/CypherOS CypherOS
+git clone --recursive-submodules https://github.com/CypherWhisperer/CypherOS CypherOS
 ```
 
 > **On the git working tree:** `nixos-install` and `nixos-rebuild` require the flake path to be either a clean git tree or a path without git tracking. If you encounter a `git tree is dirty` warning that becomes an error, the options are:
