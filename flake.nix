@@ -78,6 +78,15 @@
       # would pull independently. Same reason as claude-desktop above.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Catppuccin/nix — provides a Home Manager module for declarative Catppuccin
+    # theming across many applications, including a VSCode extension that
+    # pre-compiles the theme at build time (bypassing the read-only store problem
+    # that breaks the nixpkgs catppuccin-vsc extension).
+    catppuccin = {
+      url = "github:catppuccin/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -97,6 +106,7 @@
       home-manager,
       claude-desktop,
       nix-vscode-extensions,
+      catppuccin,
       ...
     }@inputs:
     let
@@ -195,7 +205,10 @@
                   ...
                 }:
                 {
-                  imports = [ ./modules/home/default.nix ];
+                  imports = [
+                    ./modules/home/default.nix
+                    inputs.catppuccin.homeManagerModules.catppuccin
+                  ];
 
                   # Identity — must match users.users declaration in configuration.nix
                   home.username = "cypher-whisperer";
