@@ -60,7 +60,6 @@
 #   to regenerate them with opentofu-compatible hashes.
 # =============================================================================
 
-
 {
   config,
   pkgs,
@@ -97,7 +96,8 @@
       #        --option fallback true \
       #        --option sandbox true
       #
-      #terraform
+      # It does require allowUnfree to be true, otherwise NixOS will refuse to build.
+      terraform
 
       # ── OpenTofu ──────────────────────────────────────────────────────────────
       # The free, hydra-cache FOSS fork of Terraform.
