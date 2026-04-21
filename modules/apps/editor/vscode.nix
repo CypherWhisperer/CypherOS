@@ -8,20 +8,16 @@
 #   fork has its own extension host and marketplace integration.
 #
 #   programs.vscode handles the VSCode binary and its extensions declaratively.
-#   Cursor and Antigravity are declared in home.packages (no HM module exists
-#   for them) with settings deployed via xdg.configFile.
+#   Cursor and Antigravity share the settings deployed via xdg.configFile.
 #
 # EXTENSIONS — TWO TIERS:
 #   Tier 1 (nixpkgs): extensions available as pkgs.vscode-extensions.*
 #     Managed by Nix — reproducible, no network call at activation time.
 #
-#   Tier 2 (marketplace): extensions not in nixpkgs, fetched from Open VSX
-#     or the VS Marketplace via vscode-utils.buildVscodeMarketplaceExtension.
-#     These require a hash — use lib.fakeHash first, build, copy the correct
-#     hash from the error output, update the file.
-#     Hash update workflow (same as tmux plugins):
-#       nix-prefetch-url --unpack \
-#         https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<name>/<version>/vspackage
+#   Tier 2 (marketplace): extensions not in nixpkgs, fetched from
+#     pkgs.nix-vscode-extensions.vscode-marketplace.Previous approach via
+#     Open VSX/ VS Marketplace (via vscode-utils.buildVscodeMarketplaceExtension)
+#     Was ruled over due to issues with building (hash mismatches).
 #
 # MAPLE MONO FONT NOTE:
 #   settings.json specifies Maple Mono as the editor font. Not in nixpkgs.
@@ -34,16 +30,9 @@
 #
 # SHARED SETTINGS STRATEGY:
 #   One settings.json is deployed to VSCode, Cursor, and Antigravity.
-#   If you need editor-specific overrides later, add a separate xdg.configFile
+#   If editor-specific overrides are needed, add separate xdg.configFile
 #   entry that writes only the differing keys — the last writer wins for
 #   each key in VSCode's settings merge.
-#
-# ANDROID STUDIO / FLUTTER NOTE:
-#   Flutter and Dart are declared in home.packages below. Android Studio
-#   is left as a bare package — run it once to let it download its own SDK
-#   via the built-in SDK Manager before investing in declarative SDK config.
-#   When ready, replace pkgs.android-studio with an androidenv.composeAndroidPackages
-#   derivation — see modules/apps/android.nix (future).
 
 {
   config,
@@ -423,7 +412,7 @@ in
         #           pink, red, rosewater, sapphire, sky, teal, yellow
         catppuccin.vscode.profile.default = {
           enable = true;
-          flavor = "mocha"; # your current preference
+          flavor = "mocha"; # current preference
           accent = "mauve"; # adjust to taste
         };
 
