@@ -179,7 +179,7 @@
       #        --option fallback true \
       #        --option sandbox true
       #
-      #vault
+      vault
 
       # vault ≥ 1.15 is BSL/unfree. Hydra last built 1.14.8.
       # If you need vault for secrets management, you have two real options:
