@@ -118,12 +118,12 @@
       # terraform-docs: generates documentation from .tf files.
       # Produces README tables of variables, outputs, and resources.
       # CLI: `terraform-docs markdown . > README.md`
-      # terraform-docs
+      terraform-docs
 
       # tflint: linter for Terraform/OpenTofu HCL files.
       # Catches errors and enforces best practices before apply.
       # CLI: `tflint --init && tflint`
-      # tflint
+      tflint
 
       # ── Terragrunt ────────────────────────────────────────────────────────────
       # Thin wrapper around Terraform/OpenTofu that adds DRY configurations,
