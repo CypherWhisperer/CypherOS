@@ -76,7 +76,6 @@
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
       cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
-
     })
 
     # ── Server profile defaults ────────────────────────────────────────────

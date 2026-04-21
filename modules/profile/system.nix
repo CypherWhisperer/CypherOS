@@ -58,7 +58,7 @@
       # ─────────────────────────────────────────────────────────────────────────────
       # VIRTUALISATION HELPERS TOGGLE
       # ─────────────────────────────────────────────────────────────────────────────
-      cypher-os.virtualisation.helpers.enable = lib.mkDefault false;
+      cypher-os.virtualisation.helpers.enable = lib.mkDefault true;
     })
 
     # ── Server profile cascade ───────────────────────────────────────────────
@@ -74,6 +74,10 @@
       cypher-os.devops.databases.enable = lib.mkDefault true;
       cypher-os.devops.iac.enable = lib.mkDefault true;
       cypher-os.devops.secrets.enable = lib.mkDefault true;
+      # ─────────────────────────────────────────────────────────────────────────────
+      # VIRTUALISATION HELPERS TOGGLE
+      # ─────────────────────────────────────────────────────────────────────────────
+      cypher-os.virtualisation.helpers.enable = lib.mkDefault false;
     })
 
   ];
