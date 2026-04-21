@@ -554,81 +554,85 @@ in
               github.vscode-github-actions
             ]
             ++ [
-               # ── Tier 2: nix-vscode-extensions (marketplace/open-vsx) ──────────────────
-               # Extensions not packaged in nixpkgs, sourced from nix-community/nix-vscode-extensions.
-               # No sha256 needed — hashes are pre-computed in the flake's JSON cache.
-               # To update all of these to their latest versions: nix flake update nix-vscode-extensions
-               #
-               # Naming convention: vscMkt.<publisher>.<extension-name> (all lowercase)
-               # Check Open VSX first (openVsx.*) — prefer it over vscMkt when available.
+              # ── Tier 2: nix-vscode-extensions (marketplace/open-vsx) ──────────────────
+              # Extensions not packaged in nixpkgs, sourced from nix-community/nix-vscode-extensions.
+              # No sha256 needed — hashes are pre-computed in the flake's JSON cache.
+              # To update all of these to their latest versions: nix flake update nix-vscode-extensions
+              #
+              # Naming convention: vscMkt.<publisher>.<extension-name> (all lowercase)
+              # Check Open VSX first (openVsx.*) — prefer it over vscMkt when available.
 
-               # ── AI / Code Review ───────────────────────────────────────────────────────
-               vscMkt.coderabbit.coderabbit-vscode
-               vscMkt.openai.chatgpt
+              # ── AI / Code Review ───────────────────────────────────────────────────────
+              vscMkt.coderabbit.coderabbit-vscode
+              vscMkt.openai.chatgpt
 
-               # ── Code Runner ────────────────────────────────────────────────────────────
-               vscMkt.formulahendry.code-runner
+              # ── Code Runner ────────────────────────────────────────────────────────────
+              vscMkt.formulahendry.code-runner
 
-               # ── Theme ──────────────────────────────────────────────────────────────────
-               # Catppuccin handled separately via catppuccin/nix flake module (see below)
-               vscMkt.decaycs.decay
-               vscMkt.nishantg96.dark-decay-pro
+              # ── Theme ──────────────────────────────────────────────────────────────────
+              # Catppuccin handled separately via catppuccin/nix flake module (see below)
+              vscMkt.decaycs.decay
+              vscMkt.nishantg96.dark-decay-pro
 
-               # ── HTML ───────────────────────────────────────────────────────────────────
-               vscMkt.george-alisson.html-preview-vscode
-               vscMkt.sidthesloth.html5-boilerplate
-               vscMkt.riazxrazor.html-to-jsx
+              # ── HTML ───────────────────────────────────────────────────────────────────
+              vscMkt.george-alisson.html-preview-vscode
+              vscMkt.sidthesloth.html5-boilerplate
+              vscMkt.riazxrazor.html-to-jsx
 
-               # ── CSS ────────────────────────────────────────────────────────────────────
-               vscMkt.phoenisx.cssvar
+              # ── CSS ────────────────────────────────────────────────────────────────────
+              vscMkt.phoenisx.cssvar
 
-               # ── SVG ────────────────────────────────────────────────────────────────────
-               vscMkt.henoc.svgeditor
-               vscMkt.sidthesloth.svg-snippets
+              # ── SVG ────────────────────────────────────────────────────────────────────
+              vscMkt.henoc.svgeditor
+              vscMkt.sidthesloth.svg-snippets
 
-               # ── JavaScript / TypeScript / React ────────────────────────────────────────
-               vscMkt.xabikos.javascriptsnippets
-               vscMkt.xabikos.reactsnippets
-               vscMkt.dsznajder.es7-react-js-snippets
-               vscMkt.burkeholland.simple-react-snippets
-               vscMkt.ms-vscode.vscode-typescript-next
-               vscMkt.jasonnutter.search-node-modules
-               vscMkt.infeng.vscode-react-typescript
-               vscMkt.msjsdiag.vscode-react-native
-               vscMkt.jawandarajbir.react-vscode-extension-pack
+              # ── JavaScript / TypeScript / React ────────────────────────────────────────
+              vscMkt.xabikos.javascriptsnippets
+              vscMkt.xabikos.reactsnippets
+              vscMkt.dsznajder.es7-react-js-snippets
+              vscMkt.burkeholland.simple-react-snippets
+              vscMkt.ms-vscode.vscode-typescript-next
+              vscMkt.jasonnutter.search-node-modules
+              vscMkt.infeng.vscode-react-typescript
+              vscMkt.msjsdiag.vscode-react-native
+              vscMkt.jawandarajbir.react-vscode-extension-pack
 
-               # ── Python ─────────────────────────────────────────────────────────────────
-               vscMkt.donjayamanne.python-environment-manager
-               vscMkt.kevinrose.vsc-python-indent
+              # ── Python ─────────────────────────────────────────────────────────────────
+              vscMkt.donjayamanne.python-environment-manager
+              vscMkt.kevinrose.vsc-python-indent
 
-               # ── Rust ───────────────────────────────────────────────────────────────────
-               vscMkt.dustypomerleau.rust-syntax
-               vscMkt.1yib.rust-bundle
-               vscMkt.swellaby.rust-pack
+              # ── Rust ───────────────────────────────────────────────────────────────────
+              vscMkt.dustypomerleau.rust-syntax
+              # Nix attribute names cannot start with a digit.
+              # Use the string-subscript form: attrset."string-key" instead of attrset.identifier
+              vscMkt."1yib".rust-bundle
+              vscMkt.swellaby.rust-pack
 
-               # ── Assembly ───────────────────────────────────────────────────────────────
-               vscMkt.13xforever.language-x86-64-assembly
+              # ── Assembly ───────────────────────────────────────────────────────────────
+              # Nix attribute names cannot start with a digit.
+              # Use the string-subscript form: attrset."string-key" instead of attrset.identifier
+              vscMkt."13xforever".language-x86-64-assembly
 
-               # ── SQL ────────────────────────────────────────────────────────────────────
-               vscMkt.mtxr.sqltools
-               vscMkt.mtxr.sqltools-driver-pg
+              # ── SQL ────────────────────────────────────────────────────────────────────
+              vscMkt.mtxr.sqltools
+              vscMkt.mtxr.sqltools-driver-pg
 
-               # ── Mobile: Kotlin ─────────────────────────────────────────────────────────
-               # Not in nixpkgs — sourced from nix-vscode-extensions.
-               vscMkt.fwcd.kotlin
+              # ── Mobile: Kotlin ─────────────────────────────────────────────────────────
+              # Not in nixpkgs — sourced from nix-vscode-extensions.
+              vscMkt.fwcd.kotlin
 
-               # ── DevOps: Docker Compose ─────────────────────────────────────────────────
-               # p1c2u's Docker Compose extension — not in nixpkgs.
-               vscMkt.p1c2u.vscode-docker-compose
+              # ── DevOps: Docker Compose ─────────────────────────────────────────────────
+              # p1c2u's Docker Compose extension — not in nixpkgs.
+              vscMkt.p1c2u.docker-compose
 
-               # ── DevOps: Docker Extension Pack (Jun Han) ────────────────────────────────
-               # The pack itself; ms-azuretools.vscode-docker is already in Tier 1 above.
-               vscMkt.formulahendry.vscode-docker
+              # ── DevOps: Docker Extension Pack (Jun Han) ────────────────────────────────
+              # The pack itself; ms-azuretools.vscode-docker is already in Tier 1 above.
+              vscMkt.formulahendry.docker-extension-pack
 
-               # ── AI: Claude Code ────────────────────────────────────────────────────────
-               # Anthropic's Claude Code extension — not in nixpkgs.
-               vscMkt.anthropic.claude-code
-             ];
+              # ── AI: Claude Code ────────────────────────────────────────────────────────
+              # Anthropic's Claude Code extension — not in nixpkgs.
+              vscMkt.anthropic.claude-code
+            ];
         };
 
         # Deploying the backup extension extensions
