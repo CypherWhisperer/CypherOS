@@ -118,21 +118,30 @@ let
   # ── Shared settings.json ──────────────────────────────────────────────────
   sharedSettings = {
 
-    # ── Theme ───────────────────────────────────────────────────────────────
-    # Active theme — Decayce (your preference)
-    #"workbench.colorTheme" = "Decayce";
+    # ── Theme ───────────────────────────────────────────────────────────────────
+    # workbench.colorTheme is intentionally absent here.
+    # It is set automatically by the catppuccin.vscode HM module in config above,
+    # which builds the correct theme string from the flavor/accent options.
+    # Setting it here would conflict — do not re-add it.
     #
     # HyDE-era themes — uncomment to switch:
+    # "workbench.colorTheme" = "Decayce";              # decaycs.decay
     # "workbench.colorTheme" = "Tokyo Night";          # tokyonight.tokyonight
+    # "workbench.colorTheme" = "One Dark Pro";         # zhuangtongfa.material-theme
+    # "workbench.colorTheme" = "Dracula";              # dracula-theme.theme-dracula
+    # "workbench.colorTheme" = "Gruvbox Dark Hard";    # jdinhlife.gruvbox
+    # "workbench.colorTheme" = "Cyberpunk";            # max-ss.cyberpunk
+    # "workbench.colorTheme" = "Nord";                 # arcticicestudio.nord-visual-studio-code
+    #
+    # NOTE: Catppuccin themes are handled separately via the catppuccin/nix flake module (see below).
+    #
+    # To switch flavour: change catppuccin.vscode.flavor above and rebuild.
+    # Available commented-out alternatives kept for reference:
+    #
     # "workbench.colorTheme" = "Catppuccin Mocha"; # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Macchiato"; # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Frappé";    # catppuccin.catppuccin-vsc
     # "workbench.colorTheme" = "Catppuccin Latte";     # catppuccin.catppuccin-vsc
-    # "workbench.colorTheme" = "Dracula";              # dracula-theme.theme-dracula
-    # "workbench.colorTheme" = "One Dark Pro";         # zhuangtongfa.material-theme
-    # "workbench.colorTheme" = "Gruvbox Dark Hard";    # jdinhlife.gruvbox
-    # "workbench.colorTheme" = "Cyberpunk";            # max-ss.cyberpunk
-    # "workbench.colorTheme" = "Nord";                 # arcticicestudio.nord-visual-studio-code
 
     # ── Font ────────────────────────────────────────────────────────────────
     "editor.fontFamily" = "'Maple Mono', 'JetBrainsMono Nerd Font', 'monospace', monospace";
@@ -443,6 +452,26 @@ in
         && config.cypher-os.apps.editor.vscode.enable
       )
       {
+        # ── Catppuccin Theme ────────────────────────────────────────────────────────
+        # Configured via the catppuccin/nix HM module (imported in flake.nix).
+        # This approach pre-compiles the chosen flavour at derivation time,
+        # which is necessary because the extension normally writes its compiled
+        # theme JSON to its own directory at activation — impossible in the
+        # read-only Nix store.
+        #
+        # The module automatically adds the patched extension to programs.vscode
+        # and sets workbench.colorTheme in userSettings. We therefore must NOT:
+        #   - list catppuccin.catppuccin-vsc in programs.vscode extensions (already removed)
+        #   - set workbench.colorTheme in sharedSettings (already removed)
+        #
+        # Flavours: latte (light), frappe, macchiato, mocha (darkest)
+        # Accents:  blue, flamingo, green, lavender, maroon, mauve, peach,
+        #           pink, red, rosewater, sapphire, sky, teal, yellow
+        catppuccin.vscode = {
+          enable = true;
+          flavor = "mocha"; # your current preference
+          accent = "mauve"; # adjust to taste
+        };
 
         # ── VSCode ──────────────────────────────────────────────────────────────────
         programs.vscode = {
@@ -464,7 +493,11 @@ in
               # ── Theme ────────────────────────────────────────────────────────────
               # Uncomment to install alongside (switch via workbench.colorTheme above):
               # enkia.tokyo-night
-              #catppuccin.catppuccin-vsc
+              #
+              # NOTE: Catppuccin themes are handled separately via the catppuccin/nix flake module.
+              #       (see above)
+              #
+              # catppuccin.catppuccin-vsc
               # dracula-theme.theme-dracula
               # zhuangtongfa.material-theme   # One Dark Pro
               # jdinhlife.gruvbox
