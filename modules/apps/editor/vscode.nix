@@ -410,7 +410,7 @@ in
         # Flavours: latte (light), frappe, macchiato, mocha (darkest)
         # Accents:  blue, flamingo, green, lavender, maroon, mauve, peach,
         #           pink, red, rosewater, sapphire, sky, teal, yellow
-        catppuccin.vscode.profile.default = {
+        catppuccin.vscode.profiles.default = {
           enable = true;
           flavor = "mocha"; # current preference
           accent = "mauve"; # adjust to taste
