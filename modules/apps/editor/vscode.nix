@@ -67,53 +67,7 @@ let
   # in Nix attribute paths, even when the marketplace shows mixed case.
   # e.g. "Prisma" publisher → prisma.prisma, "fwcd" → fwcd.kotlin
   vscMkt = pkgs.nix-vscode-extensions.vscode-marketplace;
-  openVsx = pkgs.nix-vscode-extensions.open-vsx;
-
-  # ── Marketplace Extensions (backup-based deployment) ──────────────────────
-  # These extensions are deployed from the configs/editor/vscode-extensions/
-  # backup rather than fetched from the marketplace via Nix.
-  # This bypasses the fakeHash .drv problem entirely.
-  # VSCode will load them from ~/.vscode/extensions/ as normal.
-  # To update: install/update via VSCode UI, then copy the updated directory
-  # back into configs/editor/vscode-extensions/ and commit.
-  extSrc = ../../../configs/editor/vscode/vscode-extensions;
-  mkExtLink = dir: {
-    name = ".vscode/extensions/${dir}";
-    value = {
-      source = "${extSrc}/${dir}";
-      #recursive = true; # symlink the directory contents, not the dir itself
-      recursive = false; # since we want the directory itself synced as a unit
-    };
-  };
-
-  backupExtensions = [
-    "coderabbit.coderabbit-vscode-0.7.5"
-    "openai.chatgpt-0.4.69-linux-x64"
-    "formulahendry.code-runner-0.12.2"
-    "decaycs.decay-1.0.9"
-    "nishantg96.dark-decay-pro-1.0.0"
-    "george-alisson.html-preview-vscode-0.2.5"
-    "sidthesloth.html5-boilerplate-1.1.1"
-    "riazxrazor.html-to-jsx-0.0.1"
-    "phoenisx.cssvar-2.6.5"
-    "henoc.svgeditor-2.9.0"
-    "sidthesloth.svg-snippets-1.0.1"
-    "xabikos.javascriptsnippets-1.8.0"
-    "xabikos.reactsnippets-2.4.0"
-    "dsznajder.es7-react-js-snippets-4.4.3"
-    "burkeholland.simple-react-snippets-1.2.8"
-    "ms-vscode.vscode-typescript-next-5.8.20250207"
-    "jasonnutter.search-node-modules-1.3.0"
-    "infeng.vscode-react-typescript-1.3.1"
-    "msjsdiag.vscode-react-native-1.13.0"
-    "jawandarajbir.react-vscode-extension-pack-1.0.0"
-    "donjayamanne.python-environment-manager-1.2.7"
-    "kevinrose.vsc-python-indent-1.19.0"
-    "dustypomerleau.rust-syntax-0.6.1"
-    "1yib.rust-bundle-1.0.0"
-    "swellaby.rust-pack-0.3.38"
-    "13xforever.language-x86-64-assembly-3.1.4"
-  ];
+  #openVsx = pkgs.nix-vscode-extensions.open-vsx;
 
   # ── Shared settings.json ──────────────────────────────────────────────────
   sharedSettings = {
@@ -467,7 +421,7 @@ in
         # Flavours: latte (light), frappe, macchiato, mocha (darkest)
         # Accents:  blue, flamingo, green, lavender, maroon, mauve, peach,
         #           pink, red, rosewater, sapphire, sky, teal, yellow
-        catppuccin.vscode = {
+        catppuccin.vscode.profile.default = {
           enable = true;
           flavor = "mocha"; # your current preference
           accent = "mauve"; # adjust to taste
@@ -667,10 +621,6 @@ in
               vscMkt.anthropic.claude-code
             ];
         };
-
-        # Deploying the backup extension extensions
-        home.file = builtins.listToAttrs (map mkExtLink backupExtensions);
-
         # ── Shared Settings Deployment ──────────────────────────────────────────────
         # Deploy the same settings.json to Cursor and Antigravity.
         # Both editors respect the XDG config path pattern.

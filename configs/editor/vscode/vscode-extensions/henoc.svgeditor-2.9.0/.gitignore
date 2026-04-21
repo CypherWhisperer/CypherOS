@@ -1,6 +1,0 @@
-out
-node_modules
-resources/bundle*
-resources/main.js
-tmp
-*.log
