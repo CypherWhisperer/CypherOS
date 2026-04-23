@@ -45,7 +45,7 @@
       #signal-desktop # unfree, also doesn't work well in nixpkgs
 
       # ── Workflow and Automation ──────────────────────────────────────────────
-      #n8n  # now handled by modules/devops/n8n.nix
+      #n8n # now handled by modules/devops/n8n.nix
     ];
   };
 }
