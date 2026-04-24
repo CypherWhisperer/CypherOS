@@ -108,6 +108,7 @@
       #
       #   theme = pkgs.grub2-themes.vimix;
       #   # Other options: pkgs.grub2-themes.tela, pkgs.grub2-themes.whitesur
+      theme = pkgs.catppuccin-grub;
       #
       # HOW TO USE A SPLASH IMAGE ONLY (simpler, no full theme):
       #
