@@ -55,6 +55,7 @@
     # kernel modules, and hardware quirks. It can belong in the repo alongside
     # the config that depends on it. Keeping everything self contained.
     ./hardware-configuration.nix
+    ./boot.nix
 
     ../../modules/profile/system.nix
 
@@ -210,32 +211,6 @@
   # daemonIOSchedClass: same idea but for disk I/O. The build daemon won't
   # starve your DE's disk reads during a build.
   nix.daemonIOSchedClass = "idle";
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # BOOT LOADER
-  # ─────────────────────────────────────────────────────────────────────────────
-  # systemd-boot is the leading candidate for CypherOS (see OQ6 in architecture).
-  # It handles a shared ESP cleanly — each OS gets its own loader entry in
-  # /boot/EFI/<os-name>/ and systemd-boot presents them all at startup.
-  #
-  # efi.canTouchEfiVariables = true: lets NixOS write its boot entry to NVRAM.
-  # Required for systemd-boot to work on most UEFI firmware.
-  boot.loader = {
-    systemd-boot.enable = false;
-    grub.enable = true;
-    grub.efiSupport = true;
-    grub.device = "nodev";
-    grub.useOSProber = false; # enable on a multiboot machine
-    # ─────────────────────────────────────────────────────────────────────────
-    # Bootloader Generation Retention
-    # ─────────────────────────────────────────────────────────────────────────
-    # CRITICAL:
-    # Number of system generations shown in GRUB.
-    # Increase this to avoid losing fallback states.
-    grub.configurationLimit = 10;
-    efi.canTouchEfiVariables = true;
-    efi.efiSysMountPoint = "/boot";
-  };
 
   # ─────────────────────────────────────────────────────────────────────────
   # Nix Garbage Collection (GC)
