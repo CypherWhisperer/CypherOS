@@ -35,9 +35,7 @@
 }:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.apps.shell.enable &&
-    config.cypher-os.apps.shell.zsh.enable ) {
+  config = lib.mkIf (config.cypher-os.apps.shell.enable && config.cypher-os.apps.shell.zsh.enable) {
 
     home.packages = with pkgs; [
       ## ────────────── ZSH ──────────────────────────────
@@ -109,11 +107,11 @@
       initContent = lib.mkMerge [
 
         (lib.mkOrder 500 ''
-              # ── Completion Security Bypass ─────────────────────────────────────────
-                # compinit rejects Nix store paths as "insecure" because they're not owned
-              # by root or $USER. The -u flag suppresses the interactive prompt and the
-              # insecure directory warning. Safe on NixOS — the store is immutable.
-              ZSH_DISABLE_COMPFIX=true
+          # ── Completion Security Bypass ─────────────────────────────────────────
+            # compinit rejects Nix store paths as "insecure" because they're not owned
+          # by root or $USER. The -u flag suppresses the interactive prompt and the
+          # insecure directory warning. Safe on NixOS — the store is immutable.
+          ZSH_DISABLE_COMPFIX=true
         '')
 
         (lib.mkOrder 550 ''
@@ -408,6 +406,16 @@
         # Brave sometimes leaves a stale lock file and refuses to start.
         "bravefix" =
           "rm -f ~/.config/BraveSoftware/Brave-Browser/SingletonLock ~/.config/BraveSoftware/Brave-Browser/SingletonSocket";
+
+        # ── NixOS Rebuild aliases ─────────────────────────────────────────────
+        # Safe rebuild — always reinstalls bootloader
+        rebuild = "sudo nixos-rebuild boot --install-bootloader --flake ~/CYPHER_OS#cypher-nixos --impure";
+
+        # Quick switch for running system (doesn't affect bootloader for next boot)
+        rebuild-switch = "sudo nixos-rebuild switch --flake ~/CYPHER_OS#cypher-nixos --impure";
+
+        # Build only — for testing evaluation without committing
+        rebuild-dry = "nixos-rebuild build --flake ~/CYPHER_OS#cypher-nixos --impure";
       };
 
       # ── sessionVariables ──────────────────────────────────────────────────────
