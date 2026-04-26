@@ -49,7 +49,7 @@
       # cypher-os.apps.enable = lib.mkDefault false;
 
       cypher-os.apps.common.enable = lib.mkDefault true;
-      cypher-os.apps.common.diskUtils.enable = lib.mkDefault true;
+      cypher-os.apps.common.disk-utils.enable = lib.mkDefault true;
       cypher-os.apps.common.proton.enable = lib.mkDefault true;
       cypher-os.apps.common.security.enable = lib.mkDefault true;
 
