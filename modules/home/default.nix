@@ -21,19 +21,7 @@
   # Every module that declares a cypher-os.* option must appear here.
   # This is unconditional — imports are not guarded by mkIf.
   # The modules themselves use mkIf internally to decide what to install.
-  imports = [
-    ../profile   # declares cypher-os.profile.{desktop,server}.enable
-    ../de        # declares cypher-os.de.{gnome,plasma,hyprland}.enable
-    ../dm        # declares cypher-os.dm.{gdm,sddm}.enable
-    ../apps      # declares cypher-os.apps.* options + wires app modules
-    ../gaming    # declares cypher-os.gaming.enable
-    ../devops    # Keep in HM to declare options
-    ../virtualisation  # Keep in HM to declare options
-
-    # imported directly in configuration.nix for now.
-    #../users     # declares the cypher-whisperer user identity
-  ];
-
+  imports = [ ../../modules ];
   # ─────────────────────────────────────────────────────────────────────────────
   # HOME MANAGER STATE VERSION
   # ─────────────────────────────────────────────────────────────────────────────

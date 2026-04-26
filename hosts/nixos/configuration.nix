@@ -60,6 +60,7 @@
     ../../modules/profile/system.nix
 
     ../../modules/users/cypher-whisperer.nix
+    ../../modules/shell/system.nix
     ../../modules/gaming/steam-system.nix
     ../../modules/devops/system.nix
     ../../modules/virtualisation/system.nix
@@ -505,13 +506,6 @@
   # that point is a services.xserver.displayManager.gdm.extraConfig-style
   # approach or a bind mount.
   #};
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # ZSH (SYSTEM LEVEL)
-  # ─────────────────────────────────────────────────────────────────────────────
-  # Setting the user shell to pkgs.zsh above requires zsh to be enabled at the
-  # system level — NixOS won't add it to /etc/shells otherwise, which breaks login.
-  programs.zsh.enable = true;
 
   # ─────────────────────────────────────────────────────────────────────────────
   # SYSTEM PACKAGES

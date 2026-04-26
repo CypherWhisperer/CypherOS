@@ -36,6 +36,11 @@
       # and sddm.enable = true → sddm wins, gdm stays off.
       cypher-os.gaming.minecraft.enable = lib.mkDefault true;
 
+      cypher-os.shell.enable = lib.mkDefault true;
+      cypher-os.shell.zsh.enable = lib.mkDefault true;
+      cypher-os.shell.fish.enable = lib.mkDefault true;
+      cypher-os.shell.nushell.enable = lib.mkDefault true;
+
       # apps is always set to true as a default. If you need to
       # override that as an emergency kill-switch, set it to false.
       # cypher-os.apps.enable = lib.mkDefault false;
@@ -85,6 +90,11 @@
     #
     (lib.mkIf config.cypher-os.profile.server.enable {
       # No DE or DM — their defaults are already false, nothing to do.
+
+      cypher-os.shell.enable = lib.mkDefault true;
+      cypher-os.shell.zsh.enable = lib.mkDefault true;
+      cypher-os.shell.fish.enable = lib.mkDefault true;
+      cypher-os.shell.nushell.enable = lib.mkDefault true;
 
       # GUI groups are absent — mkEnableOption defaults them to false already.
       # apps.enable stays true (its default) so group-level mkIf conditions fire.

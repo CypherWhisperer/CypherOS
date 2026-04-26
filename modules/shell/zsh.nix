@@ -35,7 +35,7 @@
 }:
 
 {
-  config = lib.mkIf (config.cypher-os.apps.shell.enable && config.cypher-os.apps.shell.zsh.enable) {
+  config = lib.mkIf (config.cypher-os.shell.enable && config.cypher-os.shell.zsh.enable) {
 
     home.packages = with pkgs; [
       ## ────────────── ZSH ──────────────────────────────

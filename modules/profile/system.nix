@@ -45,6 +45,11 @@
       cypher-os.gaming.enable = lib.mkDefault true;
       cypher-os.gaming.steam.enable = lib.mkDefault true;
 
+      cypher-os.shell.enable = lib.mkDefault true;
+      cypher-os.shell.zsh.enable = lib.mkDefault true;
+      cypher-os.shell.fish.enable = lib.mkDefault true;
+      cypher-os.shell.nushell.enable = lib.mkDefault true;
+
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
@@ -67,6 +72,12 @@
     # No DE or DM — their mkEnableOption defaults are already false.
     # Nothing to cascade; the block is here for symmetry and future additions.
     (lib.mkIf config.cypher-os.profile.server.enable {
+
+      cypher-os.shell.enable = lib.mkDefault true;
+      cypher-os.shell.zsh.enable = lib.mkDefault true;
+      cypher-os.shell.fish.enable = lib.mkDefault true;
+      cypher-os.shell.nushell.enable = lib.mkDefault true;
+
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
