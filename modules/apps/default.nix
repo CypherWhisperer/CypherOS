@@ -9,7 +9,6 @@
     ./dev
     ./editor
     ./productivity
-    ./shell
     ./terminal
   ];
 }
