@@ -42,6 +42,7 @@
       cypher-os.shell.nushell.enable = lib.mkDefault true;
 
       cypher-os.xdg-config.enable = lib.mkDefault true;
+      cypher-os.extra-fonts.enable = lib.mkDefault true;
 
       # apps is always set to true as a default. If you need to
       # override that as an emergency kill-switch, set it to false.
@@ -49,7 +50,6 @@
 
       cypher-os.apps.common.enable = lib.mkDefault true;
       cypher-os.apps.common.diskUtils.enable = lib.mkDefault true;
-      cypher-os.apps.common.fonts.enable = lib.mkDefault true;
       cypher-os.apps.common.proton.enable = lib.mkDefault true;
       cypher-os.apps.common.security.enable = lib.mkDefault true;
 
@@ -96,6 +96,8 @@
       cypher-os.shell.zsh.enable = lib.mkDefault true;
       cypher-os.shell.fish.enable = lib.mkDefault true;
       cypher-os.shell.nushell.enable = lib.mkDefault true;
+
+      cypher-os.extra-fonts.enable = lib.mkDefault true;
 
       # GUI groups are absent — mkEnableOption defaults them to false already.
       # apps.enable stays true (its default) so group-level mkIf conditions fire.

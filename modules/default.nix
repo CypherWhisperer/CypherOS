@@ -10,7 +10,9 @@
     ./gaming # declares cypher-os.gaming.enable
     ./devops # declares cypher-os.devops.* options
     ./virtualisation # declares cypher-os.virtualisation.helpers.enable
+    ./options.nix
     ./xdg-config.nix
+    ./fonts-hm.nix
 
     # imported directly in configuration.nix for now.
     # ./users # declares the cypher-whisperer user identity

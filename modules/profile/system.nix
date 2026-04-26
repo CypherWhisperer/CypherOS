@@ -50,6 +50,8 @@
       cypher-os.shell.fish.enable = lib.mkDefault true;
       cypher-os.shell.nushell.enable = lib.mkDefault true;
 
+      cypher-os.extra-fonts.enable = lib.mkDefault true;
+
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
       # ─────────────────────────────────────────────────────────────────────────────
@@ -77,6 +79,8 @@
       cypher-os.shell.zsh.enable = lib.mkDefault true;
       cypher-os.shell.fish.enable = lib.mkDefault true;
       cypher-os.shell.nushell.enable = lib.mkDefault true;
+
+      cypher-os.extra-fonts.enable = lib.mkDefault true;
 
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
