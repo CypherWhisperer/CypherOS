@@ -53,9 +53,6 @@
       cypher-os.apps.common.proton.enable = lib.mkDefault true;
       cypher-os.apps.common.security.enable = lib.mkDefault true;
 
-      cypher-os.apps.shell.enable = lib.mkDefault true;
-      cypher-os.apps.shell.zsh.enable = lib.mkDefault true;
-
       cypher-os.apps.cli.enable = lib.mkDefault true;
       cypher-os.apps.cli.btop.enable = lib.mkDefault true;
       cypher-os.apps.cli.htop.enable = lib.mkDefault true;
@@ -102,7 +99,6 @@
       # GUI groups are absent — mkEnableOption defaults them to false already.
       # apps.enable stays true (its default) so group-level mkIf conditions fire.
       cypher-os.apps.common.enable = lib.mkDefault true;
-      cypher-os.apps.shell.enable = lib.mkDefault true;
       cypher-os.apps.cli.enable = lib.mkDefault true;
       cypher-os.apps.editor.enable = lib.mkDefault true;
       cypher-os.apps.dev.enable = lib.mkDefault true;
