@@ -53,7 +53,9 @@
       cypher-os.devops.kubernetes.enable = lib.mkDefault true;
       cypher-os.devops.databases.enable = lib.mkDefault true;
       cypher-os.devops.iac.enable = lib.mkDefault true;
+      cypher-os.devops.iac.terraform.enable = lib.mkDefault true;
       cypher-os.devops.secrets.enable = lib.mkDefault true;
+      cypher-os.devops.secrets.vault.enable = lib.mkDefault true;
       cypher-os.devops.n8n.enable = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # VIRTUALISATION HELPERS TOGGLE
@@ -73,7 +75,9 @@
       cypher-os.devops.kubernetes.enable = lib.mkDefault true;
       cypher-os.devops.databases.enable = lib.mkDefault true;
       cypher-os.devops.iac.enable = lib.mkDefault true;
+      cypher-os.devops.iac.terraform.enable = lib.mkDefault true;
       cypher-os.devops.secrets.enable = lib.mkDefault true;
+      cypher-os.devops.secrets.vault.enable = lib.mkDefault true;
       # ─────────────────────────────────────────────────────────────────────────────
       # VIRTUALISATION HELPERS TOGGLE
       # ─────────────────────────────────────────────────────────────────────────────
