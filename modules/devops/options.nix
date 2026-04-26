@@ -11,11 +11,15 @@
   options.cypher-os.devops = {
     enable = lib.mkEnableOption "Enable DevOps infrastructure";
 
-    databases.enable = lib.mkEnableOption  "local development database services (PostgreSQL, Redis, SQLite, MongoDB tools)";
+    databases.enable = lib.mkEnableOption "local development database services (PostgreSQL, Redis, SQLite, MongoDB tools)";
     containers.enable = lib.mkEnableOption "container tooling (Docker, Podman, image inspection, scanning)";
-    iac.enable = lib.mkEnableOption    "Infrastructure as Code tooling (Terraform, OpenTofu, Ansible, Pulumi)";
     kubernetes.enable = lib.mkEnableOption "Kubernetes tooling (k3s, kubectl, Helm, k3d, kind, cluster utilities)";
+
+    iac.enable = lib.mkEnableOption "Infrastructure as Code tooling (Terraform, OpenTofu, Ansible, Pulumi)";
+    iac.terraform.enable = lib.mkEnableOption "Terraform";
+
     secrets.enable = lib.mkEnableOption "secrets management tooling (sops-nix, age, Vault)";
+    secrets.vault.enable = lib.mkEnableOption "Vault";
     n8n.enable = lib.mkEnableOption "n8n Automation tool";
   };
 }
