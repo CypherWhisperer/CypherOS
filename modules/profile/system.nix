@@ -31,6 +31,10 @@
     ../virtualisation/options.nix
     # Devops options
     ../devops/options.nix
+    # Shell Options
+    ../shell/options.nix
+    # Fonts Options
+    ../options.nix
   ];
 
   config = lib.mkMerge [
