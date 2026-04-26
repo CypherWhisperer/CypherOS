@@ -1,21 +1,31 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.profile.desktop.enable &&
-    config.cypher-os.apps.common.proton.enable ) {
+  config =
+    lib.mkIf
+      (
+        config.cypher-os.profile.desktop.enable
+        && config.cypher-os.apps.common.enable
+        && config.cypher-os.apps.common.proton.enable
+      )
+      {
 
-    home.packages = with pkgs; [
+        home.packages = with pkgs; [
 
-      # ── Proton Ecosystem ─────────────────────────────────────────────────────
-      proton-vpn
-      proton-pass
-      protonmail-desktop
-      #protonmail-bridge-gui
-      #protonmail-bridge
+          # ── Proton Ecosystem ─────────────────────────────────────────────────────
+          proton-vpn
+          proton-pass
+          protonmail-desktop
+          #protonmail-bridge-gui
+          #protonmail-bridge
 
-      # MegaSync
-      megasync
-    ];
-  };
+          # MegaSync
+          megasync
+        ];
+      };
 }
