@@ -16,7 +16,5 @@
     cypher-os.apps.common.security.enable = lib.mkDefault true;
     cypher-os.apps.common.disk-utils.enable = lib.mkDefault true;
     cypher-os.apps.common.proton.enable = lib.mkDefault true;
-    cypher-os.apps.common.fonts.enable = lib.mkDefault true;
-    cypher-os.apps.common.xdg.enable = lib.mkDefault true;
   };
 }
