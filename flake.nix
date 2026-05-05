@@ -207,7 +207,7 @@
                 {
                   imports = [
                     ./modules/home/default.nix
-                    inputs.catppuccin.homeManagerModules.catppuccin
+                    inputs.catppuccin.homeModules.catppuccin
                   ];
 
                   # Identity — must match users.users declaration in configuration.nix
