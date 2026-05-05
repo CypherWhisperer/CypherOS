@@ -41,7 +41,9 @@
 }:
 
 {
-  imports = [ terraform.nix ];
+  imports = [
+    ./terraform.nix
+  ];
   config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.iac.enable) {
 
     environment.systemPackages = with pkgs; [
