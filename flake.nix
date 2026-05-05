@@ -163,7 +163,9 @@
           # importing the flake directly there (which would break modularity).
           # The overlay registration in configuration.nix reads:
           #   nixpkgs.overlays = [ inputs.claude-desktop.overlays.default ];
-          specialArgs = { inherit inputs; };
+          specialArgs = { inherit inputs self; };
+          # self makes the current flake available in all NixOS modules, including
+          # Home Manager modules nested within it.
 
           modules = [
             # The system-level configuration for this host
@@ -192,7 +194,7 @@
 
               # Thread inputs into Home Manager modules too, in case any HM module
               # ever needs to reference a flake input directly.
-              home-manager.extraSpecialArgs = { inherit inputs; };
+              home-manager.extraSpecialArgs = { inherit inputs self; };
 
               # The actual Home Manager configuration for cypher-whisperer.
               # This imports gnome.nix which declares all user-space packages,
@@ -245,6 +247,9 @@
       homeConfigurations = {
         "cypher-whisperer@cypher-nixos" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+          # The standalone Home Manager configurations also need self
+          # NOTE: it is `extraSpecialArgs` here, not `specialArgs`.
+          extraSpecialArgs = { inherit inputs self; };
           modules = [
             ./modules/home/default.nix
             {

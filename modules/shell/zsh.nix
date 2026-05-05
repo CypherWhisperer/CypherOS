@@ -31,6 +31,7 @@
   config,
   pkgs,
   lib,
+  self,
   ...
 }:
 
@@ -463,7 +464,7 @@
     # `p10k configure` to regenerate it, then copy the result back to
     # configs/shell/p10k.zsh in the repo and commit.
     home.file.".config/zsh/.p10k.zsh" = {
-      source = ../../../configs/shell/p10k.zsh;
+      source = "${self}/configs/shell/p10k.zsh";
     };
   };
 }
