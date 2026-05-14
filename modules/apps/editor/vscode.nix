@@ -454,6 +454,13 @@ in
               visualstudioexptteam.vscodeintellicode
               visualstudioexptteam.intellicode-api-usage-examples
 
+              # ── Markdown ────────────────────────────────────────────────────────────────────
+              yzhang.markdown-all-in-one # TOC, list editing, shortcuts
+              davidanson.vscode-markdownlint # Lint enforcement
+              shd101wyy.markdown-preview-enhanced # Rich rendering (Mermaid, math, themes)
+              bierner.markdown-mermaid # Mermaid in native preview
+              #bierner.markdown-preview-github-styling # Optional: GitHub-styled native preview
+
               # ── Web / HTML / CSS ──────────────────────────────────────────────────
               ecmel.vscode-html-css
               ritwickdey.liveserver
