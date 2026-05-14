@@ -142,10 +142,20 @@ let
       # Autocorrect is built for prose and interferes with code blocks,
       # CLI snippets, paths, and Markdown syntax. Magic quotes similarly
       # break backtick strings and code. Both are off.
-      autoCorrect = {
-        active = false;
-        magicQuotes = false;
-      };
+      #
+      # autoCorrect = {
+      #   active = false;
+      #   magicQuotes = false;
+      # };
+
+      # NOTE: after encountering error (Could not start ConfigFile: Cannot use
+      # 'in' operator to search for 'primary' in false):
+      #
+      # autoCorrect is intentionally omitted — Zettlr's internal schema
+      # for this field includes keys (e.g. "primary") we don't know the
+      # shape of. Omitting it lets Zettlr seed its own correct defaults.
+      # If you need to configure autocorrect, do it via the GUI and observe
+      # what Zettlr writes to config.json, then mirror that shape here.
     };
 
     # --- Display ---
