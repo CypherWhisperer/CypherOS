@@ -20,6 +20,10 @@
       code-cursor
       jetbrains.webstorm
       android-studio # bare install — configure SDK via UI. (bundles emulator, SDK manager, AVD manager)
+
+      # Mermaid tooling
+      mermaid-cli # mmdc binary — render .mmd → SVG/PNG
+      # mermaid-filter       # if you use pandoc export pipelines
     ];
   };
 }
