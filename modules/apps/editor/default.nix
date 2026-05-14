@@ -7,5 +7,6 @@
     ./vim.nix
     ./neovim.nix
     ./vscode.nix
+    ./zettlr.nix
   ];
 }

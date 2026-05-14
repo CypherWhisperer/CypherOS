@@ -67,6 +67,7 @@
       cypher-os.apps.editor.vim.enable = lib.mkDefault true;
       cypher-os.apps.editor.neovim.enable = lib.mkDefault true;
       cypher-os.apps.editor.vscode.enable = lib.mkDefault true;
+      cypher-os.apps.editor.zettlr.enable = lib.mkDefault true;
 
       cypher-os.apps.terminal.enable = lib.mkDefault true;
       cypher-os.apps.terminal.ghostty.enable = lib.mkDefault true;
