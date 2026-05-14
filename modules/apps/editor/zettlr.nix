@@ -94,6 +94,83 @@ let
     rosewater = "#f5e0dc"; # → (reserved / future use)
   };
 
+  zettlrConfig = builtins.toJSON {
+    # --- Appearance ---
+    # darkTheme: enables dark mode globally. Pairs with the Mocha CSS theme.
+    darkTheme = true;
+
+    # theme: the base built-in theme. "berlin" is the default (green accent,
+    # sans-serif). The custom CSS fully overrides its color surface, so the
+    # accent color of the base theme is irrelevant — berlin is chosen for its
+    # clean geometry and sans-serif typography baseline.
+    theme = "berlin";
+
+    # muteLines: grays out all lines except the one under the cursor (iA Writer
+    # style). Disabled — it is useful for long-form prose but creates visual
+    # noise when scanning technical documentation or reviewing structure.
+    muteLines = false;
+
+    # --- File handling ---
+    # alwaysReloadFiles: silently reload a file if it has been modified
+    # externally. Critical for this workflow — the same .md file may be edited
+    # in VSCode or via the terminal, and Zettlr should pick up changes without
+    # prompting. Avoids the "file changed on disk" dialog friction.
+    alwaysReloadFiles = true;
+
+    # avoidNewTabs: replace the current editor tab rather than opening a new
+    # one for each file. Zettlr is used as an "open with" app, not a
+    # multi-document workspace — tab accumulation is unwanted.
+    avoidNewTabs = true;
+
+    # --- Editor ---
+    editor = {
+      # inputMode: "default" | "vim" | "emacs"
+      # Using default here intentionally. Zettlr is the fallback viewer/editor,
+      # not the daily driver for development writing. Modal editing investment
+      # lives in Neovim (CypherIDE). Switching to "vim" is a one-line change
+      # when/if desired.
+      inputMode = "default";
+
+      indentUnit = 2;
+      indentWithTabs = false;
+
+      # autoCloseBrackets: auto-inserts closing ), ], } as you type.
+      # Useful even in Markdown for link syntax [text](url).
+      autoCloseBrackets = true;
+
+      # autoCorrect: disabled for technical/development writing.
+      # Autocorrect is built for prose and interferes with code blocks,
+      # CLI snippets, paths, and Markdown syntax. Magic quotes similarly
+      # break backtick strings and code. Both are off.
+      autoCorrect = {
+        active = false;
+        magicQuotes = false;
+      };
+    };
+
+    # --- Display ---
+    display = {
+      renderImages = true;
+      renderLinks = true;
+
+      # renderMath: disabled. LaTeX math is not part of this workflow.
+      # Re-enable if writing documents with equations.
+      renderMath = false;
+
+      # renderTasks: renders [ ] and [x] as visual checkboxes.
+      # Useful for task lists in project notes and READMEs.
+      renderTasks = true;
+
+      renderHeadingNumbers = false;
+    };
+
+    # --- Spellcheck ---
+    # Hunspell-compatible dictionaries. Add more locales as needed.
+    # Dictionary packages (e.g. hunspellDicts.en_GB) must be in home.packages
+    # or environment.systemPackages if Zettlr cannot find them automatically.
+    selectedDicts = [ "en-GB" ];
+  };
+
 in
 {
   config =
@@ -112,96 +189,6 @@ in
           # dependency collocated with the tool that needs it.
           pandoc
         ];
-
-        # ─────────────────────────────────────────────────────────────────────────────
-        # APP CONFIGURATION — ~/.config/Zettlr/config.json
-        #
-        # Zettlr stores all settings in a single JSON file. We generate it with
-        # builtins.toJSON to keep it typed and diffable.
-        #
-        # NOTE: Zettlr may write additional runtime keys to this file (e.g. window
-        # geometry, last open files). Those are ephemeral and do not conflict with
-        # declarative keys — Zettlr merges config on load. The keys set here
-        # represent intentional, stable preferences.
-        # ─────────────────────────────────────────────────────────────────────────────
-
-        xdg.configFile."Zettlr/config.json".text = builtins.toJSON {
-
-          # --- Appearance ---
-          # darkTheme: enables dark mode globally. Pairs with the Mocha CSS theme.
-          darkTheme = true;
-
-          # theme: the base built-in theme. "berlin" is the default (green accent,
-          # sans-serif). The custom CSS fully overrides its color surface, so the
-          # accent color of the base theme is irrelevant — berlin is chosen for its
-          # clean geometry and sans-serif typography baseline.
-          theme = "berlin";
-
-          # muteLines: grays out all lines except the one under the cursor (iA Writer
-          # style). Disabled — it is useful for long-form prose but creates visual
-          # noise when scanning technical documentation or reviewing structure.
-          muteLines = false;
-
-          # --- File handling ---
-          # alwaysReloadFiles: silently reload a file if it has been modified
-          # externally. Critical for this workflow — the same .md file may be edited
-          # in VSCode or via the terminal, and Zettlr should pick up changes without
-          # prompting. Avoids the "file changed on disk" dialog friction.
-          alwaysReloadFiles = true;
-
-          # avoidNewTabs: replace the current editor tab rather than opening a new
-          # one for each file. Zettlr is used as an "open with" app, not a
-          # multi-document workspace — tab accumulation is unwanted.
-          avoidNewTabs = true;
-
-          # --- Editor ---
-          editor = {
-            # inputMode: "default" | "vim" | "emacs"
-            # Using default here intentionally. Zettlr is the fallback viewer/editor,
-            # not the daily driver for development writing. Modal editing investment
-            # lives in Neovim (CypherIDE). Switching to "vim" is a one-line change
-            # when/if desired.
-            inputMode = "default";
-
-            indentUnit = 2;
-            indentWithTabs = false;
-
-            # autoCloseBrackets: auto-inserts closing ), ], } as you type.
-            # Useful even in Markdown for link syntax [text](url).
-            autoCloseBrackets = true;
-
-            # autoCorrect: disabled for technical/development writing.
-            # Autocorrect is built for prose and interferes with code blocks,
-            # CLI snippets, paths, and Markdown syntax. Magic quotes similarly
-            # break backtick strings and code. Both are off.
-            autoCorrect = {
-              active = false;
-              magicQuotes = false;
-            };
-          };
-
-          # --- Display ---
-          display = {
-            renderImages = true;
-            renderLinks = true;
-
-            # renderMath: disabled. LaTeX math is not part of this workflow.
-            # Re-enable if writing documents with equations.
-            renderMath = false;
-
-            # renderTasks: renders [ ] and [x] as visual checkboxes.
-            # Useful for task lists in project notes and READMEs.
-            renderTasks = true;
-
-            renderHeadingNumbers = false;
-          };
-
-          # --- Spellcheck ---
-          # Hunspell-compatible dictionaries. Add more locales as needed.
-          # Dictionary packages (e.g. hunspellDicts.en_GB) must be in home.packages
-          # or environment.systemPackages if Zettlr cannot find them automatically.
-          selectedDicts = [ "en-GB" ];
-        };
 
         # ─────────────────────────────────────────────────────────────────────────────
         # CUSTOM CSS — ~/.config/Zettlr/custom.css
@@ -520,6 +507,32 @@ in
           }
 
           ───────────────────────────────────────────────────────────────────────────── */
+        '';
+
+        # ─────────────────────────────────────────────────────────────────────────────
+        # APP CONFIGURATION — ~/.config/Zettlr/config.json
+        #
+        # Zettlr stores all settings in a single JSON file. We generate it with
+        # builtins.toJSON to keep it typed and diffable.
+        #
+        # NOTE: Zettlr may write additional runtime keys to this file (e.g. window
+        # geometry, last open files). Those are ephemeral and do not conflict with
+        # declarative keys — Zettlr merges config on load. The keys set here
+        # represent intentional, stable preferences.
+        # ─────────────────────────────────────────────────────────────────────────────
+        home.activation.zettlrConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          # Write Zettlr config.json only if it does not already exist.
+          # This seeds the initial config from Nix without making the file
+          # read-only — Zettlr can mutate it freely at runtime.
+          #
+          # To reset to these defaults: rm ~/.config/Zettlr/config.json
+          # then run home-manager switch.
+          ZETTLR_CONFIG="$HOME/.config/Zettlr/config.json"
+          if [ ! -f "$ZETTLR_CONFIG" ]; then
+            $DRY_RUN_CMD mkdir -p "$(dirname "$ZETTLR_CONFIG")"
+            $DRY_RUN_CMD cp ${pkgs.writeText "zettlr-config.json" zettlrConfig} "$ZETTLR_CONFIG"
+            $DRY_RUN_CMD chmod 644 "$ZETTLR_CONFIG"
+          fi
         '';
       };
 }
