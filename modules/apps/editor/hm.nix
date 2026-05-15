@@ -10,7 +10,7 @@
     cypher-os.apps.editor.vim.enable = lib.mkDefault true;
     cypher-os.apps.editor.neovim.enable = lib.mkDefault true;
     cypher-os.apps.editor.vscode.enable = lib.mkDefault true;
-    cypher-os.apps.editor.zettlr.enable = lib.mkDefault true;
+    cypher-os.apps.editor.zettlr.enable = lib.mkDefault false;
 
     # Install other editors that don't need options or modules.
     home.packages = with pkgs; [
