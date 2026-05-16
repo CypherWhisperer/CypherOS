@@ -100,8 +100,8 @@
     environment.systemPackages =
       with pkgs;
       [ arduino-cli ]
-      ++ lib.optionals cfg.ide.enable [ arduino-ide ]
-      ++ lib.optionals cfg.ota.enable [ arduinoOTA ];
+      ++ lib.optionals config.cypher-os.arduino.ide.enable [ arduino-ide ]
+      ++ lib.optionals config.cypher-os.arduino.ota.enable [ arduinoOTA ];
 
     # ── udev rules ────────────────────────────────────────────────────────────
     # Merges arduino-cli's bundled udev rule file into the system rule set.
