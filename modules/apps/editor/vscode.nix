@@ -637,7 +637,12 @@ in
               # so it does not require vscode.fhs. If the serial monitor bridge fails
               # with a dynamic linker error at runtime, switch package to pkgs.vscode.fhs
               # (one-line change — all other config carries over unchanged).
-              vscMkt.vscjava.vscode-arduino
+              #
+              # Microsoft's original extension (ms-vscode.vscode-arduino) was removed from
+              # the marketplace on October 1, 2024 and the repository archived. The
+              # community-maintained fork lives under the vscode-arduino GitHub organisation,
+              # hence the publisher name matching the org
+              vscMkt.vscode-arduino.vscode-arduino-community
             ];
         };
         # ── Shared Settings Deployment ──────────────────────────────────────────────
