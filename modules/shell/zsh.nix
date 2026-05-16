@@ -417,6 +417,37 @@
 
         # Build only — for testing evaluation without committing
         rebuild-dry = "nixos-rebuild build --flake ~/CYPHER_OS#cypher-nixos --impure";
+
+        # ── Arduino / IoT ─────────────────────────────────────────────────────
+        # The shellAliases attrset is a single attrset value assigned to shellAliases =.
+        # Nix doesn't support // merging inline there, but since config is in scope
+        # (the module receives it as an arg), use lib.mkMerge at the config level —
+        # except the whole config block is already one attrset.
+        # The cleanest fit given existing structure:
+        #    add a lib.optionalAttrs call at the bottom of the shellAliases attrset as below:
+        #
+        # These aliases are only active when the Arduino subsystem is enabled
+        # (cypher-os.arduino.enable = true). They interpolate the board FQBN
+        # directly from the Arduino module option so there is a single source
+        # of truth — changing cypher-os.arduino.fqbn in options propagates here
+        # automatically on the next `home-manager switch`.
+        #
+        # ard-build:   compile the sketch in the current directory (error check)
+        # ard-upload:  compile + upload; pass the port as the final argument
+        #              e.g. ard-upload /dev/ttyACM0
+        #              boards with CH340/FTDI adapters use /dev/ttyUSB0 instead
+        # ard-monitor: open arduino-cli's built-in serial monitor at 9600 baud
+        #              Ctrl-C to quit. Change baudrate to match Serial.begin() in sketch.
+        # ard-boards:  list currently connected and detected boards
+        # ard-lib:     search the Arduino library registry (pipe to grep to filter)
+        #              e.g. ard-lib | grep -i "DHT"
+      }
+      // lib.optionalAttrs config.cypher-os.arduino.enable {
+        "ard-build" = "arduino-cli compile --fqbn ${config.cypher-os.arduino.fqbn}";
+        "ard-upload" = "arduino-cli compile --fqbn ${config.cypher-os.arduino.fqbn} --upload --port";
+        "ard-monitor" = "arduino-cli monitor --port /dev/ttyACM0 --config baudrate=9600";
+        "ard-boards" = "arduino-cli board list";
+        "ard-lib" = "arduino-cli lib search";
       };
 
       # ── sessionVariables ──────────────────────────────────────────────────────
