@@ -87,6 +87,11 @@
       url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs"; # deduplicate — same reason as all others
+    };
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -107,6 +112,7 @@
       claude-desktop,
       nix-vscode-extensions,
       catppuccin,
+      devenv,
       ...
     }@inputs:
     let

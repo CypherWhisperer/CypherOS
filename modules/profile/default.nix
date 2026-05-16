@@ -63,6 +63,7 @@
       cypher-os.apps.dev.enable = lib.mkDefault true;
       cypher-os.apps.dev.ssh.enable = lib.mkDefault true;
       cypher-os.apps.dev.git.enable = lib.mkDefault true;
+      cypher-os.apps.dev.devenv.enable = lib.mkDefault true;
 
       cypher-os.apps.editor.enable = lib.mkDefault true;
       cypher-os.apps.editor.vim.enable = lib.mkDefault true;
