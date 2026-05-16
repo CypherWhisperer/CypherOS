@@ -57,6 +57,8 @@
       cypher-os.extra-fonts.enable = lib.mkDefault true;
 
       cypher-os.arduino.enable = lib.mkDefault true;
+      cypher-os.arduino.ide.enable = lib.mkDefault true;
+      cypher-os.arduino.ota.enable = lib.mkDefault true;
 
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE
