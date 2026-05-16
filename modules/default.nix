@@ -13,6 +13,7 @@
     ./options.nix
     ./xdg-config.nix
     ./fonts-hm.nix
+    ./arduino
 
     # imported directly in configuration.nix for now.
     # ./users # declares the cypher-whisperer user identity
