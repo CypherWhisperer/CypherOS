@@ -44,6 +44,7 @@
       cypher-os.xdg-config.enable = lib.mkDefault true;
       cypher-os.extra-fonts.enable = lib.mkDefault true;
 
+      cypher-os.arduino.enable = lib.mkDefault true;
       # apps is always set to true as a default. If you need to
       # override that as an emergency kill-switch, set it to false.
       # cypher-os.apps.enable = lib.mkDefault false;
