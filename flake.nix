@@ -302,7 +302,7 @@
             # error leading to the resolution:
             # `nix eval .#homeConfigurations."cypher-whisperer@cypher-nixos".config.programs.direnv.enable 2>&1`
             # `nix eval .#homeConfigurations."cypher-whisperer@cypher-nixos".config.programs.direnv.nix-direnv.enable 2>&1`
-            c
+            inputs.catppuccin.homeModules.catppuccin
             {
               home.username = "cypher-whisperer";
               home.homeDirectory = "/home/cypher-whisperer";
