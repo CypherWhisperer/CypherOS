@@ -10,5 +10,6 @@
     ./editor
     ./productivity
     ./terminal
+    ./mail
   ];
 }
