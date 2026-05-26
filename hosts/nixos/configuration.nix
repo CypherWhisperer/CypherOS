@@ -67,6 +67,7 @@
     ../../modules/virtualisation/system.nix
     ../../modules/de/gnome/system.nix
     ../../modules/dm/gdm/system.nix
+    ../../modules/apps/mail/proton-bridge-system.nix
   ];
 
   cypher-os.profile.desktop.enable = true;

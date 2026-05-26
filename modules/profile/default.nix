@@ -82,6 +82,10 @@
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
       cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
+
+      cypher-os.apps.mail.enable = lib.mkDefault true;
+      cypher-os.apps.mail.thunderbird.enable = lib.mkDefault true;
+      cypher-os.apps.mail.protonBridge.enable = lib.mkDefault true;
     })
 
     # ── Server profile defaults ────────────────────────────────────────────
