@@ -10,7 +10,10 @@ let
   inherit (lib) mkIf;
 in
 {
-  imports = [ ./options.nix ];
+  imports = [
+    ./options.nix
+    ../options.nix
+  ];
 
   config = mkIf (config.cypher-os.apps.enable && config.cypher-os.apps.mail.enable && cfg.enable) {
 
