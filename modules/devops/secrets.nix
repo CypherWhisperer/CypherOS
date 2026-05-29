@@ -1,86 +1,4 @@
 # modules/devops/secrets.nix
-#
-# NixOS module for secrets management tooling.
-#
-# WHAT THIS FILE OWNS:
-#   - sops-nix NixOS module configuration
-#   - age encryption tool
-#   - HashiCorp Vault CLI
-#   - gnupg (required for SOPS GPG backend, optional if using age-only)
-#
-# WHAT THIS FILE DOES NOT OWN:
-#   - The actual secrets — encrypted files live in your repo, decrypted values
-#     are written to /run/secrets/ at activation time and NEVER committed
-#   - Private keys — generated once, stored in ~/.config/sops/age/keys.txt
-#     (for age) or the GPG keyring. Never in Nix, never in the repo.
-#
-# THE SOPS-NIX WORKFLOW:
-#   sops-nix integrates SOPS (Secrets OPerationS) into NixOS so secrets are
-#   decrypted at system activation and made available as files under /run/secrets/.
-#
-#   The encryption chain:
-#     plaintext secret
-#       → encrypted with your age public key (or GPG key)
-#       → committed to git as an encrypted .yaml/.json file
-#       → decrypted by sops-nix at `nixos-rebuild switch` time
-#       → written to /run/secrets/<name> with correct permissions
-#
-#   Your app reads from /run/secrets/<name>, never from the Nix store
-#   (which is world-readable). This is the correct pattern for NixOS secrets.
-#
-# FIRST-TIME SETUP (one-time, manual):
-#   1. Generate an age key:
-#        mkdir -p ~/.config/sops/age
-#        age-keygen -o ~/.config/sops/age/keys.txt
-#        # Note the public key printed to stdout — you need it for .sops.yaml
-#
-#   2. Create a .sops.yaml at the root of your repo (e.g CypherOS):
-#        creation_rules:
-#          - path_regex: secrets/.*\.yaml$
-#            age: >-
-#              <your-age-public-key-here>
-#
-#   3. Create and edit a secret:
-#        mkdir -p secrets
-#        sops secrets/my-secret.yaml
-#        # This opens your editor with an empty YAML file.
-#        # Add key: value pairs. Save and quit — sops encrypts automatically.
-#
-#   4. Reference the secret in a NixOS module:
-#        sops.secrets.my_api_key = {
-#          sopsFile = ../../secrets/my-secret.yaml;
-#        };
-#        # Then in your app config:
-#        environment.variables.MY_API_KEY = config.sops.secrets.my_api_key.path;
-#        # (path = /run/secrets/my_api_key — the decrypted file at runtime)
-#
-# ENABLE:
-#   devops.secrets.enable = true;  in your host configuration.nix
-#   AND add sops-nix to your flake inputs (see note below).
-#
-# FLAKE INTEGRATION NOTE:
-#   sops-nix must be added as a flake input before this module can be fully used.
-#   Add to flake.nix inputs:
-#
-#     sops-nix = {
-#       url = "github:Mic92/sops-nix";
-#       inputs.nixpkgs.follows = "nixpkgs";
-#     };
-#
-#   And pass it through specialArgs + import the module in your host configuration:
-#
-#     modules = [
-#       inputs.sops-nix.nixosModules.sops
-#       ...
-#     ];
-#
-#   The sops.* options below (sops.defaultSopsFile, etc.) become available only
-#   after importing that NixOS module.
-#
-# VERIFYING THE SETUP:
-#   age-keygen --version
-#   sops --version
-#   vault --version
 
 {
   config,
@@ -97,26 +15,15 @@
 
   config = lib.mkIf (config.cypher-os.devops.enable && config.cypher-os.devops.secrets.enable) {
 
-    # ── sops-nix Configuration ─────────────────────────────────────────────────
-    # sops.* options are provided by the sops-nix NixOS module, which must be
-    # imported separately in your flake (see FLAKE INTEGRATION NOTE above).
-    # This block is commented out until you add sops-nix to flake.nix.
-    #
-    # Once Added, uncomment and adjust:
+    # ── sops-nix ───────────────────────────────────────────────────────────────
+    # Uncomment once sops-nix is added to flake.nix inputs and imported in the
+    # host configuration. See the module source documentation for the full
+    # first-time setup procedure (key generation, .sops.yaml, secret declaration).
     #
     # sops = {
-    #   # defaultSopsFile: the default encrypted secrets file. Individual secret
-    #   # declarations can override this per-secret if needed.
-    #   defaultSopsFile = ../../secrets/secrets.yaml;
-    #
-    #   # age.keyFile: where sops finds your private age key at activation time.
-    #   # This path must exist on the machine — it's not managed by Nix (intentionally).
-    #   age.keyFile = "/home/cypher-whisperer/.config/sops/age/keys.txt";
-    #
-    #   # age.generateKey: false. We generate the key manually (see FIRST-TIME SETUP).
-    #   # Setting true would auto-generate a key, but then the public key is unknown
-    #   # until the first activation — chicken-and-egg for encrypting secrets.
-    #   age.generateKey = false;
+    #   defaultSopsFile  = ../../secrets/secrets.yaml;
+    #   age.keyFile      = "/home/cypher-whisperer/.config/sops/age/keys.txt";
+    #   age.generateKey  = false;
     #
     #   # secrets: declare which secrets to decrypt and where to place them.
     #   # Each key becomes a file under /run/secrets/<key>.
@@ -131,32 +38,32 @@
     environment.systemPackages = with pkgs; [
 
       # ── SOPS ──────────────────────────────────────────────────────────────────
-      # SOPS: Secrets OPerationS. CLI for encrypting/decrypting secret files.
-      # Supports age, GPG, AWS KMS, GCP KMS, Azure Key Vault backends.
-      # For personal/self-hosted use: age backend is the simplest.
-      # Usage: sops secrets/my-secret.yaml   (edit in-place, encrypted on save)
-      #        sops -d secrets/my-secret.yaml  (decrypt to stdout)
+      # Secrets OPerationS — encrypts/decrypts secret files using age, GPG, or
+      # cloud KMS backends. The age backend is simplest for self-hosted use.
+      # Edit secrets in-place (encrypted on save): sops secrets/my-secret.yaml
       sops
 
       # ── age ───────────────────────────────────────────────────────────────────
-      # age: modern file encryption tool. Simpler than GPG, no key server needed.
-      # Used as the encryption backend for sops above.
-      # age-keygen generates key pairs; age encrypts/decrypts files directly.
-      # Usage: age-keygen -o key.txt
-      #        age -r <recipient-pubkey> -o encrypted.age plaintext.txt
-      #        age -d -i key.txt encrypted.age
+      # Modern file encryption tool; the recommended SOPS backend here.
+      # Generate a key pair: age-keygen -o ~/.config/sops/age/keys.txt
       age
 
       # ── gnupg ─────────────────────────────────────────────────────────────────
-      # GnuPG: the GPG implementation. Required if you use the GPG backend for
-      # SOPS (alternative to age). Also needed for signing git commits and
-      # verifying signed packages/releases.
-      # Recommendation: use age for SOPS, but keep gnupg for git signing and
-      # package verification.
+      # GPG implementation. Use age for SOPS; keep gnupg for git commit signing
+      # and verifying signed releases/packages.
       gnupg
 
-      bws # Alternative to vault.
-      mkcert # generate locally-trusted TLS certs for dev
+      # ── Bitwarden Secrets Manager CLI ─────────────────────────────────────────
+      # bws: CLI for Bitwarden Secrets Manager (machine secrets, not the password
+      # vault). A lighter-weight Vault alternative for injecting secrets into
+      # scripts and CI pipelines. Pairs well with the Proton ecosystem boundary —
+      # use for any secret that doesn't need full Vault policy enforcement.
+      bws
+
+      # ── DEFERRED ──────────────────────────────────────────────────────────────
+      # agenix  # alternative to sops-nix; simpler surface but less flexible
+      #         # blocked on: choosing one secrets management path; revisit if
+      #         # sops-nix proves cumbersome
     ];
 
   };
