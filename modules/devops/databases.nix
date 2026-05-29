@@ -94,7 +94,8 @@
       # relational data. Installed as a package — must be enabled per-database:
       #   CREATE EXTENSION vector;
       # See: https://github.com/pgvector/pgvector
-      pgvector
+      #
+      # pgvector # Currently (2026-05-29) missing from nixpkgs; install manually if needed:
 
       # ── SQLite ────────────────────────────────────────────────────────────────
       sqlite # file-based DB; no daemon

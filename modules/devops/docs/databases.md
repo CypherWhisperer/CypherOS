@@ -5,7 +5,7 @@
 **Module path:** `modules/devops/databases.nix`
 **Evaluation context:** `NixOS system`
 **Status:** `Stable`
-**Last reviewed:** `2025-05-28`
+**Last reviewed:** `2025-05-29`
 
 ---
 
@@ -126,7 +126,8 @@ services.redis.servers.dev = {
 
 **PostgreSQL tooling:**
 - `pgcli` — PostgreSQL CLI with autocomplete, syntax highlighting, and multi-line editing; replaces bare `psql` for interactive sessions; connects with `pgcli -U cypher_dev cypher_dev`
-- `pgvector` — PostgreSQL extension for vector similarity search; required for AI/ML workloads that store embeddings alongside relational data; installed as a package but must be enabled per-database (`CREATE EXTENSION vector;`)
+- `pgvector` — PostgreSQL extension for vector similarity search; required for AI/ML workloads that store embeddings alongside relational data; installed as a package but must be enabled per-database (`CREATE EXTENSION vector;`).
+> **NOTE: `bg-vector`, as of writing this (2026-05-28) is not in the nixpkgs**
 
 **SQLite:**
 - `sqlite` — the SQLite CLI (`sqlite3`) and shared library; no daemon — SQLite is file-based; the library is linked by many applications without a separate install
