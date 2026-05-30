@@ -1,4 +1,4 @@
-# ADR-NNN: [Decision Title]
+# ADR_NNN_YYYY_MM_DD: [Decision Title]
 
 **Date:** YYYY-MM-DD
 **Status:** [Proposed · Accepted · Deprecated · Superseded by ADR-NNN]
