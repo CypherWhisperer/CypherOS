@@ -2,9 +2,12 @@
 
 Step-by-step operational guides for common and critical tasks — things you want written down before you need them under pressure.
 
-_No runbooks written yet. This section grows as operational patterns become established and worth codifying._
-
 ---
+
+| **Entry**                                           | **Summary**                                      |
+| --------------------------------------------------- | ------------------------------------------------ |
+| [DevOps + Cloud](./RBK_devops_post_build_.md)       | DevOps + Cloud Post build verification Procedure |
+| [Proton Bridge](./RBK_proton-bridge_post_build_.md) | Proton Bridge First Boot Initialization          |
 
 ## Template
 
