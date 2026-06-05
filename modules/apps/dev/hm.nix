@@ -113,8 +113,10 @@
       # Includes npm. For version management across projects, consider using
       # fnm (Fast Node Manager) or nix shells with pinned Node versions.
       # Usage: node --version   npm --version
-      nodejs_20 # pinned to LTS; change to nodejs if you want latest
-      #nodejs_22
+      #
+      # As of flake update 2026-06-05, nodejs 20.20.2 is marked as insecure.
+      #nodejs_20 # pinned to LTS; change to nodejs if you want latest
+      nodejs_22
       #nodejs          # Node.js runtime — provides `node` and `npm`
 
       # ──────── BUN ─────────────────────────────────────────────────────────────
