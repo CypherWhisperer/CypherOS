@@ -94,7 +94,7 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # ALLOWED UNTRUSTED PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
-  nixpkgs.config.permittedInsecurePackages = [ "ventoy-1.1.10" ];
+  nixpkgs.config.permittedInsecurePackages = [ "ventoy-1.1.12" ];
 
   # ─────────────────────────────────────────────────────────────────────────────
   # NIX SETTINGS
