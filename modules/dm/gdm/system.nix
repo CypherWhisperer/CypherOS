@@ -16,7 +16,9 @@
   config = lib.mkIf (config.cypher-os.profile.desktop.enable && config.cypher-os.dm.gdm.enable) {
     services.displayManager.gdm = {
       enable = true;
-      wayland = true; # prefer Wayland sessions; GDM falls back to X11 if needed
+      # This option is no longer supported with GNOME 50. This came after a
+      # flake update 2026-06-05.
+      # wayland = true; # prefer Wayland sessions; GDM falls back to X11 if needed
     };
   };
 }
