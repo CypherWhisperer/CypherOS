@@ -155,17 +155,19 @@ in
         package = ctpGtkPkg; # GTK3 -> pkgs.adw-gtk3
       };
 
-      iconTheme = {
-        # catppuccin-papirus-folders: Papirus icon set with Catppuccin-coloured folders.
-        # The accent here must be prefixed with "cat-mocha-" for the override to pick
-        # the right folder colour set.
-        name = "Papirus-Dark"; # ADWAITA -> "Adwaita"
-        package = pkgs.catppuccin-papirus-folders.override {
-          # ADWAITA -> pkgs.adwaita-icon-theme
-          flavor = ctpVariant; # mocha
-          accent = ctpAccent; # mauve
-        };
-      };
+      # Letting catppuccin/nix handle the icon and cursor themes globally for consistency across DEs and apps.
+      #
+      # iconTheme = {
+      #   # catppuccin-papirus-folders: Papirus icon set with Catppuccin-coloured folders.
+      #   # The accent here must be prefixed with "cat-mocha-" for the override to pick
+      #   # the right folder colour set.
+      #   name = "Papirus-Dark"; # ADWAITA -> "Adwaita"
+      #   package = pkgs.catppuccin-papirus-folders.override {
+      #     # ADWAITA -> pkgs.adwaita-icon-theme
+      #     flavor = ctpVariant; # mocha
+      #     accent = ctpAccent; # mauve
+      #   };
+      # };
 
       cursorTheme = {
         # catppuccin-cursors is an attribute set of pre-built cursor packages.
@@ -259,7 +261,11 @@ in
         # gtk-theme tells GTK3 apps which theme to load.
         # Must match gtk.theme.name exactly.
         gtk-theme = ctpThemeName; # ADWAITA -> "adw-gtk3";
-        icon-theme = "Papirus-Dark"; # ADWAITA -> "Adwaita";
+
+        # letting catppuccin/nix handle the icon and cursor themes globally
+        # for consistency across DEs and apps.
+        #
+        #icon-theme = "Papirus-Dark"; # ADWAITA -> "Adwaita";
 
         # cursor-theme = "Catppuccin Mocha Dark"; # ADWAITA -> "Adwaita";
         cursor-theme = "Adwaita";

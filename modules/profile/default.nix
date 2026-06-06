@@ -49,6 +49,11 @@
       # override that as an emergency kill-switch, set it to false.
       # cypher-os.apps.enable = lib.mkDefault false;
 
+      # Catppuccin theme — applies to all supported apps, shells, and DEs.
+      catppuccin.enable = true;
+      catppuccin.flavor = "mocha";
+      catppuccin.accent = "mauve";
+
       cypher-os.apps.common.enable = lib.mkDefault true;
       cypher-os.apps.common.disk-utils.enable = lib.mkDefault true;
       cypher-os.apps.common.proton.enable = lib.mkDefault true;

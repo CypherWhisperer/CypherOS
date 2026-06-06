@@ -14,13 +14,15 @@
 #   - SSH config (modules/apps/ssh.nix)
 #   - Credentials / tokens (Tier 1 secrets approach — Phase 11)
 
-
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  config = lib.mkIf (
-    config.cypher-os.apps.dev.enable &&
-    config.cypher-os.apps.dev.git.enable ) {
+  config = lib.mkIf (config.cypher-os.apps.dev.enable && config.cypher-os.apps.dev.git.enable) {
 
     home.packages = with pkgs; [
       ## ────────────── GIT ─────────────────────────────────────────────────────
@@ -46,7 +48,7 @@
       settings = {
 
         # ── Identity ────────────────────────────────────────────────────────────
-        user.name  = "CypherWhisperer";
+        user.name = "CypherWhisperer";
         user.email = "cypherwhisperer@gmail.com";
 
         # ── Core Behaviour ──────────────────────────────────────────────────────
@@ -91,7 +93,7 @@
         # These add the ones OMZ doesn't have or that you'll use differently.
         alias = {
           # Pretty log — one line per commit with graph, colours, relative dates
-          lg  = "log --oneline --graph --decorate --all";
+          lg = "log --oneline --graph --decorate --all";
           lga = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all";
 
           # Undo last commit, keep changes staged
@@ -142,7 +144,7 @@
         ".env.local"
         ".env.*.local"
         "secrets/env"
-        "*.age"            # encrypted age secrets (except when intentionally committed)
+        "*.age" # encrypted age secrets (except when intentionally committed)
 
         # Node
         "node_modules/"
@@ -165,21 +167,24 @@
     # Moved out of programs.git per the deprecation rename.
     programs.delta = {
       enable = true;
-      enableGitIntegration = true;   # explicit — silences the deprecation warning
+      enableGitIntegration = true; # explicit — silences the deprecation warning
       options = {
-        navigate     = true;   # n/N to move between diff sections
-        side-by-side = false;  # unified diff by default; toggle with `delta --side-by-side`
+        navigate = true; # n/N to move between diff sections
+        side-by-side = false; # unified diff by default; toggle with `delta --side-by-side`
         line-numbers = true;
-        syntax-theme = "Catppuccin-mocha"; # matches terminal palette
-        features     = "decorations";
+        features = lib.mkForce "catppuccin-mocha decorations"; # matches terminal palette
+
+        # catppuccin/nix now handles the theming system-wide/ globally
+        #syntax-theme = "Catppuccin-mocha";
+
         decorations = {
-          commit-decoration-style      = "blue ol";
-          commit-style                 = "raw";
-          file-style                   = "omit";
+          commit-decoration-style = "blue ol";
+          commit-style = "raw";
+          file-style = "omit";
           hunk-header-decoration-style = "blue box";
-          hunk-header-file-style       = "red";
+          hunk-header-file-style = "red";
           hunk-header-line-number-style = "#067a00";
-          hunk-header-style            = "file line-number syntax";
+          hunk-header-style = "file line-number syntax";
         };
       };
     };
