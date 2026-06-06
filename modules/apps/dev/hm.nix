@@ -169,8 +169,14 @@
       # fallback for scripts and tutorials that explicitly call `virtualenv`
       # rather than `python -m venv` or `uv venv`. Most new code won't need it.
       python3Packages.virtualenv
-      #python3Packages.pip  # Package installer (use venv per project)
-      pipx # install Python CLI tools in isolated envs
+
+      # Package installer (use venv per project)
+      #python3Packages.pip
+
+      # install Python CLI tools in isolated envs
+      # TEMP: disabled 2026-06-06 — pipx 1.8.0 test suite broken at rev 331800de.
+      #       Re-enable after next `nix flake update` advances nixpkgs past the fix.
+      # pipx
 
       # ── General tooling ───────────────────────────────────────────────────────
       #jq               # JSON processor — useful for inspecting API responses, CI
