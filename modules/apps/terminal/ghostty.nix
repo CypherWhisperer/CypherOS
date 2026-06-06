@@ -25,7 +25,8 @@
 
         programs.ghostty = {
           enable = true;
-
+          # catppuccin/nix now handles the theming system-wide/ globally.
+          #
           # themes = {
           #   catppuccin-mocha = {
           #     background = "1e1e2e";
