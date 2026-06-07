@@ -443,7 +443,6 @@ in
           "gimp.desktop"
           "org.inkscape.Inkscape.desktop"
           "org.kde.krita.desktop"
-          "figma-linux.desktop"
           "Penpot.desktop"
           # misc
           "org.gnome.Nautilus.desktop"
@@ -471,6 +470,7 @@ in
           #   "nvim.desktop"
           #   "starunl.desktop"
           #   "drawio.desktop"
+          #   "figma-linux.desktop"
         ];
       };
 

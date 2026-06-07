@@ -30,7 +30,6 @@
       audacity
       obs-studio
       penpot-desktop
-      figma-linux
       figma-agent
 
       # ── Media ────────────────────────────────────────────────────────────────
