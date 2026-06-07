@@ -6,6 +6,7 @@
 }:
 
 {
+  imports = [ ./penpot-hm.nix ];
   config = lib.mkIf (config.cypher-os.apps.enable && config.cypher-os.apps.productivity.enable) {
 
     cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
@@ -29,7 +30,6 @@
       kdePackages.kdenlive
       audacity
       obs-studio
-      penpot-desktop
       figma-agent
 
       # ── Media ────────────────────────────────────────────────────────────────
@@ -42,6 +42,7 @@
       whatsapp-electron # Electron wrapper around Whatsapp
       whatsapp-chat-exporter # WhatsApp database parser
       #signal-desktop # unfree, also doesn't work well in nixpkgs
+      telegram-desktop
 
       # ── Workflow and Automation ──────────────────────────────────────────────
       #n8n # now handled by modules/devops/n8n.nix
