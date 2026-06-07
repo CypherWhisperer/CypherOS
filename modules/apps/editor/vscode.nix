@@ -643,6 +643,9 @@ in
               # community-maintained fork lives under the vscode-arduino GitHub organisation,
               # hence the publisher name matching the org
               vscMkt.vscode-arduino.vscode-arduino-community
+
+              # ── Caddy ──────────────────────────────────────────────────────────────────
+              vscMkt.matthewpi.caddyfile-support
             ];
         };
         # ── Shared Settings Deployment ──────────────────────────────────────────────
