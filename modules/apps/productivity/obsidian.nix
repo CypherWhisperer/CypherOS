@@ -25,6 +25,16 @@
 
       # defaultSettings apply to all vaults. Vault-specific settings.* override these.
       defaultSettings = {
+        appearance = {
+          # Font Management.
+          # Note textFontFamily — Obsidian has three separate font slots: interface,
+          # text (body), and monospace. If you only set two, the third resets
+          # to system default.
+          "interfaceFontFamily" = "Courier";   # UI font
+          "monospaceFontFamily" = "Courier";   # code/monospace font
+          "textFontFamily"      = "Courier";   # reading/editor body font
+          "baseFontSize"        = 16;          # default is 16
+        };
 
         # ── Core Plugins ────────────────────────────────────────────────────────
         # These are Obsidian's built-in plugins. All are enabled by default in
