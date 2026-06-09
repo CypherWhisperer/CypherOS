@@ -67,6 +67,21 @@ let
     tweaks = [ "normal" ]; # normal = standard window buttons (max/min/close)
     variant = ctpVariant;
   };
+
+  # ── Patched extension: compact-quick-settings ─────────────────────────────
+  # Upstream metadata.json only declares shell-version up to "47". GNOME 50+
+  # silently refuses to load extensions whose declared versions don't include
+  # the running shell. This override patches metadata.json at build time to
+  # add "50+" to the shell-version list, allowing GNOME 50+ to load it.
+  # Remove this override once the upstream package ships a GNOME 50+ release.
+  compactQsExt = pkgs.gnomeExtensions.compact-quick-settings.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      metadata="$out/share/gnome-shell/extensions/compact-quick-settings@gnome-shell-extensions.mariospr.org/metadata.json"
+      tmp=$(mktemp)
+      ${pkgs.jq}/bin/jq '.["shell-version"] += ["50"]' "$metadata" > "$tmp"
+      mv "$tmp" "$metadata"
+    '';
+  });
 in
 
 {
@@ -102,7 +117,8 @@ in
       gnomeExtensions.blur-my-shell
       gnomeExtensions.burn-my-windows
       gnomeExtensions.clipboard-indicator
-      gnomeExtensions.compact-quick-settings
+      #gnomeExtensions.compact-quick-settings
+      compactQsExt # the patched version of compact-quick-settings
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.coverflow-alt-tab
