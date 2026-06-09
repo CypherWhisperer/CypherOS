@@ -34,26 +34,12 @@ in
   imports = [ ./options.nix ];
 
   config = lib.mkIf config.cypher-os.de.gnome.enable {
-    # ─────────────────────────────────────────────────────────────────────────────
-    # PACKAGES
-    # ─────────────────────────────────────────────────────────────────────────────
-    # Everything here is installed into your user profile at /nix/store and linked
-    # into the Home Manager generation path. The native package manager (pacman,
-    # apt, dnf) owns nothing in this list.
-    #
-    # Grouped by purpose. Order is irrelevant to Nix — it's a set, not a sequence.
     home.packages = with pkgs; [
 
       # ── GNOME Shell Extensions ───────────────────────────────────────────────
-      # Installing the package makes the extension *available* to GNOME.
-      # The dconf.settings block below tells GNOME Shell which UUIDs to *activate*.
-      # You need both. An installed-but-not-enabled extension shows in the
-      # Extensions app as toggled off. An enabled UUID with no package = error on load.
       gnomeExtensions.blur-my-shell
       gnomeExtensions.burn-my-windows
       gnomeExtensions.clipboard-indicator
-      #gnomeExtensions.compact-quick-settings
-      compactQsExt # the patched version of compact-quick-settings
       gnomeExtensions.compiz-alike-magic-lamp-effect
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.coverflow-alt-tab
@@ -63,6 +49,10 @@ in
       gnomeExtensions.transparent-top-bar-adjustable-transparency
       gnomeExtensions.compiz-windows-effect
       gnomeExtensions.appindicator
+
+      #gnomeExtensions.compact-quick-settings
+      compactQsExt # the patched version of compact-quick-settings
+
       # Required for Layer 2 (GNOME Shell theme). Provides the user-theme extension
       # that reads org/gnome/shell/extensions/user-theme.name from dconf.
       gnomeExtensions.user-themes
@@ -95,6 +85,7 @@ in
           "transparent-top-bar@zhanghai.me"
           "wobbly-windows@mecheye.net"
           "appindicatorsupport@rgcjonas.gmail.com"
+
           # Layer 2: GNOME Shell chrome (top bar, overview, notifications).
           # user-theme extension reads from org/gnome/shell/extensions/user-theme
           # and applies a shell theme from ~/.themes or the system themes directory.
@@ -137,9 +128,6 @@ in
       };
 
       # ── Extension: logo-menu ───────────────────────────────────────────────
-      # menu-button-icon-image = 19 selects the NixOS snowflake from the built-in
-      # icon list. You may want a different index; the extension's settings UI
-      # lets you preview them. symbolic-icon = true uses the monochrome variant.
       "org/gnome/shell/extensions/Logo-menu" = {
         menu-button-icon-image = 19;
         symbolic-icon = true;

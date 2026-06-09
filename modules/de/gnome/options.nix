@@ -1,9 +1,4 @@
 # modules/de/gnome/options.nix
-#
-# Declares cypher-os.de.gnome option.
-# Imported unconditionally by modules/home/default.nix so the option
-# exists in the merged set before any mkIf references it.
-# No config lives here — only option shapes.
 
 { lib, ... }:
 {

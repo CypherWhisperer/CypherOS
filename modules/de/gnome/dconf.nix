@@ -22,14 +22,6 @@
     # Path mapping:
     #   dconf path:  /org/gnome/desktop/interface
     #   Nix key:     "org/gnome/desktop/interface"   (leading slash dropped)
-    #
-    # Type notes:
-    #   plain string → Nix string "..."
-    #   boolean      → Nix bool true/false
-    #   integer      → Nix int (or lib.hm.gvariant.mkUint32 for uint32)
-    #   float        → Nix float
-    #   list         → Nix list [ ... ]
-    #   tuple        → lib.hm.gvariant.mkTuple [ ... ]
     dconf.settings = {
 
       # ── Interface ──────────────────────────────────────────────────────────
@@ -57,8 +49,6 @@
       };
 
       # ── Keyboard: Layout & XKB Remapping ──────────────────────────────────
-      # Your remapping lives here — no keyd daemon needed.
-      #
       # ctrl:swapcaps   → Caps Lock ↔ Left Ctrl (swap physical keys)
       # menu:super       → Menu key becomes Super (Windows key)
       # altwin:menu_win  → Reinforces Menu→Super at XKB level
@@ -161,19 +151,9 @@
       # ──────────────────────────   Dash Favorites ───────────────────────────────────────────────
       "org/gnome/shell" = {
         # The dash/dock favorites list. These are .desktop file names — GNOME
-        # looks them up in the applications directories on your PATH.
+        # looks them up in the applications directories from the OS's PATH.
         # Order here = left-to-right order in the dash.
-        # Apps not installed produce a broken icon; remove them or install the app.
-        #
-        # To find the .desktop names, simply run the command below that checks
-        # places where GNOME looks for and returns a sorted list
-        #
-        #    find /run/current-system/sw/share/applications \
-        #       ~/.local/share/applications \
-        #       ~/.nix-profile/share/applications \
-        #       /etc/profiles/per-user/$USER/share/applications \
-        #      -name "*.desktop" 2>/dev/null | xargs -I{} basename {} | sort
-
+        # Apps not installed produce a broken icon; remove them or install the app
         favorite-apps = [
           # browser
           "brave-browser.desktop"
@@ -181,6 +161,7 @@
           # communication
           "discord.desktop"
           "com.github.dagmoller.whatsapp-electron.desktop"
+          "org.telegram.desktop.desktop"
           # development
           "code.desktop"
           "antigravity.desktop"
