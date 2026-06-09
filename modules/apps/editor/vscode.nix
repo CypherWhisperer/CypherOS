@@ -437,13 +437,19 @@ in
           # extensions directory at runtime. All extensions come from Nix.
           # Set to true if you want to install extensions manually alongside
           # the Nix-managed ones (useful while evaluating new extensions).
-          mutableExtensionsDir = true; # true during active configuration phase
+          mutableExtensionsDir = false;
 
           # userSettings: written to VSCode's settings.json.
           # Shared settings are merged here.
           profiles.default.userSettings = sharedSettings;
 
-          profiles.default.extensions =
+          # Extensions are intentionally declared at the TOP LEVEL (not profiles.default.extensions)
+          # as a workaround for the home-manager regression introduced in commit b593765 (Feb 2026),
+          # which broke extension loading when using profiles.default.extensions. HM routes this
+          # to the default profile internally. A deprecation warning is emitted at build time —
+          # it is cosmetic and can be ignored until upstream reverts or properly fixes the regression.
+          # Track: https://github.com/nix-community/home-manager/issues/8793
+          extensions =
             with pkgs.vscode-extensions;
             [
               # ── Theme ────────────────────────────────────────────────────────────
