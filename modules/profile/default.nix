@@ -50,6 +50,7 @@
       # cypher-os.apps.enable = lib.mkDefault false;
 
       # Catppuccin theme — applies to all supported apps, shells, and DEs.
+      catppuccin.autoEnable = true; # suppress the evaluation warning.
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
       catppuccin.accent = "mauve";
