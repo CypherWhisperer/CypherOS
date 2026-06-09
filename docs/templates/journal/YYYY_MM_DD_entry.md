@@ -1,4 +1,4 @@
-# [YYYY-MM-DD] [Short Title]
+# [YYYY_MM_DD] [Short Title]
 
 <!--
 The journal is informal. This is the human layer on top of git history.
