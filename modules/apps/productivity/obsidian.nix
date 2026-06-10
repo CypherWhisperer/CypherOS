@@ -94,7 +94,7 @@ let
       installPhase = ''
         mkdir -p $out
         cp manifest.json $out/
-        [ -f theme.css ] && cp theme.css $out/
+        [ -f obsidian.css ] && cp obsidian.css $out/
       '';
     };
 
@@ -154,11 +154,11 @@ let
   # ── Theme packages ───────────────────────────────────────────────────────────
   themeCatppuccin = mkTheme {
     pname = "catppuccin";
-    version = "2.1.3";
+    version = "2.0.4";
     owner = "catppuccin";
     repo = "obsidian";
-    rev = "v2.1.3";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    rev = "v2.0.4";
+    hash = "sha256-fbPkZXlk+TTcVwSrt6ljpmvRL+hxB74NIEygl4ICm2U=";
   };
 
 in
