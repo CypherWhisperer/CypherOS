@@ -20,13 +20,19 @@
 #
 # CATPPUCCIN THEMING
 # ───────────────────
-# catppuccin/nix does NOT support Obsidian — there is no catppuccin.obsidian option.
-# The catppuccin/obsidian port is an Obsidian community theme, distributed through
-# Obsidian's own theme marketplace. Declarative setup is done via:
-#   1. defaultSettings.appearance.cssTheme = "Catppuccin";   — selects the theme
-#   2. defaultSettings.themes = [ (pkgs.callPackage ./obsidian-plugins/catppuccin.nix {}) ];
-#   3. The Style Settings plugin declared in communityPlugins with its data.json settings.
-#      Without Style Settings, the Catppuccin flavor/accent panel is empty.
+# catppuccin/nix DOES support Obsidian. When catppuccin.enable = true is set
+# globally and programs.obsidian.enable = true, catppuccin/nix automatically
+# injects a Catppuccin theme derivation into programs.obsidian.defaultSettings.themes.
+#
+# Do NOT also declare defaultSettings.themes manually — the HM obsidian module
+# uses findSingle over the themes list and throws "Only one theme can be enabled
+# at a time." if more than one entry has enable = true.
+#
+# Theme management is therefore fully delegated to catppuccin/nix. Flavor and
+# accent selection is handled by the Style Settings community plugin via its
+# data.json settings (see communityPlugins below). Without Style Settings, the
+# Catppuccin options panel in Preferences → Appearance is empty and the theme
+# renders with its default palette only.
 
 {
   config,
@@ -459,7 +465,7 @@ in
               "workspace:new-tab" = [
                 {
                   modifiers = [ "Ctrl" ];
-                  key = "T";
+                  key = "N";
                 }
               ];
               "workspace:close-tab" = [
@@ -516,7 +522,10 @@ in
               ];
               "bookmarks:open" = [
                 {
-                  modifiers = [ "Ctrl" ];
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
                   key = "B";
                 }
               ];
