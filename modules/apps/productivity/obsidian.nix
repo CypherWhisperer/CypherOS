@@ -71,32 +71,34 @@ let
     };
 
   # ── Theme helper ─────────────────────────────────────────────────────────────
-  mkTheme =
-    {
-      pname,
-      version,
-      owner,
-      repo,
-      rev ? version,
-      hash,
-    }:
-    pkgs.stdenv.mkDerivation {
-      inherit pname version;
-      src = pkgs.fetchFromGitHub {
-        inherit
-          owner
-          repo
-          rev
-          hash
-          ;
-      };
-      dontBuild = true;
-      installPhase = ''
-        mkdir -p $out
-        cp manifest.json $out/
-        [ -f obsidian.css ] && cp obsidian.css $out/
-      '';
-    };
+  # Letting catppuccin/nix take control over theming as it should
+  #
+  # mkTheme =
+  #   {
+  #     pname,
+  #     version,
+  #     owner,
+  #     repo,
+  #     rev ? version,
+  #     hash,
+  #   }:
+  #   pkgs.stdenv.mkDerivation {
+  #     inherit pname version;
+  #     src = pkgs.fetchFromGitHub {
+  #       inherit
+  #         owner
+  #         repo
+  #         rev
+  #         hash
+  #         ;
+  #     };
+  #     dontBuild = true;
+  #     installPhase = ''
+  #       mkdir -p $out
+  #       cp manifest.json $out/
+  #       [ -f obsidian.css ] && cp obsidian.css $out/
+  #     '';
+  #   };
 
   # ── Plugin packages ──────────────────────────────────────────────────────────
   # Update rev/hash after each nix flake update by running:
@@ -152,14 +154,16 @@ let
   };
 
   # ── Theme packages ───────────────────────────────────────────────────────────
-  themeCatppuccin = mkTheme {
-    pname = "catppuccin";
-    version = "2.0.4";
-    owner = "catppuccin";
-    repo = "obsidian";
-    rev = "v2.0.4";
-    hash = "sha256-fbPkZXlk+TTcVwSrt6ljpmvRL+hxB74NIEygl4ICm2U=";
-  };
+  # Letting catppuccin/nix take control over theming as it should
+  #
+  # themeCatppuccin = mkTheme {
+  #   pname = "catppuccin";
+  #   version = "2.0.4";
+  #   owner = "catppuccin";
+  #   repo = "obsidian";
+  #   rev = "v2.0.4";
+  #   hash = "sha256-fbPkZXlk+TTcVwSrt6ljpmvRL+hxB74NIEygl4ICm2U=";
+  # };
 
 in
 
@@ -177,8 +181,9 @@ in
           defaultSettings = {
             appearance = {
               # Catppuccin community theme.
-              # cssTheme must exactly match the theme's `name` field in manifest.json.
-              "cssTheme" = "Catppuccin";
+              # Letting catppuccin/nix take control over theming as it should
+              #
+              # "cssTheme" = "Catppuccin";
 
               # Font Management.
               # Note textFontFamily — Obsidian has three separate font slots: interface,
@@ -279,10 +284,8 @@ in
                 # Inspect your vault's .obsidian/plugins/obsidian-style-settings/data.json
                 # after manual configuration to derive the exact key names.
                 settings = {
-                  # Catppuccin flavor: latte | frappe | macchiato | mocha
-                  "catppuccin@@flavor" = "mocha";
-                  # Catppuccin accent color
-                  "catppuccin@@accent" = "mauve";
+                  "catppuccin@@flavor" = "mocha"; # Catppuccin flavor: latte | frappe | macchiato | mocha
+                  "catppuccin@@accent" = "mauve"; # Catppuccin accent color
                 };
               }
 
@@ -328,7 +331,9 @@ in
             # ── Themes ─────────────────────────────────────────────────────────────
             # Declares themes available in Obsidian's Appearance → Themes list.
             # `cssTheme` above selects which one is active.
-            themes = [ themeCatppuccin ];
+            # Letting catppuccin/nix take control over theming as it should
+            #
+            # themes = [ themeCatppuccin ];
 
             # ── CSS snippets ───────────────────────────────────────────────────────
             # Inline snippets (text =) or file references (source =). These are placed
