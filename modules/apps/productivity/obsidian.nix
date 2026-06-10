@@ -153,6 +153,15 @@ let
     hash = "sha256-/StY470XF2APruCa4GwQ4Wg+owb96spiTnOSje9ROJA=";
   };
 
+  pluginCalendar = mkPlugin {
+    pname = "calendar";
+    version = "1.5.10";
+    owner = "liamcain";
+    repo = "obsidian-calendar-plugin";
+    rev = "1.5.10";
+    hash = "sha256-SQtr2ZI5MecyNYS40okR+uEirww4GZz9WmQObv7ffNc=";
+  };
+
   # ── Theme packages ───────────────────────────────────────────────────────────
   # Letting catppuccin/nix take control over theming as it should
   #
@@ -178,6 +187,8 @@ in
           package = pkgs.obsidian;
 
           # defaultSettings apply to all vaults. Vault-specific settings.* override these.
+          # defaultSettings only has the typed sub-options the module explicitly defines:
+          # (appearance, app, corePlugins, communityPlugins, themes, cssSnippets, hotkeys, extraFiles).
           defaultSettings = {
             appearance = {
               # Catppuccin community theme.
@@ -222,7 +233,21 @@ in
               "bookmarks" # pin notes, headings, searches to sidebar
               "canvas" # infinite canvas for visual note layouts
               "command-palette" # Ctrl+P quick command launcher
-              "daily-notes" # one-note-per-day journaling / scratchpad
+
+              # one-note-per-day journaling / scratchpad
+              # Each entry in defaultSettings.corePlugins accepts a settings field of type
+              # nullOr (attrsOf anything) — core plugin settings are declared inline on the
+              # plugin entry itsel.
+              {
+                name = "daily-notes";
+                settings = {
+                  "folder" = "THE_CHAMBER_OF_SECRETS/00_MASTER_JOURNAL/DAILY_NOTES";
+                  "format" = "YYYY_MM_DD";
+                  "template" = ""; # path to a template note if you want one; empty = none for now
+                  "autorun" = false; # true = opens today's note automatically on Obsidian launch
+                };
+              }
+
               "editor-status" # word/char count in status bar
               "file-explorer" # left-panel file tree
               "file-recovery" # snapshots — saves you from accidental deletions
@@ -326,6 +351,8 @@ in
 
               # Recent Files — sidebar panel of recently opened notes.
               pluginRecentFiles # bare derivation — no settings needed
+
+              pluginCalendar # bare derivation — no settings needed
             ];
 
             # ── Themes ─────────────────────────────────────────────────────────────
@@ -354,6 +381,7 @@ in
             # Maps to hotkeys.json. Format: "plugin-id:command-id" = [ { modifiers = []; key = ""; } ];
             # An empty list removes the default binding for that command.
             hotkeys = {
+              # Quick navigation
               "command-palette:open" = [
                 {
                   modifiers = [ "Ctrl" ];
@@ -391,10 +419,167 @@ in
                   key = "I";
                 }
               ];
+              # Sidebar toggles
+              "app:toggle-left-sidebar" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "[";
+                }
+              ];
+              "app:toggle-right-sidebar" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "]";
+                }
+              ];
+
+              # Insert table — requires the Advanced Tables plugin you have declared
+              "table-editor-obsidian:insert-table" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "T";
+                }
+              ];
+
+              # Insert code block — no plugin needed, this is a core editor command
+              "editor:insert-code-block" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "K";
+                }
+              ];
+
+              # Tab management
+              "workspace:new-tab" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "T";
+                }
+              ];
+              "workspace:close-tab" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "W";
+                }
+              ];
+              "workspace:next-tab" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "Tab";
+                }
+              ];
+              "workspace:previous-tab" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "Tab";
+                }
+              ];
+              "workspace:split-vertical" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "\\";
+                }
+              ];
+              "workspace:split-horizontal" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "-";
+                }
+              ];
+
+              "app:go-back" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "ArrowLeft";
+                }
+              ];
+              "app:go-forward" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "ArrowRight";
+                }
+              ];
+              "bookmarks:open" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "B";
+                }
+              ];
+
+              # Graph
+              "graph:open" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "G";
+                }
+              ];
+              "graph:open-local" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Alt"
+                  ];
+                  key = "G";
+                }
+              ];
+
+              # Daily note
               "daily-notes:goto-today" = [
                 {
                   modifiers = [ "Ctrl" ];
                   key = "T";
+                }
+              ];
+
+              # Fold/unfold headings (very useful for navigating structured notes)
+              "editor:fold-all" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = ".";
+                }
+              ];
+              "editor:unfold-all" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = ",";
+                }
+              ];
+              "editor:toggle-fold" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = ".";
+                }
+              ];
+
+              # Toggle reading vs editing mode
+              "markdown:toggle-preview" = [
+                {
+                  modifiers = [ "Ctrl" ];
+                  key = "E";
                 }
               ];
             };
