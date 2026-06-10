@@ -4,7 +4,7 @@
 #
 # IMPORTANT: This module handles only the user-space side.
 # The overlay that makes pkgs.claude-desktop available MUST be registered
-# at the NixOS system level in hosts/nixos-gnome/configuration.nix:
+# at the NixOS system level in hosts/nixos/configuration.nix:
 #
 #   nixpkgs.overlays = [ inputs.claude-desktop.overlays.default ];
 #
@@ -42,7 +42,7 @@
         # ~/.config/Claude/claude_desktop_config.json is the canonical MCP config
         # location. We manage it declaratively so it's version-controlled.
         #
-        # NOTE: This path is relative to XDG_CONFIG_HOME. Because gnome.nix sets
+        # NOTE: This path is relative to XDG_CONFIG_HOME. Because modules/de/gnome/hm.nix sets
         # XDG_CONFIG_HOME=~/.config/profiles/gnome for the GNOME session, Claude
         # Desktop will read from ~/.config/profiles/gnome/Claude/claude_desktop_config.json
         # when launched inside the GNOME XDG profile. This is correct behaviour —
