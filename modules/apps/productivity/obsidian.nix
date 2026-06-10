@@ -211,6 +211,7 @@ in
             # the HM module — listed explicitly here so you can comment out what
             # you don't use and have an auditable record.
             corePlugins = [
+              "audio-recorder" # record audio notes from within Obsidian
               "backlink" # shows which notes link to the current note
               "bases" # Obsidian's native database/property system (new in 1.8)
               "bookmarks" # pin notes, headings, searches to sidebar
@@ -237,7 +238,7 @@ in
               # "sync"
               "tag-pane" # sidebar listing all tags
               "templates" # basic templating (use Templater plugin for power use)
-              "webview" # render web content in notes (e.g. YouTube embeds)
+              "webviewer" # render web content in notes (e.g. YouTube embeds)
               "word-count" # document word count in status bar
               "workspaces"
               "zk-prefixer"
