@@ -6,11 +6,11 @@
 }:
 
 {
-  imports = [ ./penpot-hm.nix ];
   config = lib.mkIf (config.cypher-os.apps.enable && config.cypher-os.apps.productivity.enable) {
 
     cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
     cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
+    cypher-os.apps.productivity.penpot.enable = lib.mkDefault true;
 
     # Installing the rest of productivity applications
     home.packages = with pkgs; [
@@ -34,14 +34,14 @@
 
       # ── Media ────────────────────────────────────────────────────────────────
       vlc
-      spotify # unfree
+      spotify
       clapper
 
       # ── Communication ────────────────────────────────────────────────────────
       discord
       whatsapp-electron # Electron wrapper around Whatsapp
       whatsapp-chat-exporter # WhatsApp database parser
-      #signal-desktop # unfree, also doesn't work well in nixpkgs
+      signal-desktop
       telegram-desktop
 
       # ── Workflow and Automation ──────────────────────────────────────────────
