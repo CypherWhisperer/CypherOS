@@ -112,7 +112,7 @@ let
     owner = "mgmeyers";
     repo = "obsidian-style-settings";
     rev = "1.0.9";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    hash = "sha256-eNbZQ/u3mufwVX+NRJpMSk5uGVkWfW0koXKq7wg9d+I=";
   };
 
   pluginObsidianGit = mkPlugin {
@@ -121,7 +121,7 @@ let
     owner = "Vinzent03";
     repo = "obsidian-git";
     rev = "2.32.1";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    hash = "sha256-OLDU6hS9EafOPQ7CZwfmNB4fc/T5xhP8FPeYXAjA5ro=";
   };
 
   pluginDataview = mkPlugin {
@@ -130,7 +130,7 @@ let
     owner = "blacksmithgu";
     repo = "obsidian-dataview";
     rev = "0.5.67";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    hash = "sha256-AbK1J1a8bqkPCe9dqADAfR/q/j/kRGa8qouj9GJQErc=";
   };
 
   pluginTemplater = mkPlugin {
@@ -139,7 +139,7 @@ let
     owner = "SilentVoid13";
     repo = "Templater";
     rev = "2.9.0";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    hash = "sha256-Cm+tQ+Wvb7WO809Q8ZztdOV4LZab7f81FNM86rS2eD0=";
   };
 
   pluginRecentFiles = mkPlugin {
@@ -148,7 +148,7 @@ let
     owner = "tgrosinger";
     repo = "recent-files-obsidian";
     rev = "1.7.4";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # TODO: replace
+    hash = "sha256-/StY470XF2APruCa4GwQ4Wg+owb96spiTnOSje9ROJA=";
   };
 
   # ── Theme packages ───────────────────────────────────────────────────────────
