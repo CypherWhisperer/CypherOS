@@ -46,34 +46,66 @@ let
   # ── Plugin helper ────────────────────────────────────────────────────────────
   # Inline mkDerivation for small plugins. For larger ones, move to a
   # separate file under obsidian-plugins/ and use pkgs.callPackage.
+  #
+  # Obsidian community plugins are Electron extensions loaded at runtime via
+  # Node's require(): each plugin is a directory three files
+  #  main.js - compiled JS bundle (actual plugin code)
+  #  manifest.json - plugin metadat (id, version, minAppVersion, etc.)
+  #  styles.css - Opional UI styles
+  #
+  #  Obsidian loads main.js at runtime via Node's require().
+  # The compiled main.js is NOT present in the plugin's git repository — it is a
+  # build artifact published to GitHub Releases. Fetching the source tree via
+  # fetchFromGitHub therefore produces a derivation with no main.js, and Obsidian
+  # throws "failed to load plugin" silently at startup despite the symlink existing.
+  #
+  # Each file is fetched individually from the release page with fetchurl.
+  # stylesHash is optional — pass null for plugins that don't ship styles.css.
+  #
+  # To get hashes for a new plugin or version:
+  #   nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/main.js
+  #   nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/manifest.json
+  #   nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/styles.css
+  # Convert raw base32 output to SRI format:
+  #   nix hash convert --hash-algo sha256 --to sri <raw-hash>
   mkPlugin =
     {
       pname,
       version,
       owner,
       repo,
-      rev ? version,
-      hash,
-      extraInstallPhase ? "",
+      mainJsHash,
+      manifestHash,
+      stylesHash ? null,
     }:
     pkgs.stdenv.mkDerivation {
       inherit pname version;
-      src = pkgs.fetchFromGitHub {
-        inherit
-          owner
-          repo
-          rev
-          hash
-          ;
-      };
+      dontUnpack = true;
       dontBuild = true;
-      installPhase = ''
-        mkdir -p $out
-        cp manifest.json $out/
-        [ -f main.js ]   && cp main.js   $out/
-        [ -f styles.css ] && cp styles.css $out/
-        ${extraInstallPhase}
-      '';
+      installPhase =
+        let
+          mainJs = pkgs.fetchurl {
+            url = "https://github.com/${owner}/${repo}/releases/download/${version}/main.js";
+            hash = mainJsHash;
+          };
+          manifest = pkgs.fetchurl {
+            url = "https://github.com/${owner}/${repo}/releases/download/${version}/manifest.json";
+            hash = manifestHash;
+          };
+        in
+        ''
+          mkdir -p $out
+          cp ${mainJs}   $out/main.js
+          cp ${manifest} $out/manifest.json
+          ${lib.optionalString (stylesHash != null) ''
+            cp ${
+              pkgs.fetchurl {
+                url = "https://github.com/${owner}/${repo}/releases/download/${version}/styles.css";
+                hash = stylesHash;
+              }
+            } $out/styles.css
+          ''}
+        '';
     };
 
   # ── Theme helper ─────────────────────────────────────────────────────────────
@@ -107,20 +139,19 @@ let
   #   };
 
   # ── Plugin packages ──────────────────────────────────────────────────────────
-  # Update rev/hash after each nix flake update by running:
-  #   nix-prefetch fetchFromGitHub --owner <owner> --repo <repo> --rev <tag>
-  # or use `nix-prefetch-url --unpack` on the release tarball.
-  #
-  # WARNING: hash values below are PLACEHOLDERS — replace them before
-  # attempting a build. They are marked with TODO.
+  # Hashes are for compiled release assets fetched from GitHub Releases.
+  # To update after nix flake update, re-run nix-prefetch-url for each file at
+  # the new version tag, then convert with:
+  #   nix hash convert --hash-algo sha256 --to sri <raw-hash>
 
   pluginStyleSettings = mkPlugin {
     pname = "obsidian-style-settings";
     version = "1.0.9";
     owner = "mgmeyers";
     repo = "obsidian-style-settings";
-    rev = "1.0.9";
-    hash = "sha256-eNbZQ/u3mufwVX+NRJpMSk5uGVkWfW0koXKq7wg9d+I=";
+    mainJsHash = "sha256-GCirqs2rTFV4twWmJcWFswUS+O+tTHz8WhjnDMNVdGg=";
+    manifestHash = "sha256-nP/cIM8qoTVIIOAFC2lLD5tXZEbj1dRKNq6LAYflv7g=";
+    stylesHash = "sha256-7nk30r5QZTqJzLMK5fBXKyNQfVt/EyjQBScaNjB1v9g=";
   };
 
   pluginObsidianGit = mkPlugin {
@@ -128,8 +159,9 @@ let
     version = "2.32.1";
     owner = "Vinzent03";
     repo = "obsidian-git";
-    rev = "2.32.1";
-    hash = "sha256-OLDU6hS9EafOPQ7CZwfmNB4fc/T5xhP8FPeYXAjA5ro=";
+    mainJsHash = "sha256-S/dWc0TeclfCEQwoLRgMddZTjTKIdrKBFfYewls9qRU=";
+    manifestHash = "sha256-j/iozkUHdWlnfFrqt7JsQvuNF9HQLU4ZmgY0t306JF8=";
+    stylesHash = "sha256-Yao7ujEWP4kxzbhphGFPBy7atgE1uApuRe28zmB9MwA=";
   };
 
   pluginDataview = mkPlugin {
@@ -137,8 +169,9 @@ let
     version = "0.5.67";
     owner = "blacksmithgu";
     repo = "obsidian-dataview";
-    rev = "0.5.67";
-    hash = "sha256-AbK1J1a8bqkPCe9dqADAfR/q/j/kRGa8qouj9GJQErc=";
+    mainJsHash = "sha256-YyYDb51+5z2yJtXKUeB3Sx4YG+gJZWcn/xvQSDovY2s=";
+    manifestHash = "sha256-P1XnPUPruazBaKbXsguFS29EXcvoVwWIVLHbhLgkqBw=";
+    stylesHash = "sha256-z8T/vXpQffcNan0khWGks5v2y1RbuEeKWoCsju4YxGw=";
   };
 
   pluginTemplater = mkPlugin {
@@ -146,8 +179,9 @@ let
     version = "2.9.0";
     owner = "SilentVoid13";
     repo = "Templater";
-    rev = "2.9.0";
-    hash = "sha256-Cm+tQ+Wvb7WO809Q8ZztdOV4LZab7f81FNM86rS2eD0=";
+    mainJsHash = "sha256-XgFb/QNzwwG/EImvGKdg6m52ObKNDrON6lAmd7pBkjs=";
+    manifestHash = "sha256-yVvGyxFPW8Bw0ZMWnvTSniaCnY+ry5AipoxJ6Ew9KiI=";
+    stylesHash = "sha256-Gg1JMSz6ZWamB6HkN6VyoAsWQ79EOpNI2Wpo12s9mas=";
   };
 
   pluginRecentFiles = mkPlugin {
@@ -155,8 +189,9 @@ let
     version = "1.7.4";
     owner = "tgrosinger";
     repo = "recent-files-obsidian";
-    rev = "1.7.4";
-    hash = "sha256-/StY470XF2APruCa4GwQ4Wg+owb96spiTnOSje9ROJA=";
+    mainJsHash = "sha256-Ro5wlq6PpwwUnkSEgxpWvZU9JAD6EDYklxFKReHckls=";
+    manifestHash = "sha256-nc6Z5vD6zBonFVc6ybK0Rvy1XZ8wwwlOkGyCCovQ6lQ=";
+    # no styles.css in this release
   };
 
   pluginCalendar = mkPlugin {
@@ -164,8 +199,9 @@ let
     version = "1.5.10";
     owner = "liamcain";
     repo = "obsidian-calendar-plugin";
-    rev = "1.5.10";
-    hash = "sha256-SQtr2ZI5MecyNYS40okR+uEirww4GZz9WmQObv7ffNc=";
+    mainJsHash = "sha256-f7M56c+f2+WoAforirhbNmtbN3f70ZPLyHKLwncR0SU=";
+    manifestHash = "sha256-8+lYEzhkhRK6oS1bRYSQ9/02eRj3vba9hhcc5Xvn0Is=";
+    # no styles.css in this release
   };
 
   # ── Theme packages ───────────────────────────────────────────────────────────
