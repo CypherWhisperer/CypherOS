@@ -6,5 +6,6 @@
     ./hm.nix
     ./claude.nix
     ./obsidian.nix
+    ./penpot-hm.nix
   ];
 }
