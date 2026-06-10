@@ -24,36 +24,42 @@
 # See: ADR-004-hosts-file-pending-resolved.md from cypher-penpot Project.
 # ─────────────────────────────────────────────────────────────────────────────
 
-{ ... }:
+{ lib, config, ... }:
 
 {
-  # ── Local DNS resolution ───────────────────────────────────────────────────
-  # Resolves design.penpot.local to localhost without a DNS server.
-  # This is a manual /etc/hosts approach — intentionally simple.
-  # The upgrade path to systemd-resolved stub zones is documented in ADR-004.
-  networking.hosts = {
-    "127.0.0.1" = [ "design.penpot.local" ];
-  };
+  imports = [ ./options.nix ];
+  config =
+    lib.mkIf
+      (config.cypher-os.apps.productivity.enable && config.cypher-os.apps.productivity.penpot.enable)
+      {
+        # ── Local DNS resolution ───────────────────────────────────────────────────
+        # Resolves design.penpot.local to localhost without a DNS server.
+        # This is a manual /etc/hosts approach — intentionally simple.
+        # The upgrade path to systemd-resolved stub zones is documented in ADR-004.
+        networking.hosts = {
+          "127.0.0.1" = [ "design.penpot.local" ];
+        };
 
-  # ── Caddy local CA trust ───────────────────────────────────────────────────
-  # Caddy generates a local CA on first run and stores the root certificate at:
-  #
-  #   <caddy-data-volume>/caddy/pki/authorities/local/root.crt
-  #
-  # Which on this machine resolves to:
-  #
-  #   /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/Penpot/
-  #     NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/caddy/data/caddy/pki/authorities/local/root.crt
-  #
-  # IMPORTANT — bootstrap sequence:
-  #   1. Run `docker compose up -d` first to let Caddy generate its CA.
-  #   2. Verify the root.crt file exists at the path above.
-  #   3. Then run `sudo nixos-rebuild switch` to apply this config.
-  #   4. After rebuild, browsers on this machine will trust the cert.
-  #
-  # If Caddy is ever recreated and generates a new CA (rare — the caddy/data
-  # volume is persistent), repeat step 3 to re-trust the new certificate.
-  security.pki.certificateFiles = [
-    /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/Penpot/NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/caddy/data/caddy/pki/authorities/local/root.crt
-  ];
+        # ── Caddy local CA trust ───────────────────────────────────────────────────
+        # Caddy generates a local CA on first run and stores the root certificate at:
+        #
+        #   <caddy-data-volume>/caddy/pki/authorities/local/root.crt
+        #
+        # Which on this machine resolves to:
+        #
+        #   /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/Penpot/
+        #     NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/caddy/data/caddy/pki/authorities/local/root.crt
+        #
+        # IMPORTANT — bootstrap sequence:
+        #   1. Run `docker compose up -d` first to let Caddy generate its CA.
+        #   2. Verify the root.crt file exists at the path above.
+        #   3. Then run `sudo nixos-rebuild switch` to apply this config.
+        #   4. After rebuild, browsers on this machine will trust the cert.
+        #
+        # If Caddy is ever recreated and generates a new CA (rare — the caddy/data
+        # volume is persistent), repeat step 3 to re-trust the new certificate.
+        security.pki.certificateFiles = [
+          /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/Penpot/NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/caddy/data/caddy/pki/authorities/local/root.crt
+        ];
+      };
 }
