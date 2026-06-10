@@ -220,18 +220,27 @@ in
               "editor-status" # word/char count in status bar
               "file-explorer" # left-panel file tree
               "file-recovery" # snapshots — saves you from accidental deletions
+              # "footnotes"
               "global-search" # full-text search across all notes
               "graph" # knowledge graph visualisation
+              "markdown-importer"
               "note-composer" # merge/split/extract notes
               "outgoing-link" # panel showing links from current note
               "outline" # heading tree of current note
               "page-preview" # hover preview on internal links
+              "properties"
+              # "publish"
+              # "random-note"
+              "slash-command"
+              "slides" # presentation mode for notes
               "switcher" # Ctrl+O quick note switcher
+              # "sync"
               "tag-pane" # sidebar listing all tags
               "templates" # basic templating (use Templater plugin for power use)
+              "webview" # render web content in notes (e.g. YouTube embeds)
               "word-count" # document word count in status bar
-              "slash-commands" # slash commands in editor for formatting, embeds, etc.
-              "properties" # view and edit YAML frontmatter in a sidebar pane
+              "workspaces"
+              "zk-prefixer"
             ];
 
             # ── Community Plugins ───────────────────────────────────────────────────
