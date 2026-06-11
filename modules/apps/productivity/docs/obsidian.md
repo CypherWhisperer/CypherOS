@@ -653,13 +653,13 @@ hotkeys = {
   "editor:insert-code-block"          = [{ modifiers = [ "Ctrl" "Shift" ]; key = "K"; }];
   "workspace:new-tab"                 = [{ modifiers = [ "Ctrl" ];         key = "N"; }];
   "workspace:close-tab"               = [{ modifiers = [ "Ctrl" ];         key = "W"; }];
-  "workspace:next-tab"                = [{ modifiers = [ "Ctrl" ];         key = "Tab"; }];
-  "workspace:previous-tab"            = [{ modifiers = [ "Ctrl" "Shift" ]; key = "Tab"; }];
+  "workspace:next-tab"                = [{ modifiers = [ "Ctrl" "Alt" ];         key = "ArrowRight"; }];
+  "workspace:previous-tab"            = [{ modifiers = [ "Ctrl" "Alt" ]; key = "ArrowLeft"; }];
   "workspace:split-vertical"          = [{ modifiers = [ "Ctrl" "Shift" ]; key = "\\"; }];
   "workspace:split-horizontal"        = [{ modifiers = [ "Ctrl" "Shift" ]; key = "-"; }];
-  "app:go-back"                       = [{ modifiers = [ "Ctrl" ];         key = "ArrowLeft"; }];
-  "app:go-forward"                    = [{ modifiers = [ "Ctrl" ];         key = "ArrowRight"; }];
-  "bookmarks:open"                    = [{ modifiers = [ "Ctrl" "Shift" ];         key = "B"; }];
+  "app:go-back"                       = [{ modifiers = [ "Ctrl" "Alt" ];         key = "H"; }];
+  "app:go-forward"                    = [{ modifiers = [ "Ctrl" "Alt" ];         key = "L"; }];
+  "bookmarks:open"                    = [{ modifiers = [ "Ctrl" "Shift" ]; key = "B"; }];
   "graph:open"                        = [{ modifiers = [ "Ctrl" "Shift" ]; key = "G"; }];
   "graph:open-local"                  = [{ modifiers = [ "Ctrl" "Alt" ];   key = "G"; }];
   "daily-notes:goto-today"            = [{ modifiers = [ "Ctrl" ];         key = "T"; }];

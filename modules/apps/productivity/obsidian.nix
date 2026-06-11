@@ -583,19 +583,24 @@ in
                   key = "W";
                 }
               ];
+
+              # tab navigation.
               "workspace:next-tab" = [
                 {
-                  modifiers = [ "Ctrl" ];
-                  key = "Tab";
+                  modifiers = [
+                    "Ctrl"
+                    "Alt"
+                  ];
+                  key = "ArrowRight";
                 }
               ];
               "workspace:previous-tab" = [
                 {
                   modifiers = [
                     "Ctrl"
-                    "Shift"
+                    "Alt"
                   ];
-                  key = "Tab";
+                  key = "ArrowLeft";
                 }
               ];
               "workspace:split-vertical" = [
@@ -617,16 +622,23 @@ in
                 }
               ];
 
+              # History navigation (vi-like keybinding).
               "app:go-back" = [
                 {
-                  modifiers = [ "Ctrl" ];
-                  key = "ArrowLeft";
+                  modifiers = [
+                    "Ctrl"
+                    "Alt"
+                  ];
+                  key = "H";
                 }
               ];
               "app:go-forward" = [
                 {
-                  modifiers = [ "Ctrl" ];
-                  key = "ArrowRight";
+                  modifiers = [
+                    "Ctrl"
+                    "Alt"
+                  ];
+                  key = "L";
                 }
               ];
               "bookmarks:open" = [
