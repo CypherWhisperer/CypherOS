@@ -437,6 +437,19 @@ in
           # extensions directory at runtime. All extensions come from Nix.
           # Set to true if you want to install extensions manually alongside
           # the Nix-managed ones (useful while evaluating new extensions).
+          #
+          # Required by the workaround for home-manager regression b593765 (Feb 1, 2026,
+          # "vscode: fix extension path for antigravity"). That commit changed how
+          # .extensions-immutable.json is generated, which caused VS Code to mark all
+          # Nix-managed extensions as obsolete on load — extensions were correctly
+          # symlinked but invisible to the editor.
+          #
+          # The workaround (HM issue #8793) requires extensions at the top-level
+          # programs.vscode.extensions key rather than profiles.default.extensions.
+          # That key only takes effect when mutableExtensionsDir = false.
+          #
+          # Revert to true (and move extensions back to profiles.default.extensions)
+          # once upstream resolves: https://github.com/nix-community/home-manager/issues/8793
           mutableExtensionsDir = false;
 
           # userSettings: written to VSCode's settings.json.
@@ -448,6 +461,14 @@ in
           # which broke extension loading when using profiles.default.extensions. HM routes this
           # to the default profile internally. A deprecation warning is emitted at build time —
           # it is cosmetic and can be ignored until upstream reverts or properly fixes the regression.
+          # Track: https://github.com/nix-community/home-manager/issues/8793
+          #
+          # Declared at programs.vscode.extensions (top-level) instead of
+          # programs.vscode.profiles.default.extensions — workaround for HM regression
+          # b593765 (Feb 2026). HM still routes this to the default profile internally.
+          # A build-time deprecation warning is emitted; it is cosmetic, ignore it:
+          #   trace: warning: The option `programs.vscode.extensions' ... has been renamed to
+          #   `programs.vscode.profiles.default.extensions'.
           # Track: https://github.com/nix-community/home-manager/issues/8793
           extensions =
             with pkgs.vscode-extensions;
