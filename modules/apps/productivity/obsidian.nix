@@ -433,8 +433,8 @@ in
               {
                 pkg = pluginObsidianGit;
                 settings = {
-                  "autoSaveInterval" = 10; # commit every 10 minutes
-                  "autoPushInterval" = 15; # 0 = push on each commit
+                  "autoSaveInterval" = 15; # commit every 15 minutes
+                  "autoPushInterval" = 0; # 0 = push on each commit
                   "commitMessage" = "vault: auto-commit {{date}}";
                   "disablePopups" = false;
                   "showStatusBar" = true;
