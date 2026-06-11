@@ -245,7 +245,7 @@ in
               "interfaceFontFamily" = "Courier"; # UI font
               "monospaceFontFamily" = "Courier"; # code/monospace font
               "textFontFamily" = "Courier"; # reading/editor body font
-              "baseFontSize" = 16; # default is 16
+              "baseFontSize" = 14;
 
               # Theme mode. Obsidian respects the OS setting when set to false/unset;
               # force dark explicitly if you want to guarantee Mocha.
@@ -254,14 +254,87 @@ in
 
             # ── App settings ───────────────────────────────────────────────────────
             app = {
+              # ── Reading & editor behaviour ─────────────────────────────────────────────
+              # Constrains line width in reading/source view — reduces eye-tracking fatigue on wide monitors.
               "readableLineLength" = true; # constrain line width in reading mode
-              "showLineNumber" = false; # line numbers off — cleaner reading
-              "defaultViewMode" = "source"; # source | preview | live-preview
-              "livePreview" = true; # live preview in source mode
+
+              # Hides line numbers — cleaner prose environment; re-enable if you ever do heavy structural editing.
+              "showLineNumber" = false;
+
+              # Opens files in Live Preview by default — immediate rendered feedback without a split pane.
+              "defaultViewMode" = "live"; # source | preview | live-preview
+
+              # Enables the hybrid source+preview editor engine; required for defaultViewMode = "live".
+              "livePreview" = true;
+
+              # Indentation width — aligns with your repo and devenv tab conventions.
               "tabSize" = 2;
+
+              # Uses spaces rather than hard tab characters — consistent with tabSize above.
+              "useTab" = false;
+
+              # Collapses indented list items — useful in long structured notes; toggle per note as needed.
               "foldIndent" = true;
-              "showFrontmatter" = false; # hide YAML frontmatter in reading mode
-              "vimMode" = false; # toggle if you ever want Vim keybindings
+
+              # Collapses headings on open — reduces visual noise in long ADRs and runbooks.
+              "foldHeading" = false;
+
+              # Hides YAML frontmatter block in reading mode — cleaner output for prose-heavy notes.
+              "showFrontmatter" = false;
+
+              # Single newline renders as a line break (GFM-compatible) — keeps repo docs portable across renderers.
+              "strictLineBreaks" = false;
+
+              # Enables spell checking — useful for journal and prose entries across all vault concerns.
+              "spellcheck" = true;
+
+              # Spell check language set — extend if your vault spans multiple written languages.
+              "spellcheckLanguages" = [ "en" ];
+
+              # Auto-indents continuation of list items on Enter — prevents manual re-indenting in nested lists.
+              "smartIndentList" = true;
+
+              # Converts pasted HTML to Markdown on paste — reduces cleanup when pulling content from browsers.
+              "autoConvertHtml" = true;
+
+              # Vim keybindings — disabled; toggle if modal editing ever becomes preferable.
+              "vimMode" = false;
+
+              # ── Links & navigation ──────────────────────────────────────────────────────
+
+              # Writes standard Markdown links instead of [[wikilinks]] — critical for portability outside Obsidian.
+              "useMarkdownLinks" = true;
+
+              # Relative link paths — keeps links valid in any renderer (GitHub, mdBook, VSCode preview).
+              "newLinkFormat" = "relative";
+
+              # Auto-updates links when a file is renamed — prevents silent broken references across the vault.
+              "alwaysUpdateLinks" = true;
+
+              # Opens new tabs adjacent to the active one — preserves spatial context while navigating.
+              "openNextToActiveLeaf" = true;
+
+              # New tab steals focus on open — direct navigation flow without manual click-to-focus.
+              "focusNewTab" = true;
+
+              # Allows Obsidian to traverse symlinks into directories outside the vault root.
+              "followSymlinks" = true;
+
+              # ── Files & attachments ─────────────────────────────────────────────────────
+
+              # Dropped/pasted attachments land in ./assets relative to the current note — keeps repos clean.
+              "attachmentFolderPath" = "./assets";
+
+              # New notes are created in the same folder as the currently active note — contextually appropriate.
+              "newFileLocation" = "current";
+
+              # ── Safety ──────────────────────────────────────────────────────────────────
+
+              # Confirms before deleting — essential guard when editing files that are symlinked into live repos.
+              "promptDelete" = true;
+
+              # Sends deleted files to the system trash — recoverable and keeps the vault directory clean.
+              "trashOption" = "system";
             };
 
             # ── Core Plugins ────────────────────────────────────────────────────────
