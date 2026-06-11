@@ -2,12 +2,12 @@
 
 # Obsidian — `obsidian.nix`
 
-> _Declarative Obsidian configuration: installs the app, manages vault `.obsidian/` config via Home Manager's `programs.obsidian` module, and wires community plugins as local Nix derivations._
+> _Declarative Obsidian configuration: installs the app, manages vault `.obsidian/` config via Home Manager's `programs.obsidian` module, and wires community plugins as local Nix derivations built from compiled GitHub Release assets._
 
 **Module path:** `modules/apps/productivity/obsidian.nix`
 **Evaluation context:** `Home Manager`
 **Status:** `Stable`
-**Last reviewed:** `2026-06-10`
+**Last reviewed:** `2026-06-11`
 
 ---
 
@@ -16,7 +16,7 @@
 **Does:**
 
 - Enables and configures `programs.obsidian` via Home Manager
-- Builds each community plugin as a `stdenv.mkDerivation` fetched from GitHub, and passes the resulting derivations to `communityPlugins`
+- Builds each community plugin as a `stdenv.mkDerivation` that fetches compiled release assets (`main.js`, `manifest.json`, `styles.css`) from GitHub Releases via `fetchurl`, and passes the resulting derivations to `communityPlugins`
 - Declares all active core plugins explicitly, including inline `settings` for `daily-notes`
 - Declares appearance settings (_fonts, font sizes, editor behaviour_) in `defaultSettings.appearance` and `defaultSettings.app`
 - Declares all keybindings in `defaultSettings.hotkeys`, mapping Obsidian command IDs to key chords
@@ -52,40 +52,128 @@
 
 **What is this?** A `let`-bound function that accepts a structured attribute set and returns a `stdenv.mkDerivation`. It is not a module option — it is a local build helper used only within this file's `let` block.
 
-**What does it do?** For a given plugin's GitHub coordinates (`owner`, `repo`, `rev`, `hash`), it fetches the source with `fetchFromGitHub`, then copies `manifest.json`, `main.js`, and `styles.css` (whichever exist) into the derivation output. The resulting store path is a directory containing exactly the files Obsidian expects to find in `.obsidian/plugins/<plugin-id>/`. The HM module then symlinks that store path into the vault at activation time. An optional `extraInstallPhase` argument allows arbitrary additional `cp` or `install` commands for plugins that ship non-standard file layouts.
+**What does it do?** Fetches compiled release assets (`main.js`, `manifest.json`, and optionally `styles.css`) individually from the plugin's GitHub Releases page using `pkgs.fetchurl`, then copies them into the derivation output. The resulting store path is a directory containing exactly the files Obsidian expects to find in `.obsidian/plugins/<plugin-id>/`. The HM module then symlinks that store path into the vault at activation time. `stylesHash = null` skips `styles.css` for plugins that don't publish it.
 
-**Why is it here?** There is no `pkgs.obsidianPlugins.*` attribute set in nixpkgs — community plugins are not packaged upstream. Each plugin must be a derivation built locally. Rather than repeating the full `stdenv.mkDerivation` boilerplate for every plugin, `mkPlugin` factors out the invariant structure (fetch → copy manifest/js/css → output). The function lives in the `let` block of this file rather than in a separate `callPackage` file because all current plugins are simple enough that centralising them here is lower friction than a separate directory. If a plugin requires non-trivial build steps, the comment in the block signals the migration path: move it to `obsidian-plugins/` and reference it via `pkgs.callPackage`.
+**Why fetchurl over fetchFromGitHub?** Obsidian community plugins are Electron extensions loaded at runtime via Node's `require()`. The entry point is `main.js` — a compiled JavaScript bundle. This file is a build artifact: it is **not present in the plugin's git repository source tree**. `fetchFromGitHub` fetches the source tree at a given tag, which contains TypeScript source, a `package.json`, build config, etc., but no compiled `main.js`. A derivation built from source therefore has no `main.js`, and Obsidian throws "failed to load plugin" at startup despite the HM symlinks being correctly created. The compiled `main.js` is published exclusively to the GitHub Releases page for each version tag. Each file is fetched individually with `fetchurl` so that each has its own verified hash.
+
+> **Incident note — 2026-06-10:** _This was the root cause of all six community plugins failing to load after the initial `nixos-rebuild boot` + reboot that activated this module. The HM activation completed without error, symlinks were correctly created, and `community-plugins.json` listed all plugins as enabled — but every plugin directory was missing `main.js`. Obsidian loaded the manifest, registered the plugin as enabled, then failed silently when it couldn't execute the missing entry point._
 
 ```nix
+
 mkPlugin =
   {
     pname,
     version,
     owner,
     repo,
-    rev ? version,
-    hash,
-    extraInstallPhase ? "",
+    mainJsHash,
+    manifestHash,
+    stylesHash ? null,
   }:
   pkgs.stdenv.mkDerivation {
     inherit pname version;
-    src = pkgs.fetchFromGitHub {
-      inherit
-        owner
-        repo
-        rev
-        hash
-        ;
-    };
+    dontUnpack = true;
     dontBuild = true;
-    installPhase = ''
-      mkdir -p $out
-      cp manifest.json $out/
-      [ -f main.js ]   && cp main.js   $out/
-      [ -f styles.css ] && cp styles.css $out/
-      ${extraInstallPhase}
-    '';
+    installPhase =
+      let
+        mainJs = pkgs.fetchurl {
+          url = "https://github.com/${owner}/${repo}/releases/download/${version}/main.js";
+          hash = mainJsHash;
+        };
+        manifest = pkgs.fetchurl {
+          url = "https://github.com/${owner}/${repo}/releases/download/${version}/manifest.json";
+          hash = manifestHash;
+        };
+      in
+      ''
+        mkdir -p $out
+        cp ${mainJs}   $out/main.js
+        cp ${manifest} $out/manifest.json
+        ${lib.optionalString (stylesHash != null) ''
+          cp ${pkgs.fetchurl {
+            url = "https://github.com/${owner}/${repo}/releases/download/${version}/styles.css";
+            hash = stylesHash;
+          }} $out/styles.css
+        ''}
+      '';
   };
+```
+**Hash update workflow:** After bumping a plugin version, get new hashes with:
+
+```bash
+# Fetch and hash each release asset
+nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/main.js
+nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/manifest.json
+nix-prefetch-url https://github.com/<owner>/<repo>/releases/download/<version>/styles.css
+
+# Convert raw base32 output to SRI format (required by hash = fields)
+nix hash convert --hash-algo sha256 --to sri <raw-hash>
+```
+
+> Note: `nix hash to-sri` is deprecated as of current Nix versions. Use `nix hash convert --hash-algo sha256 --to sri` instead. The deprecated form still works but emits a warning.
+
+> _Update accordingly, put them in a quick bash scripts and execute_
+
+
+```bash
+#!/bin/bash
+
+# Style Settings 1.0.9
+nix-prefetch-url https://github.com/mgmeyers/obsidian-style-settings/releases/download/1.0.9/main.js
+nix-prefetch-url https://github.com/mgmeyers/obsidian-style-settings/releases/download/1.0.9/manifest.json
+nix-prefetch-url https://github.com/mgmeyers/obsidian-style-settings/releases/download/1.0.9/styles.css
+
+# Obsidian Git 2.32.1
+nix-prefetch-url https://github.com/Vinzent03/obsidian-git/releases/download/2.32.1/main.js
+nix-prefetch-url https://github.com/Vinzent03/obsidian-git/releases/download/2.32.1/manifest.json
+nix-prefetch-url https://github.com/Vinzent03/obsidian-git/releases/download/2.32.1/styles.css
+
+# Dataview 0.5.67
+nix-prefetch-url https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.67/main.js
+nix-prefetch-url https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.67/manifest.json
+nix-prefetch-url https://github.com/blacksmithgu/obsidian-dataview/releases/download/0.5.67/styles.css
+
+# Templater 2.9.0
+nix-prefetch-url https://github.com/SilentVoid13/Templater/releases/download/2.9.0/main.js
+nix-prefetch-url https://github.com/SilentVoid13/Templater/releases/download/2.9.0/manifest.json
+nix-prefetch-url https://github.com/SilentVoid13/Templater/releases/download/2.9.0/styles.css
+
+# Recent Files 1.7.4
+nix-prefetch-url https://github.com/tgrosinger/recent-files-obsidian/releases/download/1.7.4/main.js
+nix-prefetch-url https://github.com/tgrosinger/recent-files-obsidian/releases/download/1.7.4/manifest.json
+# recent-files likely has no styles.css — check; if 404 skip it
+
+# Calendar 1.5.10
+nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/main.js
+nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/manifest.json
+nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/styles.css
+```
+
+
+```bash
+
+#!/bin/bash
+
+for h in \
+  0s3lap1hrrqqbby7qk5dxzw141dkhp2jb9h5nxw5ak5brnmana0q \
+  1f5zwn3h32xf6r5d9mg38rj5g6qg9dlhn1g04143b89arwhdrzww \
+  1n5zflq3c6i70p82h4vzbdym08rbazqfa2mkrj4klrahpv93fygf \
+  05d97mdw47pn2n0v4xl86a6m7mkm1hc2sa0c2715fwny8irmdxsb \
+  0pr479yvfd06k8clwbfhs4bqvys2djrbgsjsgiknjx878p7aiy4g \
+  001kgmhcxg7d8mp0mf1m06vdlbh79xhq8sdqrlqqjgqn66x3pak1 \
+  0sv35wx4il0vzwknfr89x0dih7jbfzh53jnm4sr3vrvykmph69k3 \
+  07584jw89nxiaj40amz8rdfl8vsbhl5v5mx6d30srfgb8cyyfm9z \
+  0v6433p8xb40ba54gf2vak5zd6xklihqa93xd86zfzahgayzzi6g \
+  0fwj86x7f9jhxa6v63ldn8wpcvpac2kiibw922zh3hvk0gymn0ay \
+  08ia7m6fhjcclqi91jxbiyfq49lysbs9w5lks5qc0nsg275wcny9 \
+  1awr7mmxfs3av5496fj4px1ic2x0fajkgr510yk6crgs5hqlj38s \
+  0nwjvkhlajhijwj3c47s00j3v5dxaqd87124kqa0r9wgmsb713j6 \
+  0m7as25hm0kcj170khrhkxfvbz26njrcjfjp2lkimk7sy3k9kklx \
+  09fi25vw52vjr35r7lgvfwvmnsrnbfw8lazs06lfbnwzrzlkkcvz \
+  12yhwxxya70phsyvdggp31wkdzgpj224anrdl6x151b4709misgk
+do
+  echo "$h -> $(nix hash convert --hash-algo sha256 --to sri $h)"
+done
 ```
 
 ---
@@ -126,65 +214,72 @@ mkPlugin =
 
 ### Block 3 — Plugin derivation bindings
 
-**What is this?** Six `let`-bound attribute bindings — `pluginStyleSettings`, `pluginObsidianGit`, `pluginDataview`, `pluginTemplater`, `pluginRecentFiles`, `pluginCalendar` — each produced by calling `mkPlugin` with a specific plugin's coordinates.
+**What is this?** Six `let`-bound attribute bindings — `pluginStyleSettings`, `pluginObsidianGit`, `pluginDataview`, `pluginTemplater`, `pluginRecentFiles`, `pluginCalendar` — each produced by calling `mkPlugin` with a specific plugin's release asset hashes.
 
-**What does it do?** Each binding resolves to a store path (a derivation output directory). These bindings are referenced by name in the `communityPlugins` list below — either as bare derivations (auto-wrapped by `coercedTo` into `{ pkg = drv; enable = true; }`) or as the `pkg` field of a settings submodule. At `home-manager switch` time, HM symlinks each store path into the vault's `.obsidian/plugins/<plugin-id>/`.
+**What does it do?** Each binding resolves to a store path (a derivation output directory) containing `main.js`, `manifest.json`, and `styles.css` where applicable. These bindings are referenced by name in the `communityPlugins` list — either as bare derivations or as the `pkg` field of a settings submodule. At `home-manager switch` time, HM symlinks each store path into the vault's `.obsidian/plugins/<plugin-id>/`.
 
-**Why is it here?** Separating derivation construction from the `communityPlugins` list keeps the list readable — the list expresses _which plugins are active and with what settings_, while the `let` block expresses _how to build them_. It also makes hash maintenance straightforward: all version/hash data is in one place, and the comment above the block documents the update workflow (`nix-prefetch` or `lib.fakeHash` trick).
+**Why is it here?** Separating derivation construction from the `communityPlugins` list keeps the list readable — the list expresses _which plugins are active and with what settings_, while the `let` block expresses _how to build them_. All version and hash data is co-located, and the comment above the block documents the update workflow.
 
 ```nix
+
 pluginStyleSettings = mkPlugin {
-  pname = "obsidian-style-settings";
-  version = "1.0.9";
-  owner = "mgmeyers";
-  repo = "obsidian-style-settings";
-  rev = "1.0.9";
-  hash = "sha256-eNbZQ/u3mufwVX+NRJpMSk5uGVkWfW0koXKq7wg9d+I=";
+  pname        = "obsidian-style-settings";
+  version      = "1.0.9";
+  owner        = "mgmeyers";
+  repo         = "obsidian-style-settings";
+  mainJsHash   = "sha256-GCirqs2rTFV4twWmJcWFswUS+O+tTHz8WhjnDMNVdGg=";
+  manifestHash = "sha256-nP/cIM8qoTVIIOAFC2lLD5tXZEbj1dRKNq6LAYflv7g=";
+  stylesHash   = "sha256-7nk30r5QZTqJzLMK5fBXKyNQfVt/EyjQBScaNjB1v9g=";
 };
 
 pluginObsidianGit = mkPlugin {
-  pname = "obsidian-git";
-  version = "2.32.1";
-  owner = "Vinzent03";
-  repo = "obsidian-git";
-  rev = "2.32.1";
-  hash = "sha256-OLDU6hS9EafOPQ7CZwfmNB4fc/T5xhP8FPeYXAjA5ro=";
+  pname        = "obsidian-git";
+  version      = "2.32.1";
+  owner        = "Vinzent03";
+  repo         = "obsidian-git";
+  mainJsHash   = "sha256-S/dWc0TeclfCEQwoLRgMddZTjTKIdrKBFfYewls9qRU=";
+  manifestHash = "sha256-j/iozkUHdWlnfFrqt7JsQvuNF9HQLU4ZmgY0t306JF8=";
+  stylesHash   = "sha256-Yao7ujEWP4kxzbhphGFPBy7atgE1uApuRe28zmB9MwA=";
 };
 
 pluginDataview = mkPlugin {
-  pname = "dataview";
-  version = "0.5.67";
-  owner = "blacksmithgu";
-  repo = "obsidian-dataview";
-  rev = "0.5.67";
-  hash = "sha256-AbK1J1a8bqkPCe9dqADAfR/q/j/kRGa8qouj9GJQErc=";
+  pname        = "dataview";
+  version      = "0.5.67";
+  owner        = "blacksmithgu";
+  repo         = "obsidian-dataview";
+  mainJsHash   = "sha256-YyYDb51+5z2yJtXKUeB3Sx4YG+gJZWcn/xvQSDovY2s=";
+  manifestHash = "sha256-P1XnPUPruazBaKbXsguFS29EXcvoVwWIVLHbhLgkqBw=";
+  stylesHash   = "sha256-z8T/vXpQffcNan0khWGks5v2y1RbuEeKWoCsju4YxGw=";
 };
 
 pluginTemplater = mkPlugin {
-  pname = "templater-obsidian";
-  version = "2.9.0";
-  owner = "SilentVoid13";
-  repo = "Templater";
-  rev = "2.9.0";
-  hash = "sha256-Cm+tQ+Wvb7WO809Q8ZztdOV4LZab7f81FNM86rS2eD0=";
+  pname        = "templater-obsidian";
+  version      = "2.9.0";
+  owner        = "SilentVoid13";
+  repo         = "Templater";
+  mainJsHash   = "sha256-XgFb/QNzwwG/EImvGKdg6m52ObKNDrON6lAmd7pBkjs=";
+  manifestHash = "sha256-yVvGyxFPW8Bw0ZMWnvTSniaCnY+ry5AipoxJ6Ew9KiI=";
+  stylesHash   = "sha256-Gg1JMSz6ZWamB6HkN6VyoAsWQ79EOpNI2Wpo12s9mas=";
 };
 
 pluginRecentFiles = mkPlugin {
-  pname = "recent-files-obsidian";
-  version = "1.7.4";
-  owner = "tgrosinger";
-  repo = "recent-files-obsidian";
-  rev = "1.7.4";
-  hash = "sha256-/StY470XF2APruCa4GwQ4Wg+owb96spiTnOSje9ROJA=";
+  pname        = "recent-files-obsidian";
+  version      = "1.7.4";
+  owner        = "tgrosinger";
+  repo         = "recent-files-obsidian";
+  mainJsHash   = "sha256-Ro5wlq6PpwwUnkSEgxpWvZU9JAD6EDYklxFKReHckls=";
+  manifestHash = "sha256-nc6Z5vD6zBonFVc6ybK0Rvy1XZ8wwwlOkGyCCovQ6lQ=";
+  # no styles.css in this release
 };
 
 pluginCalendar = mkPlugin {
-  pname = "calendar";
-  version = "1.5.10";
-  owner = "liamcain";
-  repo = "obsidian-calendar-plugin";
-  rev = "1.5.10";
-  hash = "sha256-SQtr2ZI5MecyNYS40okR+uEirww4GZz9WmQObv7ffNc=";
+  pname        = "calendar";
+  version      = "1.5.10";
+  owner        = "liamcain";
+  repo         = "obsidian-calendar-plugin";
+  mainJsHash   = "sha256-f7M56c+f2+WoAforirhbNmtbN3f70ZPLyHKLwncR0SU=";
+  manifestHash = "sha256-8+lYEzhkhRK6oS1bRYSQ9/02eRj3vba9hhcc5Xvn0Is=";
+  # no styles.css in this release
 };
 ```
 
@@ -511,7 +606,7 @@ vaults = {
 
 - `pkgs.obsidian` — the Obsidian desktop app
 - `pkgs.stdenv.mkDerivation` — used by `mkPlugin` to build each community plugin
-- `pkgs.fetchFromGitHub` — fetches plugin sources; requires network access during build
+- `pkgs.fetchurl` — fetches individual release assets; requires network access during build
 
 **External flake inputs used:**
 
@@ -547,7 +642,7 @@ Inline comments in source files use three header tiers to classify non-active co
 
 ## Design Notes
 
-- `mkPlugin` is intentionally inlined rather than extracted to `obsidian-plugins/` because all current plugins are structurally identical (fetch → copy three files). The escape hatch is documented in the block comment: if a plugin requires non-trivial build steps, migrate it to a `callPackage` file at that point.
+- `mkPlugin` fetches compiled release assets from GitHub Releases using `fetchurl` — not source trees via `fetchFromGitHub`. The source tree does not contain `main.js`.
 
 - Theme management is EXCLUDED from this file. `catppuccin/nix` owns it. The commented-out `mkTheme` and `themeCatppuccin` blocks are retained as build history — they document the failed approach (manual theme fetch conflicting with catppuccin/nix's implicit injection) and its resolution without requiring a git blame.
 
@@ -557,7 +652,6 @@ Inline comments in source files use three header tiers to classify non-active co
 
 - `Ctrl+B` appears twice in the hotkeys block — once for `editor:toggle-bold` and once for `bookmarks:open`. Obsidian's hotkey system last-write-wins per command ID but does not prevent two commands sharing a chord in JSON. This is a known conflict to resolve in a future pass.
 
-
 ---
 
 ## Known Limitations
@@ -565,7 +659,6 @@ Inline comments in source files use three header tiers to classify non-active co
 - Style Settings `data.json` key names (`catppuccin@@flavor`, `catppuccin@@accent`) were derived from the plugin's CSS variable addressing scheme and community documentation — they have not been verified by inspecting a live `data.json` after manual configuration. If Catppuccin flavor/accent controls don't appear in Preferences after activation, inspect `.obsidian/plugins/obsidian-style-settings/data.json` in a manually-configured vault to derive the exact key names and update `settings` accordingly.
 - `workspace.json` is unmanaged — workspace layout is not reproducible across machines or fresh activations.
 - Plugin hashes must be manually updated after `nix flake update` if nixpkgs bumps a plugin's pinned revision. There is no automated hash-update mechanism.
-- `Ctrl+B` is bound to both `editor:toggle-bold` and `bookmarks:open` — unresolved conflict.
 - `daily-notes` `template` field is empty — no template is applied to new daily notes yet. A Templater-based daily note template is a natural next step.
 
 ---
@@ -587,5 +680,5 @@ Inline comments in source files use three header tiers to classify non-active co
 Module: modules/apps/productivity/obsidian.nix
 Context: Home Manager
 Created: 2026-06-10
-Updated: 2026-06-10
+Updated: 2026-06-11
 -->
