@@ -320,6 +320,79 @@ in
               # Allows Obsidian to traverse symlinks into directories outside the vault root.
               "followSymlinks" = true;
 
+              # ── File watcher exclusions ──────────────────────────────────────────────────
+              # Applied during vault traversal at startup — prevents Obsidian from placing
+              # inotify watches on directories that either contain permission-restricted
+              # files (e.g. .git/objects/pack at 444) or would generate excessive noise.
+              #
+              # Matches against path *components* (substring match on each directory name).
+              # A filter of ".git" blocks any directory named exactly ".git" at any depth.
+              #
+              # Sources:
+              #   - ignore-by-default (nodemon/AVA canonical list)
+              #   - standard .gitignore templates per language ecosystem
+              #   - NixOS/devenv specific artifacts
+              "userIgnoreFilters" = [
+                # ── Version control ──────────────────────────────────────────────────────
+                ".git" # Git internals — pack objects are 444 read-only; EACCES root cause
+
+                # ── Node / JavaScript / TypeScript ───────────────────────────────────────
+                "node_modules" # npm/yarn/pnpm deps — can contain thousands of .md files
+                ".yarn" # Yarn PnP cache and install state
+                "bower_components" # Legacy Bower packages (unlikely but defensive)
+                ".nyc_output" # nyc/Istanbul coverage raw data
+                ".sass-cache" # node-sass compilation cache
+                "dist" # Compiled/bundled output (TS, Vite, webpack, etc.)
+                "build" # Generic build output dir
+                ".next" # Next.js build cache and output
+                ".nuxt" # Nuxt build cache
+                ".svelte-kit" # SvelteKit build output
+                ".turbo" # Turborepo cache
+                ".parcel-cache" # Parcel bundler cache
+                ".cache" # Generic cache dir (Babel, Gatsby, etc.)
+                "coverage" # Jest/Vitest/Istanbul HTML coverage reports
+
+                # ── PHP / Composer ───────────────────────────────────────────────────────
+                "vendor" # Composer packages — can be enormous
+
+                # ── Python ───────────────────────────────────────────────────────────────
+                "__pycache__" # Compiled bytecode (.pyc files)
+                ".venv" # Python virtualenv (common convention)
+                "venv" # Python virtualenv (alternate convention)
+                ".pytest_cache" # pytest run cache
+                ".mypy_cache" # mypy type-checker cache
+                ".ruff_cache" # ruff linter cache
+
+                # ── Rust ─────────────────────────────────────────────────────────────────
+                "target" # Cargo build artifacts — can be gigabytes; contains binaries
+
+                # ── Go ───────────────────────────────────────────────────────────────────
+                # Go outputs to named binaries; no standard ignored dir beyond build/
+
+                # ── Java / JVM ───────────────────────────────────────────────────────────
+                ".gradle" # Gradle build cache and wrapper
+                ".m2" # Maven local repository cache
+
+                # ── Nix / NixOS ──────────────────────────────────────────────────────────
+                "result" # nix build symlink output — points into /nix/store (read-only)
+                ".devenv" # devenv state dir — contains symlinks into Nix store + DB files
+                ".direnv" # direnv cache — nix-direnv writes shell env here
+
+                # ── Docker / Containers ──────────────────────────────────────────────────
+                ".docker" # Docker context and config fragments
+
+                # ── IDEs and editors ─────────────────────────────────────────────────────
+                ".idea" # JetBrains IDE project files
+                ".vscode" # VS Code workspace settings (unlikely in vault but defensive)
+
+                # ── OS and system ────────────────────────────────────────────────────────
+                ".DS_Store" # macOS metadata (irrelevant on NixOS but harmless to list)
+                "Thumbs.db" # Windows thumbnail cache
+
+                # ── Logs ─────────────────────────────────────────────────────────────────
+                ".log" # Log output directories named .log (tsserver, etc.)
+              ];
+
               # ── Files & attachments ─────────────────────────────────────────────────────
 
               # Dropped/pasted attachments land in ./assets relative to the current note — keeps repos clean.
