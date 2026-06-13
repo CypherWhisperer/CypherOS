@@ -349,39 +349,40 @@ The Home Manager Obsidian module defines `appSettingsType = with types; nullOr (
 
 **What does it do?** Each key maps to an Obsidian editor, navigation, file management, or safety preference. The full key inventory:
 
-| Key                        | Type   | Effect                                                                                                                                                                                                                                    |
-| -------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Editor Behavior**        |        |                                                                                                                                                                                                                                           |
-| `readableLineLength`       | bool   | Constrains line width in reading/live-preview mode to a comfortable measure — _prevents full-width lines on wide monitors_                                                                                                                |
-| `showLineNumber`           | bool   | Line numbers off — _keeps the editor surface clean; this is a notes app, not an IDE_                                                                                                                                                      |
-| `defaultViewMode`          | string | Opens new notes in `live` (Live Preview) mode by default — _immediate rendered feedback without a split pane_                                                                                                                             |
-| `livePreview`              | bool   | Enables the hybrid source+preview editor engine; required for `defaultViewMode = "live"` to function                                                                                                                                      |
-| `tabSize`                  | bool   | Indentation width for nested lists and code blocks; 2 matches the broader CypherOS formatting convention                                                                                                                                  |
-| `useTab`                   | bool   | Uses spaces rather than hard tab characters — _consistent with `tabSize` above_                                                                                                                                                           |
-| `foldIndent`               | bool   | Enables folding of indented content blocks in the editor                                                                                                                                                                                  |
-| `foldHeading`              | bool   | Collapse headings on open. Useful for long ADRs, noisy in journals — _prevents context being hidden on open across a wide-concern vault_ `false`                                                                                          |
-| `showFrontmatter`          | bool   | Hides YAML frontmatter block in reading mode; still editable in source mode                                                                                                                                                               |
-| `strictLineBreaks`         | bool   | `false` = Single newline renders as a line break _(GFM-compatible)_ — _keeps repo docs portable across external renderers_. Matters if docs render elsewhere. Keep `false` for repo markdown.                                             |
-| `spellcheck`               | bool   | Enables spell checking — _useful for journal, prose, and cross-domain vault entries_                                                                                                                                                      |
-| `spellcheckLanguages`      | list   | Spell check language list - _e.g. `["en"]`  **only relevant if `spellcheck = true`**. extend if the vault spans multiple written languages_                                                                                               |
-| `smartIndentList`          | bool   | Auto-indents list item continuations on Enter — _prevents manual re-indenting in nested structures_                                                                                                                                       |
-| `autoConvertHtml`          | bool   | Converts pasted HTML to Markdown on paste — _reduces cleanup when pulling content from browsers_                                                                                                                                          |
-| **Navigation & Workspace** |        |                                                                                                                                                                                                                                           |
-| `vimMode`                  | bool   | Vim keybindings off; preserved as a named toggle for deliberate future enabling                                                                                                                                                           |
-| `useMarkdownLinks`         | bool   | Writes standard Markdown links `[text](path)` instead of `[[wikilinks]]` if true — _critical for portability outside Obsidian_. wikilinks are Obsidian-only syntax and will break in GitHub/VSCode renders.                               |
-| `newLinkFormat`            | string | `"shortest"` / `"relative"` / `"absolute"`. **Use `"relative"` for repo docs**. Relative link paths — _keeps links valid in any renderer (GitHub, mdBook, VSCode preview)_                                                                |
-| `alwaysUpdateLinks`        | bool   | Auto-updates internal links when a file is renamed — _`true` prevents silent broken references across the vault_                                                                                                                          |
-| `openNextToActiveLeaf`     | bool   | Opens new tabs adjacent to the active one instead of replacement — _preserves spatial context while navigating_                                                                                                                           |
-| `focusNewTab`              | bool   | Whether new tab steals focus on open — _direct navigation flow without manual click-to-focus_                                                                                                                                             |
-| `followSymlinks`           | bool   | Allows Obsidian to traverse symlinks into directories outside the vault root — _enables the repo-docs-as-vault-subfolder strategy_                                                                                                        |
-| **Files & Attachments**    |        |                                                                                                                                                                                                                                           |
-| `attachmentFolderPath`     | string | Where dropped/pasted attachments land relative to the current note — _keeps repo directories clean_. (Set per-vault to keep repos clean, e.g. `"./assets"`.)                                                                              |
-| `newFileLocation`          | string | New notes are created in the same folder as the currently active note — _contextually appropriate across a multi-concern vault_ (`"root"` / `"current"` / `"folder"`. Use `"current"` so new files land relative to what you're editing.) |
-| `newFileLocation`          | string | `"root"` / `"current"` / `"folder"`. Use `"current"` so new files land relative to what you're editing.                                                                                                                                   |
-| **Performance/Behavior**   |        |                                                                                                                                                                                                                                           |
-| `promptDelete`             | bool   | Confirms before deleting — _essential guard when editing files that are symlinked into live repos_. `false` = instant delete, risky on symlinked repo files. Keep `true`.                                                                 |
-| `trashOption`              | string | Sends deleted files to the system trash — _recoverable and keeps the vault directory clean_ (`"local"` (`.trash/` folder in vault) / `"system"` / `"none"`. Use `"system"` — cleaner for repos.)                                          |
-| `pdfExportSettings`        | object |                                                                                                                                                                                                                                           |
+| Key                        | Type              | Effect                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Editor Behavior**        |                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `readableLineLength`       | bool              | Constrains line width in reading/live-preview mode to a comfortable measure — _prevents full-width lines on wide monitors_                                                                                                                                                                                                                                                                                                                                   |
+| `showLineNumber`           | bool              | Line numbers off — _keeps the editor surface clean; this is a notes app, not an IDE_                                                                                                                                                                                                                                                                                                                                                                         |
+| `defaultViewMode`          | string            | Opens new notes in `live` (Live Preview) mode by default — _immediate rendered feedback without a split pane_                                                                                                                                                                                                                                                                                                                                                |
+| `livePreview`              | bool              | Enables the hybrid source+preview editor engine; required for `defaultViewMode = "live"` to function                                                                                                                                                                                                                                                                                                                                                         |
+| `tabSize`                  | bool              | Indentation width for nested lists and code blocks; 2 matches the broader CypherOS formatting convention                                                                                                                                                                                                                                                                                                                                                     |
+| `useTab`                   | bool              | Uses spaces rather than hard tab characters — _consistent with `tabSize` above_                                                                                                                                                                                                                                                                                                                                                                              |
+| `foldIndent`               | bool              | Enables folding of indented content blocks in the editor                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `foldHeading`              | bool              | Collapse headings on open. Useful for long ADRs, noisy in journals — _prevents context being hidden on open across a wide-concern vault_ `false`                                                                                                                                                                                                                                                                                                             |
+| `showFrontmatter`          | bool              | Hides YAML frontmatter block in reading mode; still editable in source mode                                                                                                                                                                                                                                                                                                                                                                                  |
+| `strictLineBreaks`         | bool              | `false` = Single newline renders as a line break _(GFM-compatible)_ — _keeps repo docs portable across external renderers_. Matters if docs render elsewhere. Keep `false` for repo markdown.                                                                                                                                                                                                                                                                |
+| `spellcheck`               | bool              | Enables spell checking — _useful for journal, prose, and cross-domain vault entries_                                                                                                                                                                                                                                                                                                                                                                         |
+| `spellcheckLanguages`      | list              | Spell check language list - _e.g. `["en"]`  **only relevant if `spellcheck = true`**. extend if the vault spans multiple written languages_                                                                                                                                                                                                                                                                                                                  |
+| `smartIndentList`          | bool              | Auto-indents list item continuations on Enter — _prevents manual re-indenting in nested structures_                                                                                                                                                                                                                                                                                                                                                          |
+| `autoConvertHtml`          | bool              | Converts pasted HTML to Markdown on paste — _reduces cleanup when pulling content from browsers_                                                                                                                                                                                                                                                                                                                                                             |
+| **Navigation & Workspace** |                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `vimMode`                  | bool              | Vim keybindings off; preserved as a named toggle for deliberate future enabling                                                                                                                                                                                                                                                                                                                                                                              |
+| `useMarkdownLinks`         | bool              | Writes standard Markdown links `[text](path)` instead of `[[wikilinks]]` if true — _critical for portability outside Obsidian_. wikilinks are Obsidian-only syntax and will break in GitHub/VSCode renders.                                                                                                                                                                                                                                                  |
+| `newLinkFormat`            | string            | `"shortest"` / `"relative"` / `"absolute"`. **Use `"relative"` for repo docs**. Relative link paths — _keeps links valid in any renderer (GitHub, mdBook, VSCode preview)_                                                                                                                                                                                                                                                                                   |
+| `alwaysUpdateLinks`        | bool              | Auto-updates internal links when a file is renamed — _`true` prevents silent broken references across the vault_                                                                                                                                                                                                                                                                                                                                             |
+| `openNextToActiveLeaf`     | bool              | Opens new tabs adjacent to the active one instead of replacement — _preserves spatial context while navigating_                                                                                                                                                                                                                                                                                                                                              |
+| `focusNewTab`              | bool              | Whether new tab steals focus on open — _direct navigation flow without manual click-to-focus_                                                                                                                                                                                                                                                                                                                                                                |
+| `followSymlinks`           | bool              | Allows Obsidian to traverse symlinks into directories outside the vault root — _enables the repo-docs-as-vault-subfolder strategy_                                                                                                                                                                                                                                                                                                                           |
+| `userIgnoreFilters`        | array _(strings)_ | List of directory name components that Obsidian excludes from both the file indexer and the inotify file watcher. <br><br>Matched as substring against each path component at vault traversal time during startup.<br><br>Directories matching any entry are neither indexed nor watched — _preventing EACCES crashes when symlinked repositories contain read-only files (e.g. `.git/objects/pack`) and suppressing noise from build artifact directories._ |
+| **Files & Attachments**    |                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `attachmentFolderPath`     | string            | Where dropped/pasted attachments land relative to the current note — _keeps repo directories clean_. (Set per-vault to keep repos clean, e.g. `"./assets"`.)                                                                                                                                                                                                                                                                                                 |
+| `newFileLocation`          | string            | New notes are created in the same folder as the currently active note — _contextually appropriate across a multi-concern vault_ (`"root"` / `"current"` / `"folder"`. Use `"current"` so new files land relative to what you're editing.)                                                                                                                                                                                                                    |
+| `newFileLocation`          | string            | `"root"` / `"current"` / `"folder"`. Use `"current"` so new files land relative to what you're editing.                                                                                                                                                                                                                                                                                                                                                      |
+| **Performance/Behavior**   |                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `promptDelete`             | bool              | Confirms before deleting — _essential guard when editing files that are symlinked into live repos_. `false` = instant delete, risky on symlinked repo files. Keep `true`.                                                                                                                                                                                                                                                                                    |
+| `trashOption`              | string            | Sends deleted files to the system trash — _recoverable and keeps the vault directory clean_ (`"local"` (`.trash/` folder in vault) / `"system"` / `"none"`. Use `"system"` — cleaner for repos.)                                                                                                                                                                                                                                                             |
+| `pdfExportSettings`        | object            |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 **Why is it here?** Without this block, Obsidian's defaults apply — _notably `defaultViewMode` would be `preview`, `readableLineLength` would be `false`, and `useMarkdownLinks` would be `false` (wikilinks)._ Declaring all keys explicitly means every fresh vault activation or new machine starts with a consistent, intentional, fully-documented editor state. The exhaustive declaration is deliberate: on a glance read of the source file, configuration and intention are both immediately legible.
 
@@ -453,6 +454,67 @@ app = {
 
   # Allows Obsidian to traverse symlinks into directories outside the vault root.
   "followSymlinks" = true;
+  
+  "userIgnoreFilters" = [
+    # ── Version control ──────────────────────────────────────────────────────
+    ".git" # Git internals — pack objects are 444 read-only; EACCES root cause
+
+    # ── Node / JavaScript / TypeScript ───────────────────────────────────────
+    "node_modules" # npm/yarn/pnpm deps — can contain thousands of .md files
+    ".yarn" # Yarn PnP cache and install state
+    "bower_components" # Legacy Bower packages (unlikely but defensive)
+    ".nyc_output" # nyc/Istanbul coverage raw data
+    ".sass-cache" # node-sass compilation cache
+    "dist" # Compiled/bundled output (TS, Vite, webpack, etc.)
+    "build" # Generic build output dir
+    ".next" # Next.js build cache and output
+    ".nuxt" # Nuxt build cache
+    ".svelte-kit" # SvelteKit build output
+    ".turbo" # Turborepo cache
+    ".parcel-cache" # Parcel bundler cache
+    ".cache" # Generic cache dir (Babel, Gatsby, etc.)
+    "coverage" # Jest/Vitest/Istanbul HTML coverage reports
+
+    # ── PHP / Composer ───────────────────────────────────────────────────────
+    "vendor" # Composer packages — can be enormous
+
+    # ── Python ───────────────────────────────────────────────────────────────
+    "__pycache__" # Compiled bytecode (.pyc files)
+    ".venv" # Python virtualenv (common convention)
+    "venv" # Python virtualenv (alternate convention)
+    ".pytest_cache" # pytest run cache
+    ".mypy_cache" # mypy type-checker cache
+    ".ruff_cache" # ruff linter cache
+
+    # ── Rust ─────────────────────────────────────────────────────────────────
+    "target" # Cargo build artifacts — can be gigabytes; contains binaries
+
+    # ── Go ───────────────────────────────────────────────────────────────────
+    # Go outputs to named binaries; no standard ignored dir beyond build/
+
+    # ── Java / JVM ───────────────────────────────────────────────────────────
+    ".gradle" # Gradle build cache and wrapper
+    ".m2" # Maven local repository cache
+
+    # ── Nix / NixOS ──────────────────────────────────────────────────────────
+    "result" # nix build symlink output — points into /nix/store (read-only)
+    ".devenv" # devenv state dir — contains symlinks into Nix store + DB files
+    ".direnv" # direnv cache — nix-direnv writes shell env here
+
+    # ── Docker / Containers ──────────────────────────────────────────────────
+    ".docker" # Docker context and config fragments
+
+    # ── IDEs and editors ─────────────────────────────────────────────────────
+    ".idea" # JetBrains IDE project files
+    ".vscode" # VS Code workspace settings (unlikely in vault but defensive)
+
+    # ── OS and system ────────────────────────────────────────────────────────
+    ".DS_Store" # macOS metadata (irrelevant on NixOS but harmless to list)
+    "Thumbs.db" # Windows thumbnail cache
+
+    # ── Logs ─────────────────────────────────────────────────────────────────
+    ".log" # Log output directories named .log (tsserver, etc.)
+  ];
 
   # ── Files & attachments ─────────────────────────────────────────────────────
 
@@ -769,6 +831,12 @@ Inline comments in source files use three header tiers to classify non-active co
 		- An explicit declaration with a comment removes that ambiguity entirely.
 		- The cost is verbosity; the benefit is that the file is self-documenting and audit-ready on a single read-through.
 
+    - Symlinked repositories use root-level symlinks with watcher exclusions, not subdirectory symlinks.
+        - When integrating external repository documentation into the vault via symlinks, _AND_ the symlink targets the repository root rather than individual _(NESTED)_ subdirectories, there is a mitigation strategy against EACCESS error.
+          
+        - This preserves the self-contained module documentation convention _(source files and their `docs/` co-located within module group directories)_ and avoids maintaining one symlink per module group as the repository grows. 
+        - The tradeoff — that non-documentation directories _(`.git/`, build artifacts, Nix store symlinks)_ are also reachable — is mitigated entirely by `userIgnoreFilters`. `followSymlinks = true` enables traversal; `userIgnoreFilters` constrains what is actually watched and indexed. See `INC_2026_06_12_001`.
+
 ---
 
 ## Known Limitations
@@ -799,6 +867,11 @@ Inline comments in source files use three header tiers to classify non-active co
 		- `spellcheckLanguages` is only effective for languages whose dictionary is bundled with the installed Obsidian version.
 		- The available set is determined by the `pkgs.obsidian` package version pinned in the flake.
 		- If the vault is extended to cover content in a language whose dictionary is absent from that build, spell checking for that language will silently produce no results rather than erroring.
+
+    - **`userIgnoreFilters` matches on directory name components only, not full paths or glob patterns.** 
+        - A filter entry of `"target"` will exclude _any_ directory named `target` at any depth — including a legitimate notes folder the user might name `target`. 
+        - If a future vault directory name collides with a filter entry, that directory will silently disappear from Obsidian's index with no warning.
+        - Name vault directories deliberately to avoid collisions with the entries in the filter list.
 
 ---
 
