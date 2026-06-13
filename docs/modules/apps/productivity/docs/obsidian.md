@@ -815,13 +815,6 @@ hotkeys = {
 vaults = {
   my-obsidian-notes = {
     target = "DATA/FILES/PROJECTS/PRIVATE/PERSONAL/MY_OBSIDIAN_NOTES";
-    settings = {
-      corePluginSettings = {
-          canvas = {
-            "newFileFolderPath" = "CANVAS";
-          };
-        };
-    };
   };
 };
 ```

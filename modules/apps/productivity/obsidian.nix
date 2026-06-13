@@ -885,17 +885,7 @@ in
               # should diverge from defaultSettings above.
               # settings.appearance.cssTheme = "Minimal";
               # settings.corePlugins = [ ... ];
-
-              settings = {
-                corePluginSettings = {
-                  canvas = {
-                    # New canvas files created via ribbon/command palette land here.
-                    # Right-click → New canvas in File Explorer ignores this and uses the
-                    # clicked folder — that's intentional and correct behaviour.
-                    "newFileFolderPath" = "CANVAS"; # adjust to vault structure
-                  };
-                };
-              };
+              # settings.[app, appearance, corePlugins, communityPlugins, cssSnippets, themes, hotkeys, extraFiles]
             };
           };
         };
