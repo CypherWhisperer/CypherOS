@@ -147,6 +147,20 @@ nix-prefetch-url https://github.com/tgrosinger/recent-files-obsidian/releases/do
 nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/main.js
 nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/manifest.json
 nix-prefetch-url https://github.com/liamcain/obsidian-calendar-plugin/releases/download/1.5.10/styles.css
+
+# Advanced Canvas
+nix-prefetch-url https://github.com/Developer-Mike/obsidian-advanced-canvas/releases/download/6.2.0/main.js
+nix-prefetch-url https://github.com/Developer-Mike/obsidian-advanced-canvas/releases/download/6.2.0/manifest.json
+nix-prefetch-url https://github.com/Developer-Mike/obsidian-advanced-canvas/releases/download/6.2.0/styles.css
+
+# optimized canvas connections
+nix-prefetch-url https://github.com/felixchenier/obsidian-optimize-canvas-connections/releases/download/1.0.0/main.js
+nix-prefetch-url https://github.com/felixchenier/obsidian-optimize-canvas-connections/releases/download/1.0.0/manifest.json
+
+# Canvas Filter
+nix-prefetch-url https://github.com/IKoshelev/Obsidian-Canvas-Filter/releases/download/0.9.4/main.js
+nix-prefetch-url https://github.com/IKoshelev/Obsidian-Canvas-Filter/releases/download/0.9.4/manifest.json
+nix-prefetch-url https://github.com/IKoshelev/Obsidian-Canvas-Filter/releases/download/0.9.4/styles.css
 ```
 
 
@@ -368,6 +382,7 @@ The Home Manager Obsidian module defines `appSettingsType = with types; nullOr (
 | `autoConvertHtml`          | bool              | Converts pasted HTML to Markdown on paste — _reduces cleanup when pulling content from browsers_                                                                                                                                                                                                                                                                                                                                                             |
 | **Navigation & Workspace** |                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `vimMode`                  | bool              | Vim keybindings off; preserved as a named toggle for deliberate future enabling                                                                                                                                                                                                                                                                                                                                                                              |
+| `canvasSnap`               | bool              | snap cards to grid by default — cleaner spatial layout, especially for research boards where structure matters. Toggle off per canvas at runtime.                                                                                                                                                                                                                                                                                                            |
 | `useMarkdownLinks`         | bool              | Writes standard Markdown links `[text](path)` instead of `[[wikilinks]]` if true — _critical for portability outside Obsidian_. wikilinks are Obsidian-only syntax and will break in GitHub/VSCode renders.                                                                                                                                                                                                                                                  |
 | `newLinkFormat`            | string            | `"shortest"` / `"relative"` / `"absolute"`. **Use `"relative"` for repo docs**. Relative link paths — _keeps links valid in any renderer (GitHub, mdBook, VSCode preview)_                                                                                                                                                                                                                                                                                   |
 | `alwaysUpdateLinks`        | bool              | Auto-updates internal links when a file is renamed — _`true` prevents silent broken references across the vault_                                                                                                                                                                                                                                                                                                                                             |
@@ -434,6 +449,10 @@ app = {
 
   # Vim keybindings — disabled; toggle if modal editing ever becomes preferable.
   "vimMode" = false;
+  
+  # Canvas: snap cards to grid by default — cleaner spatial layout, especially 
+  # for research boards where structure matters. Toggle off per canvas at runtime. 
+  "canvasSnap" = true;
 
   # ── Links & navigation ──────────────────────────────────────────────────────
 
@@ -541,49 +560,84 @@ app = {
 
 **What does it do?** This list is serialised into `core-plugins.json`, which is Obsidian's record of which built-in plugins are active. The HM module unconditionally overwrites this file on every activation — any plugin not listed here will be disabled, regardless of what was previously set manually. The full set of known core plugin IDs is enumerated in the HM module source, and only IDs from that enum are accepted.
 
-The `daily-notes` entry is the only one expanded to the submodule form because it carries `settings`. Those settings are serialised into `daily-notes.json` (the plugin's own config file), configuring where new daily notes are created, what filename format they use, whether a template is applied, and whether the plugin auto-opens today's note on launch. Every other plugin is a bare string — `enable = true` and `settings = null` by default.
+The `daily-notes` entry is the only one expanded to the submodule form because it carries `settings`. Those settings are serialised into `daily-notes.json` _(the plugin's own config file)_, configuring where new daily notes are created, what filename format they use, whether a template is applied, and whether the plugin auto-opens today's note on launch. Every other plugin is a bare string — `enable = true` and `settings = null` by default.
 
 Commented-out entries (`footnotes`, `publish`, `random-note`, `sync`) are plugins that exist in Obsidian's core set but are not relevant to this workflow. They are listed and commented rather than omitted so the full known set is auditable in one place and re-enabling one is a one-character change.
+
+A few Notes:
+1. **`bases`**:
+    - this is Obsidian's new structured data/database feature _(landed in v1.8)_. 
+    - Think Notion-style tables backed by your markdown frontmatter, queryable like Dataview but native.
+    - It's relevant because there's already a community plugin that renders Bases content **on Canvas** — _you can have a live database view as a node on your spatial board._
+      
+2. **`webviewer`**:
+    - required if you want Canvas webpage cards _(the fully interactive iframe nodes)_ to actually work.
+    - Without this enabled, URL-type canvas nodes render a broken empty frame.
+      
+3. **`properties`**:
+    - surfaces YAML frontmatter as a visual property panel.
+    - Once you start using Canvas heavily for research, tagging notes with frontmatter _(`status`, `topic`, `source`, etc.)_ and querying them via Dataview or Bases becomes a necessity.
 
 **Why is it here?** Because the HM module overwrites `core-plugins.json` unconditionally, omission equals disablement. An explicit, auditable list is the only safe approach — it prevents silent plugin disablement on rebuild caused by a forgotten entry.
 
 ```nix
 corePlugins = [
-  "audio-recorder"
-  "backlink"
-  "bases"
-  "bookmarks"
-  "canvas"
-  "command-palette"
+  # ── Navigation & UI ─────────────────────────────────────────────────────────
+  "file-explorer" # left-panel file tree
+  "global-search" # vault-wide full-text search
+  "switcher" # Ctrl+O (quick open palette) quick note switcher
+  "command-palette" # Ctrl+P quick command launcher
+  "bookmarks" # persisitent notes, headings, searches to sidebar
+  "outline" # heading tree of current note (ease of in-note navigation)
+  "page-preview" # hover popover preview on internal links
+  "backlink" # shows which notes link to the current note
+  "outgoing-link" # panel showing links from current note
+  "tag-pane" # tag browser (sidebar listing all tags)
+  "word-count" # document word count in status bar
+
+  # ── Editing ─────────────────────────────────────────────────────────────────
+  "editor-status" # cursor position in status bar
+  "templates" # basic templating (use Templater plugin for power use)
+  "note-composer" # merge/split/extract note operations.
+  "slash-command" # / trigger for commands inline
+
+  # ── Knowledge graph & canvas ────────────────────────────────────────────────
+  "graph" # knowledge graph visualisation (local + global)
+  "canvas" # infinite spatial canvas.
+
+  # ── Daily workflow ──────────────────────────────────────────────────────────
+  "file-recovery" # snapshot-based file recovery — always keep this on.
+
+  # one-note-per-day journaling / scratchpad
+  # Each entry in defaultSettings.corePlugins accepts a settings field of type
+  # nullOr (attrsOf anything) — core plugin settings are declared inline on the
+  # plugin entry itsel.
   {
     name = "daily-notes";
     settings = {
-      "folder"   = "THE_CHAMBER_OF_SECRETS/00_MASTER_JOURNAL/DAILY_NOTES";
-      "format"   = "YYYY_MM_DD";
-      "template" = "";
-      "autorun"  = false;
+      "folder" = "THE_CHAMBER_OF_SECRETS/00_MASTER_JOURNAL/DAILY_NOTES";
+      "format" = "YYYY_MM_DD";
+      "template" = ""; # path to a template note if you want one; empty = none for now
+      "autorun" = false; # true = opens today's note automatically on Obsidian launch
     };
   }
-  "editor-status"
-  "file-explorer"
-  "file-recovery"
-  "global-search"
-  "graph"
+
+  # ── Data & structure ────────────────────────────────────────────────────────
+  "bases" # Obsidian's native database/property system (new in 1.8)
+  "properties" # (frontmatter properties panel) surfaces YAML frontmatter as visual property panel.
+  "webviewer" # built-in browser pane — needed for webpage cards on canvas
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  "audio-recorder" # record audio notes from within Obsidian
   "markdown-importer"
-  "note-composer"
-  "outgoing-link"
-  "outline"
-  "page-preview"
-  "properties"
-  "slash-command"
-  "slides"
-  "switcher"
-  "tag-pane"
-  "templates"
-  "webviewer"
-  "word-count"
+  "slides" # presentation mode for notes
   "workspaces"
   "zk-prefixer"
+
+  # "footnotes"
+  # "publish"
+  # "random-note"
+  # "sync"
 ];
 ```
 
@@ -611,6 +665,8 @@ Plugin-by-plugin summary:
 
 
 **Why is it here?** Community plugins have no system-level install mechanism — they must be in `.obsidian/plugins/` to be loaded. This block is the complete, auditable manifest of all active community plugins. Adding a plugin without declaring it here means it will not exist in the vault on the next rebuild.
+
+The only watch-out: the upstream module merges `app.json` and `appearance.json` but `community-plugins.json` is **replaced, not merged**, per vault. If you ever want vault-specific plugin subsets, you'll need to explicitly redeclare the full list at the vault level. For your current single-vault setup this doesn't matter yet.
 
 ```nix
 communityPlugins = [
@@ -649,8 +705,12 @@ communityPlugins = [
       "templates_folder"         = "TEMPLATES";
     };
   }
+  
   pluginRecentFiles
   pluginCalendar
+  pluginAdvancedCanvas
+  pluginOptimizeCanvasConnections
+  pluginCanvasFilter
 ];
 ```
 
@@ -729,6 +789,15 @@ hotkeys = {
   "editor:unfold-all"                 = [{ modifiers = [ "Ctrl" "Shift" ]; key = ","; }];
   "editor:toggle-fold"                = [{ modifiers = [ "Ctrl" ];         key = "."; }];
   "markdown:toggle-preview"           = [{ modifiers = [ "Ctrl" ];         key = "E"; }];
+  
+  # ── Canvas ───────────────────────────────────────────────────────────    
+  # create new canvas 
+  "canvas:new-file" = [ { modifiers = [ "Ctrl" "Shift" ]; key = "C"; } ]; 
+  # export canvas to PNG/SVG 
+  "canvas:export-as-image" = [ { modifiers = [ "Ctrl" "Shift" ]; key = "E"; } ];
+  
+  # canvas:convert-to-file has no default — assign if you use inline text cards heavily 
+  # canvas:zoom-to-fit — already defaults to Shift+1 on most systems; override if needed
 };
 ```
 
@@ -746,6 +815,13 @@ hotkeys = {
 vaults = {
   my-obsidian-notes = {
     target = "DATA/FILES/PROJECTS/PRIVATE/PERSONAL/MY_OBSIDIAN_NOTES";
+    settings = {
+      corePluginSettings = {
+          canvas = {
+            "newFileFolderPath" = "CANVAS";
+          };
+        };
+    };
   };
 };
 ```

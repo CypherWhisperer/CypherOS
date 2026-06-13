@@ -204,6 +204,37 @@ let
     # no styles.css in this release
   };
 
+  # CANVAS RELATED
+  pluginAdvancedCanvas = mkPlugin {
+    pname = "advanced-canvas";
+    version = "6.2.1";
+    owner = "Developer-Mike";
+    repo = "obsidian-advanced-canvas";
+    mainJsHash = "sha256-J2wnJ5P6oVkxXf+s9SdpfcuV4KDeNswy2aipZfFqWr8=";
+    manifestHash = "sha256-WzUcGP0bFHokKXghYbEq4HfOVM6oOs/mqtABjoNUNyw=";
+    stylesHash = "sha256-WBiZf6PInCdKzJpH9yTrlJGNZnHG9JnYXXN2aW52PAs=";
+  };
+
+  pluginOptimizeCanvasConnections = mkPlugin {
+    pname = "optimize-canvas-connections";
+    version = "1.0.0";
+    owner = "felixchenier";
+    repo = "obsidian-optimize-canvas-connections";
+    mainJsHash = "sha256-sadDBFF7K6ENah9b2DQedM28TIugCqTBcMp5m1f0F/M=";
+    manifestHash = "sha256-0z5SO0QjQw86i0T4s5usT6pfudq+Esa5uoYK9wDzjcI=";
+    # no styles.css in releases
+  };
+
+  pluginCanvasFilter = mkPlugin {
+    pname = "obsidian-canvas-filter";
+    version = "0.9.4";
+    owner = "IKoshelev";
+    repo = "Obsidian-Canvas-Filter";
+    mainJsHash = "sha256-b2y/XCRr3V413n/D5B//cJ0WbSbw188YDorRb7h7UMI=";
+    manifestHash = "sha256-ZtgWYcJ/wcnXo+/wE1TfAQ1tSuvWq2WZTbp/mC4LtPc=";
+    stylesHash = "sha256-NNq6X4QF/nehZymrFYosSvXBk008n+N2/Yw59bxrryw=";
+  };
+
   # ── Theme packages ───────────────────────────────────────────────────────────
   # Letting catppuccin/nix take control over theming as it should
   #
@@ -299,6 +330,10 @@ in
 
               # Vim keybindings — disabled; toggle if modal editing ever becomes preferable.
               "vimMode" = false;
+
+              # Canvas: snap cards to grid by default — cleaner spatial layout, especially
+              # for research boards where structure matters. Toggle off per canvas at runtime.
+              "canvasSnap" = true;
 
               # ── Links & navigation ──────────────────────────────────────────────────────
 
@@ -415,12 +450,31 @@ in
             # the HM module — listed explicitly here so you can comment out what
             # you don't use and have an auditable record.
             corePlugins = [
-              "audio-recorder" # record audio notes from within Obsidian
-              "backlink" # shows which notes link to the current note
-              "bases" # Obsidian's native database/property system (new in 1.8)
-              "bookmarks" # pin notes, headings, searches to sidebar
-              "canvas" # infinite canvas for visual note layouts
+              # ── Navigation & UI ─────────────────────────────────────────────────────────
+              "file-explorer" # left-panel file tree
+              "global-search" # vault-wide full-text search
+              "switcher" # Ctrl+O (quick open palette) quick note switcher
               "command-palette" # Ctrl+P quick command launcher
+              "bookmarks" # persisitent notes, headings, searches to sidebar
+              "outline" # heading tree of current note (ease of in-note navigation)
+              "page-preview" # hover popover preview on internal links
+              "backlink" # shows which notes link to the current note
+              "outgoing-link" # panel showing links from current note
+              "tag-pane" # tag browser (sidebar listing all tags)
+              "word-count" # document word count in status bar
+
+              # ── Editing ─────────────────────────────────────────────────────────────────
+              "editor-status" # cursor position in status bar
+              "templates" # basic templating (use Templater plugin for power use)
+              "note-composer" # merge/split/extract note operations.
+              "slash-command" # / trigger for commands inline
+
+              # ── Knowledge graph & canvas ────────────────────────────────────────────────
+              "graph" # knowledge graph visualisation (local + global)
+              "canvas" # infinite spatial canvas.
+
+              # ── Daily workflow ──────────────────────────────────────────────────────────
+              "file-recovery" # snapshot-based file recovery — always keep this on.
 
               # one-note-per-day journaling / scratchpad
               # Each entry in defaultSettings.corePlugins accepts a settings field of type
@@ -436,30 +490,22 @@ in
                 };
               }
 
-              "editor-status" # word/char count in status bar
-              "file-explorer" # left-panel file tree
-              "file-recovery" # snapshots — saves you from accidental deletions
-              # "footnotes"
-              "global-search" # full-text search across all notes
-              "graph" # knowledge graph visualisation
+              # ── Data & structure ────────────────────────────────────────────────────────
+              "bases" # Obsidian's native database/property system (new in 1.8)
+              "properties" # (frontmatter properties panel) surfaces YAML frontmatter as visual property panel.
+              "webviewer" # built-in browser pane — needed for webpage cards on canvas
+
+              # ──────────────────────────────────────────────────────────────────────────────
+              "audio-recorder" # record audio notes from within Obsidian
               "markdown-importer"
-              "note-composer" # merge/split/extract notes
-              "outgoing-link" # panel showing links from current note
-              "outline" # heading tree of current note
-              "page-preview" # hover preview on internal links
-              "properties"
-              # "publish"
-              # "random-note"
-              "slash-command"
               "slides" # presentation mode for notes
-              "switcher" # Ctrl+O quick note switcher
-              # "sync"
-              "tag-pane" # sidebar listing all tags
-              "templates" # basic templating (use Templater plugin for power use)
-              "webviewer" # render web content in notes (e.g. YouTube embeds)
-              "word-count" # document word count in status bar
               "workspaces"
               "zk-prefixer"
+
+              # "footnotes"
+              # "publish"
+              # "random-note"
+              # "sync"
             ];
 
             # ── Community Plugins ───────────────────────────────────────────────────
@@ -539,8 +585,10 @@ in
 
               # Recent Files — sidebar panel of recently opened notes.
               pluginRecentFiles # bare derivation — no settings needed
-
               pluginCalendar # bare derivation — no settings needed
+              pluginAdvancedCanvas
+              pluginOptimizeCanvasConnections
+              pluginCanvasFilter
             ];
 
             # ── Themes ─────────────────────────────────────────────────────────────
@@ -785,6 +833,28 @@ in
                   key = "E";
                 }
               ];
+
+              # ── Canvas ───────────────────────────────────────────────────────────────────
+              "canvas:new-file" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "C";
+                }
+              ]; # create new canvas
+              "canvas:export-as-image" = [
+                {
+                  modifiers = [
+                    "Ctrl"
+                    "Shift"
+                  ];
+                  key = "E";
+                }
+              ]; # export canvas to PNG/SVG
+              # canvas:convert-to-file has no default — assign if you use inline text cards heavily
+              # canvas:zoom-to-fit — already defaults to Shift+1 on most systems; override if needed
             };
           };
 
@@ -815,6 +885,17 @@ in
               # should diverge from defaultSettings above.
               # settings.appearance.cssTheme = "Minimal";
               # settings.corePlugins = [ ... ];
+
+              settings = {
+                corePluginSettings = {
+                  canvas = {
+                    # New canvas files created via ribbon/command palette land here.
+                    # Right-click → New canvas in File Explorer ignores this and uses the
+                    # clicked folder — that's intentional and correct behaviour.
+                    "newFileFolderPath" = "CANVAS"; # adjust to vault structure
+                  };
+                };
+              };
             };
           };
         };
