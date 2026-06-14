@@ -7,5 +7,6 @@
     ./claude.nix
     ./obsidian.nix
     ./penpot-hm.nix
+    ./logseq.nix
   ];
 }
