@@ -29,7 +29,7 @@ let
   # Electron 34 has been tested and the app runs correctly; upstream issue tracked
   # at nixpkgs#528213. Revisit this override when nixpkgs updates Logseq's Electron pin.
   logseq-patched = pkgs.logseq.override {
-    electron_27 = pkgs.electron_34; # attribute name reflects what logseq's derivation expects
+    electron_39 = pkgs.electron_34; # attribute name reflects what logseq's derivation expects
   };
 
   graphBase = "${config.home.homeDirectory}/DATA/FILES/DE_FILES/SHARED/APPS/logseq/NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/graph";
