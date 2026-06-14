@@ -95,7 +95,14 @@
   # ─────────────────────────────────────────────────────────────────────────────
   # ALLOWED UNTRUSTED PACKAGES
   # ─────────────────────────────────────────────────────────────────────────────
-  nixpkgs.config.permittedInsecurePackages = [ "ventoy-1.1.12" ];
+  nixpkgs.config.permittedInsecurePackages = [
+    "ventoy-1.1.12"
+    # Logseq pins electron_39 (39.8.10), which nixpkgs has marked EOL/insecure.
+    # Upstream hasn't cut a release bumping the Electron pin yet.
+    # Tracked at nixpkgs#528213. Revisit when Logseq releases a new version.
+    # Electron override attempts (34, 36, 37, 38) all failed — removed/insecure.
+    "electron_39.8.10"
+  ];
 
   # ─────────────────────────────────────────────────────────────────────────────
   # NIX SETTINGS

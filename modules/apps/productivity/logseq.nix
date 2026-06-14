@@ -24,21 +24,13 @@
 
 let
   cfg = config.cypher-os.apps.productivity.logseq;
-
-  # Override the pinned Electron version to avoid the insecure-package error.
-  # Electron 34 has been tested and the app runs correctly; upstream issue tracked
-  # at nixpkgs#528213. Revisit this override when nixpkgs updates Logseq's Electron pin.
-  logseq-patched = pkgs.logseq.override {
-    electron_39 = pkgs.electron_34; # attribute name reflects what logseq's derivation expects
-  };
-
   graphBase = "${config.home.homeDirectory}/DATA/FILES/DE_FILES/SHARED/APPS/logseq/NEW_SCHOOL/PERSISTENT_INSTANCE_DATA/graph";
 
 in
 {
   config = lib.mkIf (config.cypher-os.apps.productivity.enable && cfg.enable) {
 
-    home.packages = [ logseq-patched ];
+    home.packages = with pkgs; [ logseq ];
 
     # ── Graph directory ────────────────────────────────────────────────────────
     # Ensure the graph directory exists. Logseq will populate it on first launch
