@@ -75,7 +75,7 @@ in
       '';
     };
 
-    # ── custom.css — Catppuccin Mocha ──────────────────────────────────────────
+    # ── custom.css — Catppuccin Mocha ────────────────────────────────────────────────────────────────────────────────────────
     # Logseq auto-loads logseq/custom.css from the graph directory.
     # Using a local file (not :custom-css-url) avoids any outbound request —
     # consistent with the privacy-first posture.
@@ -85,8 +85,15 @@ in
     #
     # To update: curl -o logseq-catppuccin-mocha.css https://logseq.catppuccin.com/ctp-mocha.css
     # then embed it here or reference it via a path in the nix store.
-    home.file."${graphBase}/logseq/custom.css" = {
-      source = ./config/catppuccin-mocha.css;
-    };
+    #
+    # home.file would place a Nix store symlink here, which Logseq's CSS file
+    # watcher cannot follow correctly. home.activation copies the file as a real
+    # mutable file instead. Updated on every `home-manager switch`.
+    home.activation.logseqCatppuccinCss = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD cp --remove-destination \
+        ${./config/catppuccin-mocha.css} \
+        "${graphBase}/logseq/custom.css"
+      $DRY_RUN_CMD chmod 644 "${graphBase}/logseq/custom.css"
+    '';
   };
 }
