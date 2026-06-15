@@ -60,6 +60,7 @@
       cypher-os.arduino.ide.enable = lib.mkDefault true;
       cypher-os.arduino.ota.enable = lib.mkDefault true;
 
+      cypher-os.apps.productivity.enable = lib.mkDefault true;
       cypher-os.apps.productivity.penpot.enable = lib.mkDefault true;
       cypher-os.apps.productivity.affine.enable = lib.mkDefault true;
 
