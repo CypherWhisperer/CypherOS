@@ -12,7 +12,7 @@
         };
 
         security.pki.certificateFiles = [
-          /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/affine/NEW_SCHOOL/INSTANCE_DATA/caddy/data/caddy/pki/authorities/local/root.crt
+          /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/affine/NEW_SCHOOL/PERSISTENT_DATA/caddy/data/caddy/pki/authorities/local/root.crt
         ];
       };
 }
