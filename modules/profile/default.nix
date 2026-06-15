@@ -90,6 +90,7 @@
       cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
       cypher-os.apps.productivity.penpot.enable = lib.mkDefault true;
       cypher-os.apps.productivity.logseq.enable = lib.mkDefault true;
+      cypher-os.apps.productivity.affine.enable = lib.mkDefault true;
 
       cypher-os.apps.mail.enable = lib.mkDefault true;
       cypher-os.apps.mail.thunderbird.enable = lib.mkDefault true;

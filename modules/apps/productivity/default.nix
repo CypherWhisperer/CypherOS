@@ -8,5 +8,6 @@
     ./obsidian.nix
     ./penpot-hm.nix
     ./logseq.nix
+    ./affine-hm.nix
   ];
 }

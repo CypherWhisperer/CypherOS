@@ -7,5 +7,6 @@
     obsidian.enable = lib.mkEnableOption "Obsidian Desktop App";
     penpot.enable = lib.mkEnableOption "Penpot Design App";
     logseq.enable = lib.mkEnableOption "Logseq knowledge base";
+    affine.enable = lib.mkEnableOption "AFFiNE knowledge base";
   };
 }

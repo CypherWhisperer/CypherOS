@@ -69,6 +69,7 @@
     ../../modules/dm/gdm/system.nix
     ../../modules/apps/mail/proton-bridge-system.nix
     ../../modules/apps/productivity/penpot-system.nix
+    ../../modules/apps/productivity/affine-system.nix
   ];
 
   cypher-os.profile.desktop.enable = true;
