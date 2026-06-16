@@ -35,6 +35,7 @@
       gnome-calendar
       simple-scan # scanner app — keep if thou have a scanner, exclude if not
       gnome-clocks # keep or exclude based on preference
+      gnome-console
       # gnome-characters   # character/emoji picker — borderline useful
     ];
   };
