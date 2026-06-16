@@ -50,10 +50,30 @@
       # cypher-os.apps.enable = lib.mkDefault false;
 
       # Catppuccin theme — applies to all supported apps, shells, and DEs.
-      catppuccin.autoEnable = true; # suppress the evaluation warning.
-      catppuccin.enable = true;
-      catppuccin.flavor = "mocha";
-      catppuccin.accent = "mauve";
+      catppuccin = {
+        autoEnable = true; # suppress the evaluation warning.
+        enable = true;
+        flavor = "mocha";
+        accent = "mauve";
+
+        obs.enable = true;
+        zathura.enable = true;
+        zellij.enable = true;
+        kitty.enable = true;
+        fish.enable = true;
+        fzf.enable = true;
+        gitui.enable = true;
+        k9s.enable = true;
+        lazygit.enable = true;
+        nushell.enable = true;
+        kvantum.enable = true;
+      };
+
+      qt = {
+        enable = true;
+        platformTheme.name = "kvantum";
+        style.name = "kvantum";
+      };
 
       cypher-os.apps.common.enable = lib.mkDefault true;
       cypher-os.apps.common.disk-utils.enable = lib.mkDefault true;
