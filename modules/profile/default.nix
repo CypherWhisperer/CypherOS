@@ -64,6 +64,7 @@
       cypher-os.apps.cli.btop.enable = lib.mkDefault true;
       cypher-os.apps.cli.htop.enable = lib.mkDefault true;
       cypher-os.apps.cli.tmux.enable = lib.mkDefault true;
+      cypher-os.apps.cli.zellij.enable = lib.mkDefault true;
       cypher-os.apps.cli.fastfetch.enable = lib.mkDefault true;
 
       cypher-os.apps.dev.enable = lib.mkDefault true;

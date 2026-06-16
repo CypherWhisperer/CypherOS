@@ -8,5 +8,6 @@
     ./fastfetch.nix
     ./htop.nix
     ./tmux.nix
+    ./zellij.nix
   ];
 }
