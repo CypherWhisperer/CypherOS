@@ -9,5 +9,6 @@
     ./penpot-hm.nix
     ./logseq.nix
     ./affine-hm.nix
+    ./zathura.nix
   ];
 }

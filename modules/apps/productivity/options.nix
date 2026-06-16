@@ -8,5 +8,6 @@
     penpot.enable = lib.mkEnableOption "Penpot Design App";
     logseq.enable = lib.mkEnableOption "Logseq knowledge base";
     affine.enable = lib.mkEnableOption "AFFiNE knowledge base";
+    zathura.enable = lib.mkEnableOption "Zathura PDF reader";
   };
 }
