@@ -53,6 +53,9 @@
 - `config.cypher-os.apps.productivity.claude.enable` — _app-level switch for Claude Desktop. Read by `claude.nix`._
 - `config.cypher-os.apps.productivity.obsidian.enable` — _app-level switch for Obsidian. Read by `obsidian.nix`._
 - `config.cypher-os.apps.productivity.penpot.enable` — _app-level switch for Penpot. Read by `penpot-hm.nix` and `penpot-system.nix`._
+- `config.cypher-os.apps.productivity.logseq.enable` — _app-level switch for logseq. Read by `logseq.nix`._
+- `config.cypher-os.apps.productivity.affine.enable` — _app-level switch for AFFiNE. Read by `affine-hm.nix` and `affine-system.nix`._
+- `config.cypher-os.apps.productivity.zathura.enable` — _app-level switch for Zathura. Read by `zathura.nix`._
 
 **Why is it here?** The Nix module system requires options to be declared before they can be read. Centralising all declarations for a module group in a single `options.nix` keeps the contract for that group explicit and auditable in one place. Any module that reads a `cypher-os.apps.productivity.*` option must have this file in its import chain — _either via `default.nix` (for HM-context modules) or directly (for NixOS-context modules like `penpot-system.nix` which cannot rely on the HM import chain)._
 
@@ -62,6 +65,9 @@ options.cypher-os.apps.productivity = {
   claude.enable  = lib.mkEnableOption "Claude Desktop";
   obsidian.enable = lib.mkEnableOption "Obsidian Desktop App";
   penpot.enable  = lib.mkEnableOption "Penpot Design App";
+  logseq.enable = lib.mkEnableOption "Logseq knowledge base";
+  affine.enable = lib.mkEnableOption "AFFiNE knowledge base";
+  zathura.enable = lib.mkEnableOption "Zathura PDF reader";
 };
 ```
 

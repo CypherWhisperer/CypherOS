@@ -1,4 +1,4 @@
-# modules/apps/productivity/logseq-hm.nix
+# modules/apps/productivity/logseq.nix
 #
 # Sync across devices (e.g., Android phone) is handled at the filesystem layer
 # via Syncthing — not by Logseq itself. Syncthing is declared separately.
