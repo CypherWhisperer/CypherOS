@@ -63,6 +63,12 @@ in
         package = ctpGtkPkg; # GTK3 -> pkgs.adw-gtk3
       };
 
+      # silencing evaluation warning:
+      gtk4.theme = {
+        name = ctpThemeName;
+        package = ctpGtkPkg;
+      };
+
       # Letting catppuccin/nix handle the icon and cursor themes globally for consistency across DEs and apps.
       #
       # iconTheme = {
@@ -101,12 +107,12 @@ in
     # ─────────────────────────────────────────────────────────────────────────────
     # LAYER 3: LIBADWAITA (GTK4) THEMING
     # ─────────────────────────────────────────────────────────────────────────────
-    # home.file.".config/gtk-4.0/gtk.css".source =
-    # "${ctpGtkPkg}/share/themes/${ctpThemeName}/gtk-4.0/gtk.css";
-    #
-    # home.file.".config/gtk-4.0/gtk-dark.css".source =
-    # "${ctpGtkPkg}/share/themes/${ctpThemeName}/gtk-4.0/gtk-dark.css";
-    #
+    home.file.".config/gtk-4.0/gtk.css".source =
+    "${ctpGtkPkg}/share/themes/${ctpThemeName}/gtk-4.0/gtk.css";
+
+    home.file.".config/gtk-4.0/gtk-dark.css".source =
+    "${ctpGtkPkg}/share/themes/${ctpThemeName}/gtk-4.0/gtk-dark.css";
+
     # home.file.".config/gtk-4.0/assets" = {
     # recursive = true;
     # source    = "${ctpGtkPkg}/share/themes/${ctpThemeName}/gtk-4.0/assets";
@@ -131,6 +137,21 @@ in
         # gtk-theme tells GTK3 apps which theme to load.
         # Must match gtk.theme.name exactly.
         gtk-theme = ctpThemeName; # ADWAITA -> "adw-gtk3";
+
+        color-scheme = "prefer-dark"; # drives the dark mode toggle
+        # letting catppuccin/nix handle the icon and cursor themes globally
+        # for consistency across DEs and apps.
+        #
+        #icon-theme = "Papirus-Dark"; # ADWAITA -> "Adwaita";
+
+        # cursor-theme = "Catppuccin Mocha Dark"; # ADWAITA -> "Adwaita";
+        cursor-theme = "Adwaita";
+        cursor-size = 24;
+      };
+
+      # Enforde Dark Mode at XDG portal level
+      "org/freedesktop/appearance" = {
+        color-scheme = lib.hm.gvariant.mkUint32 1; # the value 1 does the magic
       };
     };
   };

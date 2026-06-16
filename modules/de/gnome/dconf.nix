@@ -26,26 +26,11 @@
 
       # ── Interface ──────────────────────────────────────────────────────────
       "org/gnome/desktop/interface" = {
-        color-scheme = "prefer-dark"; # drives the dark mode toggle
         clock-format = "24h";
         show-battery-percentage = false;
         font-name = "Cantarell 11";
         document-font-name = "Cantarell 11";
         monospace-font-name = "Monospace 11";
-
-        # letting catppuccin/nix handle the icon and cursor themes globally
-        # for consistency across DEs and apps.
-        #
-        #icon-theme = "Papirus-Dark"; # ADWAITA -> "Adwaita";
-
-        # cursor-theme = "Catppuccin Mocha Dark"; # ADWAITA -> "Adwaita";
-        cursor-theme = "Adwaita";
-        cursor-size = 24;
-      };
-
-      # Enforde Dark Mode at XDG portal level
-      "org/freedesktop/appearance" = {
-        color-scheme = lib.hm.gvariant.mkUint32 1; # the value 1 does the magic
       };
 
       # ── Keyboard: Layout & XKB Remapping ──────────────────────────────────
