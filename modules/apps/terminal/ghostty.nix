@@ -65,6 +65,9 @@
             # ── Window ────────────────────────────────────────────────────────────
             window-padding-x = 1;
             window-padding-y = 1;
+            # uses the active terminal theme colors for the window chrome
+            # prevents the terminal headerbar and terminal content from theme conflict
+            window-theme = "ghostty";
 
             # ── Theme ─────────────────────────────────────────────────────────────
             theme = "catppuccin-mocha";
