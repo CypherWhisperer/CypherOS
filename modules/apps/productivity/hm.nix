@@ -18,9 +18,6 @@
       drawio
       staruml
 
-      # ── Office Suite ───────────────────────────────────────────────────────
-      libreoffice
-
       # ── Creative Suite ───────────────────────────────────────────────────────
       #houdini
       gimp

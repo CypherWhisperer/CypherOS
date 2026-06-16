@@ -10,5 +10,6 @@
     ./logseq.nix
     ./affine-hm.nix
     ./zathura.nix
+    ./libreoffice.nix
   ];
 }

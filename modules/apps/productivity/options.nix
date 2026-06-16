@@ -9,5 +9,6 @@
     logseq.enable = lib.mkEnableOption "Logseq knowledge base";
     affine.enable = lib.mkEnableOption "AFFiNE knowledge base";
     zathura.enable = lib.mkEnableOption "Zathura PDF reader";
+    libreOffice.enable = lib.mkEnableOption "LibreOffice Suite";
   };
 }
