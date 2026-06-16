@@ -1,0 +1,193 @@
+<!-- deliberate annotation; forcing the self to articulate why every construct exists before you're allowed to move past it. The payoff isn't the doc file; it's the cognitive forcing function. When you can't write a sentence explaining a code block, you've found a gap. -->
+
+# AFFiNE System — `affine-system.nix`
+
+> _Registers `affine.local` in `/etc/hosts` and trusts the AFFiNE stack's Caddy-generated local CA at the NixOS system level._
+
+**Module path:** `modules/apps/productivity/affine-system.nix` 
+**Evaluation context:** `NixOS system` 
+**Status:** `Stable`
+**Last reviewed:** `2026-06-15`
+
+---
+
+## Responsibility
+
+**Does:**
+
+- Adds `127.0.0.1 affine.local` to `/etc/hosts` via `networking.hosts`
+- Trusts the AFFiNE Caddy stack's local root CA via `security.pki.certificateFiles`, making `https://affine.local` accept without warnings in browsers and Electron apps
+
+**Does not:**
+
+- Install the AFFiNE desktop app — see `affine-hm.nix`
+- Declare options — see `options.nix`
+- Manage the Docker Compose stack or any containers
+- Handle Cloudflare Tunnel or external networking
+
+---
+
+## Evaluation Context
+
+|Property|Value|
+|---|---|
+|Evaluated by|`nixosModules`|
+|Options namespace|`cypher-os.apps.productivity`|
+|Imports `options.nix`|Yes — required|
+|Kill-switch guard|`lib.mkIf (config.cypher-os.apps.productivity.enable && config.cypher-os.apps.productivity.affine.enable)`|
+|Profile default|`lib.mkDefault true` set in `modules/profile/system.nix`|
+
+---
+
+## Block Analysis
+
+---
+
+### Block 1 — `imports`
+
+**What is this?** A list passed to the `imports` attribute of the module's top-level attrset.
+
+**What does it do?** Merges `options.nix` into this module's NixOS evaluation context, making the `cypher-os.apps.productivity.*` option namespace visible to the `config` block below.
+
+**Why is it here?** `affine-system.nix` is evaluated in the NixOS system context. `options.nix` declares the `cypher-os.apps.productivity.affine.enable` option. Without this import, any reference to that option in the `lib.mkIf` guard below would throw an `undefined option` error at evaluation time. The import is the bridge between the option declaration and its consumption in this context.
+
+```nix
+imports = [ ./options.nix ];
+```
+
+---
+
+### Block 2 — kill-switch guard
+
+**What is this?** A `lib.mkIf` expression wrapping the entire `config` attrset. The condition is the logical AND of two option reads.
+
+**What does it do?** When either `productivity.enable` or `affine.enable` is `false`, the entire block evaluates to `{}` — NixOS sees no `networking.hosts` or `security.pki.certificateFiles` contributions from this file. When both are `true`, the full config block is passed to the NixOS module system for merging.
+
+**Why is it here?** Two-level guard is the standard CypherOS pattern for leaf modules within a group. `productivity.enable` is the group kill-switch — disabling it disables all productivity modules at once. `affine.enable` is the app-level toggle — allowing AFFiNE to be independently disabled without touching the group or other apps.
+
+```nix
+config = lib.mkIf
+  (config.cypher-os.apps.productivity.enable
+    && config.cypher-os.apps.productivity.affine.enable)
+  { ... };
+```
+
+---
+
+### Block 3 — `networking.hosts`
+
+**What is this?** An attribute under `networking.hosts`, which NixOS merges into `/etc/hosts` on activation.
+
+**What does it do?** Adds the line `127.0.0.1 affine.local` to `/etc/hosts`, enabling DNS-free resolution of `affine.local` to localhost. This is what allows `https://affine.local` to resolve in a browser or the AFFiNE desktop app without a DNS server or stub zone.
+
+**Why is it here?** `affine.local` is not a real domain and will never be registered in public DNS. The two available mechanisms for local resolution are `/etc/hosts` (simple, no daemon dependency) and `systemd-resolved` stub zones (more powerful, requires configuration). The `/etc/hosts` approach is used here as the intentionally simple path. The upgrade to `systemd-resolved` stub zones is deferred — see ADR-004 in the Penpot repository, which documents the migration plan for all local services.
+
+```nix
+networking.hosts = {
+  "127.0.0.1" = [ "affine.local" ];
+};
+```
+
+---
+
+### Block 4 — `security.pki.certificateFiles`
+
+**What is this?** A list of paths passed to `security.pki.certificateFiles`, which NixOS uses to populate the system-wide TLS trust store on activation.
+
+**What does it do?** Adds the Caddy-generated local root CA certificate to the system trust store. After `nixos-rebuild switch`, this certificate is trusted by all system-level TLS consumers — including Firefox (via the system NSS store), Chromium-based browsers, and Electron apps such as the AFFiNE desktop app. This is what makes `https://affine.local` show a valid padlock rather than a security warning.
+
+**Why is it here?** Caddy's local CA is self-signed and not trusted by default. The CA certificate is generated by the Caddy container on first run and written to a known path in the persistent data volume. Trusting it imperatively (via `update-ca-certificates` or similar) is not possible on NixOS — the trust store is immutable outside of the Nix build process. `security.pki.certificateFiles` is the correct NixOS-native mechanism.
+
+**Bootstrap dependency:** The certificate file at the path below must exist before `nixos-rebuild switch` is run. Start the Docker stack first (`docker compose up -d`), confirm Caddy has generated the CA, then rebuild.
+
+```nix
+security.pki.certificateFiles = [
+  /home/cypher-whisperer/DATA/FILES/DE_FILES/SHARED/APPS/affine/NEW_SCHOOL/PERSISTENT_DATA/caddy/data/caddy/pki/authorities/local/root.crt
+];
+```
+
+---
+
+## Dependencies
+
+**Imported files:**
+
+- `options.nix` — declares `cypher-os.apps.productivity.affine.enable`; required for the kill-switch guard to evaluate without an undefined option error
+
+**NixOS options set by this file:**
+
+- `networking.hosts."127.0.0.1"` — appends `affine.local` to the hosts list for that IP
+- `security.pki.certificateFiles` — appends the Caddy root CA path to the system trust store list
+
+**Home Manager options set by this file:** None
+
+**nixpkgs packages required:** None
+
+**External flake inputs used:** None
+
+---
+
+## Option Surface
+
+|Option|Type|Default|Effect when `true`|
+|---|---|---|---|
+|`cypher-os.apps.productivity.enable`|`bool`|`false`|Group kill-switch; `false` makes this entire file a no-op|
+|`cypher-os.apps.productivity.affine.enable`|`bool`|`false`|App-level toggle; `false` makes this entire file a no-op|
+
+---
+
+## Comment Convention
+
+Inline comments in source files use three header tiers to classify non-active code without explanation bloat. Deep rationale belongs here in the documentation, not in the source file.
+
+```nix
+# ── DEFERRED — not yet needed; low friction to add ───────────────────────────
+# package-name  # reason: <one line>
+
+# ── EXCLUDED — active decision not to include ────────────────────────────────
+# package-name  # reason: BSL license / broken nixpkgs derivation / etc.
+
+# ── PENDING — blocked on something external ──────────────────────────────────
+# package-name  # blocked on: <what>
+```
+
+---
+
+## Design Notes
+
+- The `networking.hosts` approach is explicitly temporary. When the CypherOS networking session implements `systemd-resolved` stub zones, the `networking.hosts` entry here migrates to a central local domain registry and this block is removed.
+  
+- The `security.pki.certificateFiles` entry here is for the AFFiNE stack's Caddy CA specifically. The Penpot stack's Caddy CA is a separate certificate declared in `penpot-system.nix`. They are independent — each stack generates its own CA. Both must be listed separately.
+  
+- The two-level guard (`productivity.enable && affine.enable`) is the standard CypherOS pattern. A known gap: setting `affine.enable = true` while `productivity.enable = false` silently does nothing — the guard short-circuits. A future session will introduce assertions to catch this.
+
+---
+
+## Known Limitations
+
+- **Bootstrap ordering:** The Caddy CA certificate path is hardcoded and must exist on disk before `nixos-rebuild switch` is invoked. If the Docker stack has never been started, the path does not exist and the rebuild either errors (depending on NixOS version) or silently skips the CA trust. Documented in bootstrap sequence in `overview.md`.
+  
+- **Concurrent stack limitation:** AFFiNE's Caddy and Penpot's Caddy both bind `:80/:443`. They cannot run simultaneously. Until the shared Caddy session, only one stack can be active at a time. This module has no awareness of that constraint — it is a Docker-layer concern.
+  
+- **GNOME lens only:** Tested on the GNOME lens of CypherOS. KDE Plasma lens not yet validated — CA trust store behavior may differ for KDE wallet or KDE-specific TLS consumers.
+
+---
+
+## Related
+
+|Type|Reference|
+|---|---|
+|Options declared in|`./options.nix`|
+|Counterpart file|`affine-hm.nix`|
+|Profile default set in|`modules/profile/system.nix`|
+|ADR (local-only decision)|AFFiNE infra repo — `ADR_002_local_first_no_tunnel.md`|
+|ADR (hosts file pattern)|Penpot infra repo — `ADR_004_hosts_file_pending_resolved.md`|
+
+---
+
+<!-- METADATA 
+Module: modules/apps/productivity/affine-system.nix 
+Context: NixOS system 
+Created: 2026-06-15 
+Updated: 2026-06-15 
+-->
