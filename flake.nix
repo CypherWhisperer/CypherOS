@@ -92,6 +92,10 @@
       url = "github:cachix/devenv";
       inputs.nixpkgs.follows = "nixpkgs"; # deduplicate — same reason as all others
     };
+
+    nur = {
+      url = "github:nix-community/NUR";
+    }
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -113,6 +117,7 @@
       nix-vscode-extensions,
       catppuccin,
       devenv,
+      nur,
       ...
     }@inputs:
     let
@@ -143,6 +148,7 @@
           # Publisher and extension names must be fully lowercase in Nix attribute
           # paths, even if the marketplace shows mixed case.
           nix-vscode-extensions.overlays.default
+          nur.overlays.default
         ];
       };
 

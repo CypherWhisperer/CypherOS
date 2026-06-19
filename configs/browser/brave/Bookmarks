@@ -1,0 +1,47 @@
+{
+   "checksum": "aee9b70166390f09249dee6b20b841f2",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13420923048865483",
+            "date_last_used": "0",
+            "guid": "3c2d9860-0b89-4c41-95da-659de01032e4",
+            "id": "5",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": "iam",
+            "type": "url",
+            "url": "https://www.youtube.com/watch?v=gFu2wjQMM0Q"
+         } ],
+         "date_added": "13420897035574494",
+         "date_last_used": "0",
+         "date_modified": "13420923048865483",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Bookmarks",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13420897035574494",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "2",
+         "name": "Other bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13420897035574494",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "3",
+         "name": "Mobile bookmarks",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}

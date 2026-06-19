@@ -105,6 +105,10 @@
       cypher-os.apps.browser.enable = lib.mkDefault true;
       cypher-os.apps.browser.brave.enable = lib.mkDefault true;
       cypher-os.apps.browser.firefox.enable = lib.mkDefault true;
+      cypher-os.apps.browser.librewolf.enable = lib.mkDefault true;
+      cypher-os.apps.browser.mullvad.enable = lib.mkDefault true;
+      cypher-os.apps.browser.tor.enable = lib.mkDefault true;
+
 
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
