@@ -11,5 +11,6 @@
     ./affine-hm.nix
     ./zathura.nix
     ./libreoffice.nix
+    ./obs.nix
   ];
 }

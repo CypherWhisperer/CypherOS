@@ -109,7 +109,6 @@
       cypher-os.apps.browser.mullvad.enable = lib.mkDefault true;
       cypher-os.apps.browser.tor.enable = lib.mkDefault true;
 
-
       cypher-os.apps.productivity.enable = lib.mkDefault true;
       cypher-os.apps.productivity.claude.enable = lib.mkDefault true;
       cypher-os.apps.productivity.obsidian.enable = lib.mkDefault true;
@@ -118,6 +117,7 @@
       cypher-os.apps.productivity.affine.enable = lib.mkDefault true;
       cypher-os.apps.productivity.zathura.enable = lib.mkDefault true;
       cypher-os.apps.productivity.libreOffice.enable = lib.mkDefault true;
+      cypher-os.apps.productivity.obs.enable = lib.mkDefault true;
 
       cypher-os.apps.mail.enable = lib.mkDefault true;
       cypher-os.apps.mail.thunderbird.enable = lib.mkDefault true;

@@ -10,5 +10,6 @@
     affine.enable = lib.mkEnableOption "AFFiNE knowledge base";
     zathura.enable = lib.mkEnableOption "Zathura PDF reader";
     libreOffice.enable = lib.mkEnableOption "LibreOffice Suite";
+    obs.enable = lib.mkEnableOption "LibreOffice Suite";
   };
 }

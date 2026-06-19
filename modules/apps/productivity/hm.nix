@@ -26,7 +26,6 @@
       krita
       kdePackages.kdenlive
       audacity
-      obs-studio
       figma-agent
 
       # ── Media ────────────────────────────────────────────────────────────────
