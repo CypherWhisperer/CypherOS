@@ -47,6 +47,15 @@
             # obs-move-transition    # Smooth move transitions between scenes
             # obs-source-clone       # Clone sources across scenes
           ];
+
+          # Note on catppuccin theming for OBS: with catppuccin.autoEnable = true globally,
+          # the catppuccin/nix module hooks into programs.obs-studio automatically.
+          # If you ever need to override the flavour or accent for OBS specifically:
+          catppuccin = {
+            enable = true;
+            flavor = "mocha";
+            accent = "mauve";
+          };
         };
       };
 }
