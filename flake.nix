@@ -95,7 +95,8 @@
 
     nur = {
       url = "github:nix-community/NUR";
-    }
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -180,6 +181,16 @@
           # Home Manager modules nested within it.
 
           modules = [
+            # Inject overlays into the NixOS pkgs instance.
+            # This is the correct hook — nixos-rebuild and HM both see these.
+            {
+              nixpkgs.overlays = [
+                nix-vscode-extensions.overlays.default
+                nur.overlays.default
+              ];
+              nixpkgs.config.allowUnfree = true;
+            }
+
             # The system-level configuration for this host
             ./hosts/nixos/configuration.nix
 
