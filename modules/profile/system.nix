@@ -65,6 +65,7 @@
       cypher-os.apps.productivity.affine.enable = lib.mkDefault true;
 
       cypher-os.apps.browser.tor.enable = lib.mkDefault true;
+      cypher-os.apps.browser.brave.enable = lib.mkDefault true;
 
       # ─────────────────────────────────────────────────────────────────────────────
       # DEVOPS INFRASTRUCTURE

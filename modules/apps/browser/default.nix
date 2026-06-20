@@ -35,6 +35,6 @@
     ./librewolf.nix
     ./mullvad.nix
     ./tor-hm.nix
-    ./brave.nix
+    ./brave-hm.nix
   ];
 }
