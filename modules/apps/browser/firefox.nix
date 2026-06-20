@@ -119,7 +119,7 @@
             # See: https://github.com/arkenfox/user.js/wiki
             settings = {
 
-              # 0100 — Startup
+              # §0100 — Startup
               "browser.startup.page" = 0; # blank page on startup
               "browser.startup.homepage" = "about:blank";
               "browser.newtabpage.enabled" = false;
@@ -132,19 +132,19 @@
               "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
               "browser.newtabpage.activity-stream.default.sites" = "";
 
-              # 0200 — Geolocation
+              # §0200 — Geolocation
               "geo.provider.network.url" = "";
               "geo.enabled" = false;
               "browser.region.network.url" = "";
               "browser.region.update.enabled" = false;
 
-              # 0300 — Language / Locale
+              # §0300 — Language / Locale
               # NOTE: Setting intl.accept_languages to "en-US, en" improves fingerprint
               # uniformity but may break region-specific sites. Keeping it loose here.
               "intl.accept_languages" = "en-US, en";
               "javascript.use_us_english_locale" = true;
 
-              # 0400 — Telemetry (belt-and-suspenders on top of policies)
+              # §0400 — Telemetry (belt-and-suspenders on top of policies)
               "datareporting.healthreport.uploadEnabled" = false;
               "datareporting.policy.dataSubmissionEnabled" = false;
               "app.shield.optoutstudies.enabled" = false;
@@ -165,7 +165,7 @@
               "toolkit.coverage.opt-out" = true;
               "toolkit.coverage.endpoint.base" = "";
 
-              # 0500 — Geolocation / Safe Browsing (network call tradeoffs)
+              # §0500 — Geolocation / Safe Browsing (network call tradeoffs)
               # Safe Browsing sends URL hashes to Google. Disable if your threat model
               # prioritises privacy over phishing protection; keep enabled if you visit
               # unknown links regularly. Commented out = keep Firefox default (enabled).
@@ -174,7 +174,7 @@
               # "browser.safebrowsing.downloads.enabled" = false;
               # "browser.safebrowsing.blockedURIs.enabled" = false;
 
-              # 0600 — Network
+              # §0600 — Network
               "network.prefetch-next" = false;
               "network.dns.disablePrefetch" = true;
               "network.dns.disablePrefetchFromHTTPS" = true;
@@ -189,10 +189,10 @@
               "network.trr.uri" = "https://dns.quad9.net/dns-query";
               "network.trr.bootstrapAddress" = "9.9.9.9";
 
-              # 0700 — DNS / Proxy / Socks
+              # §0700 — DNS / Proxy / Socks
               "network.gio.supported-protocols" = ""; # attack surface reduction
 
-              # 0900 — Disk / Avoidance
+              # §0900 — Disk / Avoidance
               # Disabling disk cache reduces persistence but hurts performance.
               # Uncomment to go Arkenfox-level paranoid.
               # "browser.cache.disk.enable"           = false;
@@ -203,7 +203,7 @@
               "network.http.referer.XOriginPolicy" = 2; # only send to same eTLD+1
               "network.http.referer.XOriginTrimmingPolicy" = 2; # strip to scheme+host+port
 
-              # 1200 — HTTPS / SSL
+              # §1200 — HTTPS / SSL
               "dom.security.https_only_mode" = true;
               "dom.security.https_only_mode_error_page_user_suggestions" = true;
               "security.ssl.require_safe_negotiation" = true;
@@ -215,7 +215,7 @@
               "security.remote_settings.crlite_filters.enabled" = true;
               "security.pki.crlite_mode" = 2;
 
-              # 1400 — Fonts
+              # §1400 — Fonts
               "browser.display.use_document_fonts" = 1; # 0 = block all web fonts; 1 = allow
               # Set to 0 if you want Arkenfox-level fingerprint reduction
 
@@ -226,18 +226,18 @@
               "permissions.default.desktop-notification" = 2;
               "permissions.default.xr" = 2; # deny WebXR/VR
 
-              # 1700 — WebRTC
+              # §1700 — WebRTC
               # WebRTC leaks your real IP even behind a VPN. Disable entirely if you
               # don't do video calls in Firefox; re-enable per-site via exceptions.
               "media.peerconnection.enabled" = false;
               "media.peerconnection.ice.proxy_only_if_behind_proxy" = true;
               "media.peerconnection.ice.default_address_only" = true;
 
-              # 1800 — Plugins
+              # §1800 — Plugins
               "plugin.default.state" = 0;
               "plugin.scan.plid.all" = false;
 
-              # 2000 — History
+              # §2000 — History
               "places.history.enabled" = true; # keep history (personal preference)
               "browser.formfill.enable" = false;
               "signon.autofillForms" = false; # use Proton Pass instead
@@ -245,11 +245,11 @@
               "signon.privateBrowsingCapture.enabled" = false;
               "network.auth.subresource-http-auth-allow" = 1;
 
-              # 2200 — Window / Tab behaviour
+              # §2200 — Window / Tab behaviour
               "browser.link.open_newwindow" = 3; # open in new tab, not window
               "browser.link.open_newwindow.restriction" = 0;
 
-              # 2300 — Shutdown
+              # §2300 — Shutdown
               # Clear on shutdown: set these to true if you want ephemeral sessions
               "privacy.sanitize.sanitizeOnShutdown" = false;
               "privacy.clearOnShutdown.cache" = false;
@@ -259,7 +259,7 @@
               "privacy.clearOnShutdown.history" = false;
               "privacy.clearOnShutdown.sessions" = false;
 
-              # 2400 — Fingerprinting
+              # §2400 — Fingerprinting
               "privacy.resistFingerprinting" = true;
               "privacy.fingerprintingProtection" = true;
               # NOTE: resistFingerprinting sets window size to a uniform 1000x900 bucket.
@@ -267,14 +267,14 @@
               # "privacy.resistFingerprinting.letterboxing" = true;  # adds grey bars instead
               "privacy.resistFingerprinting.randomDataOnCanvasExtract" = true;
 
-              # 2600 — DOM
+              # §2600 — DOM
               "dom.disable_window_move_resize" = true;
               "dom.disable_beforeunload" = true;
               "dom.disable_window_flip" = true;
               "dom.disable_open_during_load" = true;
               "dom.popup_maximum" = 4;
 
-              # 2700 — ETP (Enhanced Tracking Protection)
+              # §2700 — ETP (Enhanced Tracking Protection)
               "browser.contentblocking.category" = "strict";
               "privacy.trackingprotection.enabled" = true;
               "privacy.trackingprotection.socialtracking.enabled" = true;
@@ -282,10 +282,10 @@
               "privacy.trackingprotection.fingerprinting.enabled" = true;
               "privacy.trackingprotection.emailtracking.enabled" = true;
 
-              # 2800 — Shutdown (storage isolation)
+              # §2800 — Shutdown (storage isolation)
               "privacy.partition.network_state.ocsp_cache" = true;
 
-              # 4500 — Optional opsec
+              # §4500 — Optional opsec
               "browser.urlbar.speculativeConnect.enabled" = false;
               "browser.urlbar.dnsResolveSingleWordsAfterSearch" = 0;
 
