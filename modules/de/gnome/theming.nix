@@ -67,7 +67,7 @@ let
   # The theme name as installed by the script. Fausto-Korpsvart's install.sh
   # Constructed per install.sh: ${name}${ctype}${theme}${color}${size}${tweaks_tag}
   # ctype="" (mocha is default), theme="-Mauve", color="-Dark", size="" (standard), tweaks_tag=""
-  fkThemeName = "Catppuccin-Mauve-Dark-Macos";
+  fkThemeName = "Catppuccin-Mauve-Dark";
 
   # ─────────────────────────────────────────────────────────────────────────
   # DERIVATION — compile Fausto-Korpsvart theme from source
@@ -117,8 +117,7 @@ let
         --dest    "$out/share/themes" \
         --name    "Catppuccin" \
         -a mauve \
-        -m dark \
-        --tweaks macos
+        -m dark
 
       # --libadwaita symlinks gtk-4.0 into $HOME/.config/gtk-4.0 — we don't
       # want that side-effect in a Nix build. The gtk-4.0 assets inside
