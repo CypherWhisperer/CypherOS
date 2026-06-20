@@ -50,125 +50,139 @@
 }:
 
 {
-  config = lib.mkIf (config.cypher-os.apps.browser.enable && config.cypher-os.apps.browser.librewolf.enable) {
+  config =
+    lib.mkIf (config.cypher-os.apps.browser.enable && config.cypher-os.apps.browser.librewolf.enable)
+      {
 
-    programs.librewolf = {
-      enable = true;
+        programs.librewolf = {
+          enable = true;
 
-      # ── Global settings (apply to all profiles) ────────────────────────────
-      # These relax LibreWolf's most aggressive defaults.
-      # Everything not listed here retains LibreWolf's hardened defaults.
-      settings = {
-        # WebGL: LibreWolf disables by default. Re-enable for web apps that
-        # require it (Figma, Penpot browser, some map renderers).
-        # TRADEOFF: WebGL exposes GPU fingerprinting surface.
-        "webgl.disabled" = false;
+          # ── Global settings (apply to all profiles) ────────────────────────────
+          # These relax LibreWolf's most aggressive defaults.
+          # Everything not listed here retains LibreWolf's hardened defaults.
+          settings = {
+            # WebGL: LibreWolf disables by default. Re-enable for web apps that
+            # require it (Figma, Penpot browser, some map renderers).
+            # TRADEOFF: WebGL exposes GPU fingerprinting surface.
+            "webgl.disabled" = false;
 
-        # resistFingerprinting: LibreWolf enables by default. Keeping it ON.
-        # NOTE: This sets the OS reported to Windows to reduce fingerprint variance.
-        # Disable only if OS spoofing causes breakage you cannot tolerate.
-        "privacy.resistFingerprinting" = true;
+            # resistFingerprinting: LibreWolf enables by default. Keeping it ON.
+            # NOTE: This sets the OS reported to Windows to reduce fingerprint variance.
+            # Disable only if OS spoofing causes breakage you cannot tolerate.
+            "privacy.resistFingerprinting" = true;
 
-        # History: LibreWolf clears on shutdown by default. Relax for usability.
-        "privacy.clearOnShutdown.history" = false;
-        "privacy.clearOnShutdown.cookies" = false;
-        "privacy.sanitize.sanitizeOnShutdown" = false;
+            # History: LibreWolf clears on shutdown by default. Relax for usability.
+            "privacy.clearOnShutdown.history" = false;
+            "privacy.clearOnShutdown.cookies" = false;
+            "privacy.sanitize.sanitizeOnShutdown" = false;
 
-        # Cookies: LibreWolf sets lifetimePolicy = 2 (expire on session end).
-        # Set to 0 = accept cookies normally (honor server expiry).
-        "network.cookie.lifetimePolicy" = 0;
+            # Cookies: LibreWolf sets lifetimePolicy = 2 (expire on session end).
+            # Set to 0 = accept cookies normally (honor server expiry).
+            "network.cookie.lifetimePolicy" = 0;
 
-        # HTTPS-only mode: keep on (LibreWolf default is off; enforce it)
-        "dom.security.https_only_mode" = true;
+            # HTTPS-only mode: keep on (LibreWolf default is off; enforce it)
+            "dom.security.https_only_mode" = true;
 
-        # DNS-over-HTTPS (same Quad9 config as Firefox)
-        "network.trr.mode" = 2;
-        "network.trr.uri"  = "https://dns.quad9.net/dns-query";
-        "network.trr.bootstrapAddress" = "9.9.9.9";
+            # DNS-over-HTTPS (same Quad9 config as Firefox)
+            "network.trr.mode" = 2;
+            "network.trr.uri" = "https://dns.quad9.net/dns-query";
+            "network.trr.bootstrapAddress" = "9.9.9.9";
 
-        # Proton Pass: LibreWolf's default disables form autofill. Keep disabled
-        # since Proton Pass extension handles password autofill.
-        "signon.autofillForms"           = false;
-        "signon.formlessCapture.enabled" = false;
+            # Proton Pass: LibreWolf's default disables form autofill. Keep disabled
+            # since Proton Pass extension handles password autofill.
+            "signon.autofillForms" = false;
+            "signon.formlessCapture.enabled" = false;
 
-        # Vertical tabs (same as Firefox module)
-        "sidebar.revamp"       = true;
-        "sidebar.verticalTabs" = true;
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+            # Vertical tabs (same as Firefox module)
+            "sidebar.revamp" = true;
+            "sidebar.verticalTabs" = true;
+            "sidebar.visibility" = "hide-sidebar"; # ← collapsed by default, expands on hover
+            # "sidebar.main.tools" = "aichat,syncedtabs,history"; # optional: what appears in sidebar
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
 
-        # UX quality-of-life
-        "browser.compactmode.show"              = true;
-        "browser.uidensity"                     = 1;
-        "browser.tabs.closeWindowWithLastTab"   = false;
-        "browser.aboutConfig.showWarning"       = false;
-        "browser.toolbars.bookmarks.visibility" = "never";
-        "browser.link.open_newwindow"           = 3;
-      };
+            # UX quality-of-life
+            "browser.compactmode.show" = true;
+            "browser.uidensity" = 1;
+            "browser.tabs.closeWindowWithLastTab" = false;
+            "browser.aboutConfig.showWarning" = false;
+            "browser.toolbars.bookmarks.visibility" = "never";
+            "browser.link.open_newwindow" = 3;
+          };
 
-      profiles.default = {
-        id        = 0;
-        name      = "default";
-        isDefault = true;
+          profiles.default = {
+            id = 0;
+            name = "default";
+            isDefault = true;
 
-        # ── userChrome.css ────────────────────────────────────────────────────
-        userChrome = ''
-          @-moz-document url(chrome://browser/content/browser.xhtml) {
-            /* Hide legacy horizontal tab bar — vertical sidebar replaces it */
-            #TabsToolbar {
-              visibility: collapse !important;
-            }
+            # ── userChrome.css ────────────────────────────────────────────────────
+            userChrome = ''
+              @-moz-document url(chrome://browser/content/browser.xhtml) {
+                /* Hide legacy horizontal tab bar — vertical sidebar replaces it */
+                #TabsToolbar {
+                  visibility: collapse !important;
+                }
 
-            /* Hide Tree Style Tab sidebar header chrome */
-            #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"]
-            #sidebar-header {
-              visibility: collapse !important;
-            }
+                /* Hide Tree Style Tab sidebar header chrome */
+                #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"]
+                #sidebar-header {
+                  visibility: collapse !important;
+                }
 
-            /* Compact nav bar */
-            #nav-bar {
-              padding-top: 2px !important;
-              padding-bottom: 2px !important;
-            }
-          }
-        '';
+                /* Compact nav bar */
+                #nav-bar {
+                  padding-top: 2px !important;
+                  padding-bottom: 2px !important;
+                }
+              }
+            '';
 
-        # ── Extensions ────────────────────────────────────────────────────────
-        # See NOTE in header re: HM 25.05 symlink bug for LibreWolf.
-        extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
-          ublock-origin
-          privacy-badger
-          decentraleyes
-          clearurls
-          tree-style-tab
-          dark-reader
-          react-devtools
-          simple-tab-groups
-          tab-session-manager
-        ];
+            # ── Extensions ────────────────────────────────────────────────────────
+            # See NOTE in header re: HM 25.05 symlink bug for LibreWolf.
 
-        extensions.settings = {
-          "uBlock0@raymondhill.net".settings = {
-            selectedFilterLists = [
-              "ublock-filters"
-              "ublock-badware"
-              "ublock-privacy"
-              "ublock-unbreak"
-              "ublock-quick-fixes"
-              "easylist"
-              "easyprivacy"
-              "adguard-generic"
-              "urlhaus-1"
+            # What force = true means: it tells Home Manager you are intentionally
+            # taking declarative ownership of all extension settings for this profile,
+            # and you accept that anything not declared here will be absent. It's a
+            # safeguard against accidentally wiping extension config you set manually
+            # — once you declare it, you own it entirely. Correct posture for CypherOS.
+            extensions.force = true;
+            extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
+              ublock-origin
+              privacy-badger
+              decentraleyes
+              clearurls
+              tree-style-tab
+              #dark-reader # error: undefined variable 'dark-reader'
+              react-devtools
+              simple-tab-groups
+              tab-session-manager
             ];
+
+            extensions.settings = {
+              "uBlock0@raymondhill.net".settings = {
+                selectedFilterLists = [
+                  "ublock-filters"
+                  "ublock-badware"
+                  "ublock-privacy"
+                  "ublock-unbreak"
+                  "ublock-quick-fixes"
+                  "easylist"
+                  "easyprivacy"
+                  "adguard-generic"
+                  "adguard-annoyances"
+                  "adguard-social"
+                  "ublock-annoyances"
+                  "urlhaus-1"
+                ];
+              };
+            };
           };
         };
-      };
-    };
 
-    # ── Catppuccin LibreWolf Integration ─────────────────────────────────────
-    catppuccin.librewolf.profiles.default = {
-      enable = true;
-      flavor = "mocha";
-      accent = "mauve";
-    };
-  };
+        # ── Catppuccin LibreWolf Integration ─────────────────────────────────────
+        catppuccin.librewolf.profiles.default = {
+          enable = true;
+          flavor = "mocha";
+          accent = "mauve";
+        };
+      };
 }
