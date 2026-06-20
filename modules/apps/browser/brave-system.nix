@@ -282,27 +282,32 @@ let
 
 in
 
-lib.mkIf (config.cypher-os.apps.browser.enable && config.cypher-os.apps.browser.brave.enable) {
+{
+  imports = [ ./options.nix ];
+  config =
+    lib.mkIf (config.cypher-os.apps.browser.enable && config.cypher-os.apps.browser.brave.enable)
+      {
 
-  # ── Deploy policy file ────────────────────────────────────────────────────
-  # environment.etc writes to /etc/ at nixos-rebuild switch time.
-  # The file is owned by root, read by Brave at every launch.
-  # Changes take effect on next Brave launch (no restart required for most keys).
-  environment.etc."brave/policies/managed/cypher-os.json" = {
-    text = builtins.toJSON bravePolicy;
-    mode = "0644";
-    user = "root";
-    group = "root";
-  };
+        # ── Deploy policy file ────────────────────────────────────────────────────
+        # environment.etc writes to /etc/ at nixos-rebuild switch time.
+        # The file is owned by root, read by Brave at every launch.
+        # Changes take effect on next Brave launch (no restart required for most keys).
+        environment.etc."brave/policies/managed/cypher-os.json" = {
+          text = builtins.toJSON bravePolicy;
+          mode = "0644";
+          user = "root";
+          group = "root";
+        };
 
-  # ── Ensure policy directory exists ───────────────────────────────────────
-  # environment.etc handles file creation but not intermediate directories
-  # if they don't already exist. This activation script creates them.
-  # On NixOS, /etc/brave/ and subdirectories won't exist until we create them.
-  system.activationScripts.bravePoliciesDir = lib.stringAfter [ "etc" ] ''
-    mkdir -p /etc/brave/policies/managed
-    mkdir -p /etc/brave/policies/recommended
-    chmod 755 /etc/brave/policies/managed
-    chmod 755 /etc/brave/policies/recommended
-  '';
+        # ── Ensure policy directory exists ───────────────────────────────────────
+        # environment.etc handles file creation but not intermediate directories
+        # if they don't already exist. This activation script creates them.
+        # On NixOS, /etc/brave/ and subdirectories won't exist until we create them.
+        system.activationScripts.bravePoliciesDir = lib.stringAfter [ "etc" ] ''
+          mkdir -p /etc/brave/policies/managed
+          mkdir -p /etc/brave/policies/recommended
+          chmod 755 /etc/brave/policies/managed
+          chmod 755 /etc/brave/policies/recommended
+        '';
+      };
 }
