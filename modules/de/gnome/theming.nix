@@ -60,28 +60,18 @@ let
   # Valid accents: default|purple|pink|red|orange|yellow|green|teal|grey
   # "purple" is the closest available to Catppuccin's mauve.
   # ─────────────────────────────────────────────────────────────────────────
-  fkAccent = "purple"; # → closest to Catppuccin mauve
   fkVariant = "mocha"; # → passed via --tweaks (frappe|macchiato; mocha is default)
-  fkColor = "dark"; # → --color dark
-  fkSize = "standard"; # → --size standard|compact
+  fkAccent = "mauve";
+  # fkMode = "dark";
 
   # The theme name as installed by the script. Fausto-Korpsvart's install.sh
-  # produces a directory named: Catppuccin-<Accent>-<Size> inside the dest.
-  # With --color dark the suffix becomes "Dark":
-  #
-  #   Catppuccin-Purple-Standard (contains both light and dark subdirs inside,
-  #   but for gtk3 we reference the Dark variant name that tweaks/GNOME expects).
-  #
-  # Confirmed naming from install.sh source:
-  #   theme_name="Catppuccin${theme_accent:-}${theme_size:-}"
-  #   → "Catppuccin-Purple-Standard" for purple + standard
-  #
-  # The GTK3 theme directory name is: "${theme_name}-Dark"
-  fkThemeName = "Catppuccin-Purple-Standard-Dark";
+  # Constructed per install.sh: ${name}${ctype}${theme}${color}${size}${tweaks_tag}
+  # ctype="" (mocha is default), theme="-Mauve", color="-Dark", size="" (standard), tweaks_tag=""
+  fkThemeName = "Catppuccin-Mauve-Dark-Macos";
 
   # ─────────────────────────────────────────────────────────────────────────
   # DERIVATION — compile Fausto-Korpsvart theme from source
-  # Requires sassc and gtk-engine-murrine at build time.
+  # Requires sassc  at build time.
   # The install script writes to --dest; we capture that as $out/share/themes.
   # ─────────────────────────────────────────────────────────────────────────
   fkGtkPkg = pkgs.stdenvNoCC.mkDerivation {
@@ -101,27 +91,34 @@ let
 
     nativeBuildInputs = with pkgs; [
       sassc # SCSS compiler — required by install.sh
-      gtk-engine-murrine # GTK2/3 Murrine engine — required for correct GTK3 rendering
-      gnome-themes-extra # Provides Adwaita base assets relied on by the theme
-      glib # gsettings — used internally by install.sh
-      bc # arithmetic used in install.sh
     ];
 
+    # install.sh sets REPO_DIR=$(dirname $0), so it must be invoked from within
+    # themes/ for the relative SRC_DIR/LIB_DIR paths to resolve correctly.
+    # --libadwaita is intentionally omitted: it tries to symlink into $HOME/.config/gtk-4.0
+    # which is a side-effect incompatible with a Nix sandbox. We handle gtk-4.0
+    # assets separately via xdg.configFile below.
     installPhase = ''
       runHook preInstall
 
       # install.sh expects a writable HOME for temporary files
+      # install.sh may write temp files relative to $HOME
       export HOME=$(mktemp -d)
 
+      # Bypassing interactive menu - nix sandbox doesn't support such.
+      export BATCH_MODE=true
+
       mkdir -p $out/share/themes
+
+      # install.sh is inside themes/ subdirectory - Not repo root
+      cd themes
 
       bash install.sh \
         --dest    "$out/share/themes" \
         --name    "Catppuccin" \
-        --theme   "${fkAccent}" \
-        --color   "${fkColor}" \
-        --size    "${fkSize}" \
-        --libadwaita
+        -a mauve \
+        -m dark \
+        --tweaks macos
 
       # --libadwaita symlinks gtk-4.0 into $HOME/.config/gtk-4.0 — we don't
       # want that side-effect in a Nix build. The gtk-4.0 assets inside
@@ -131,7 +128,7 @@ let
     '';
 
     meta = {
-      description = "Catppuccin GTK theme by Fausto-Korpsvart (Mocha/Purple, libadwaita-aware)";
+      description = "Catppuccin GTK theme by Fausto-Korpsvart (Mocha/Mauve)";
       homepage = "https://github.com/Fausto-Korpsvart/Catppuccin-GTK-Theme";
       license = pkgs.lib.licenses.gpl3Only;
       platforms = pkgs.lib.platforms.linux;
