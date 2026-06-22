@@ -161,14 +161,42 @@ let
 
     # ── Privacy / attack surface reduction ───────────────────────────────
     # Disable WebRTC to prevent IP leak. Re-enable if you use Brave for calls.
-    "--disable-features=WebRTC"
+    #
+    # NOTE: REMOVED:
+    # Handled correctly via WebRtcIPHandling managed policy in brave-system.nix
+    # Disabling the feature module breaks YouTube's media pipeline
+    #
+    # The flag is too blunt. --disable-features= is a Chromium feature flag
+    # toggle that operates at a low level — it doesn't just disable WebRTC
+    # network behaviour, it can disable the entire WebRTC feature module
+    # including the media pipeline components YouTube's player depends on.
+    # YouTube's player uses WebRTC APIs internally for adaptive bitrate
+    # streaming and playback coordination, not just for video calls.
+    # Disabling the feature entirely at the Chromium level is known to
+    # cause YouTube to fall back to degraded playback paths — and in that
+    # degraded state, Brave's Shields don't intercept the ad serving correctly
+    # because the player is behaving abnormally.
+    #
+    # This caused sites like YT to feature ads on Brave Browser.
+    #
+    # The correct way to prevent WebRTC IP leaks is via the managed policy
+    # already written — WebRtcIPHandling = "disable_non_proxied_udp" in
+    # brave-system.nix. That restricts what IPs WebRTC can expose without
+    # touching the feature module itself. The --disable-features=WebRTC flag is
+    # redundant now that the policy handles it, and actively harmful.
+    #
+    #"--disable-features=WebRTC"
+
     # Disable component updates phoning home on launch
     # NOTE: this disables CRLSets updates — acceptable if you update Brave regularly
     "--disable-component-update"
+
     # Prevent Brave from offering to translate pages via cloud translation
     "--translate-script-url=data:text/javascript,"
+
     # Disable crash reporting endpoint
     "--disable-breakpad"
+
     # Silence first-run wizard
     "--no-first-run"
     "--no-default-browser-check"
@@ -188,9 +216,9 @@ in
         # ── Package ───────────────────────────────────────────────────────────────
         # Install the wrapper rather than bare Brave so flags apply everywhere.
         home.packages = [
-          braveWrapped
+          # braveWrapped
           # Keep the original package available for direct access if needed:
-          # pkgs.brave
+          pkgs.brave
         ];
 
         # ── Activation: seed mutable config files ─────────────────────────────────
