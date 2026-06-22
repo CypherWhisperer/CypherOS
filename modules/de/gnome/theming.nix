@@ -83,7 +83,7 @@ let
       repo = "Catppuccin-GTK-Theme";
       # Pin to a specific commit for reproducibility.
       # Update this rev + hash after verifying a new upstream commit.
-      rev = "HEAD";
+      rev = "35695ce73854ec59342a34abe7ef0684be1138dd"; # "HEAD"
       # replace accordingly. e.g:
       # nix-prefetch-url --unpack https://github.com/Fausto-Korpsvart/Catppuccin-GTK-Theme/archive/HEAD.tar.gz
       hash = "sha256-WV9uMOd88GR8i77PEr1UyJFacIP1tXu1p9uDVxfYy6M=";
