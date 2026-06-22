@@ -274,7 +274,7 @@ in
         # GNOME 47+ native accent-color — fallback for apps that read this key
         # directly instead of the GTK CSS. "purple" is the closest built-in
         # to Catppuccin mauve. Does not override libadwaita CSS; both work together.
-        accent-color = "purple";
+        accent-color = "blue";
 
         # letting catppuccin/nix handle the icon and cursor themes globally
         # for consistency across DEs and apps.
