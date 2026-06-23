@@ -260,7 +260,12 @@
               "privacy.clearOnShutdown.sessions" = false;
 
               # §2400 — Fingerprinting
-              "privacy.resistFingerprinting" = true;
+              # SET TO FALSE: Due to web content theming; i.e
+              # Configuring a dark theme is disabled because ResistFingerprinting is enabled.
+              # This means Firefox will force web content to display in a light theme.
+              #
+              # FOR ME LIGHT MODE = COMPLETELY AND INEXCUSSIBLY UNACCEPTABLE
+              "privacy.resistFingerprinting" = false;
               "privacy.fingerprintingProtection" = true;
               # NOTE: resistFingerprinting sets window size to a uniform 1000x900 bucket.
               # This can feel odd. You can relax it:
