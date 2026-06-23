@@ -69,7 +69,11 @@
             # resistFingerprinting: LibreWolf enables by default. Keeping it ON.
             # NOTE: This sets the OS reported to Windows to reduce fingerprint variance.
             # Disable only if OS spoofing causes breakage you cannot tolerate.
-            "privacy.resistFingerprinting" = true;
+            #
+            # SET TO FALSE: Due to web content theming; i.e
+            # Configuring a dark theme is disabled because ResistFingerprinting is enabled.
+            # This means LibreWolf will force web content to display in a light theme.
+            "privacy.resistFingerprinting" = false;
 
             # History: LibreWolf clears on shutdown by default. Relax for usability.
             "privacy.clearOnShutdown.history" = false;
