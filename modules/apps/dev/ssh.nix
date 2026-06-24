@@ -71,10 +71,14 @@
       matchBlocks = {
 
         # ── GitHub: CypherWhisperer (primary dev account) ───────────────────────
-        "github.com-cypher" = {
+
+        # NOTE: update to "github.com-cypher" when extending implementation to support
+        # multiple keys.
+        # Also move ~/.ssh/id_ed25519 to ~/.ssh/id_ed25519_cypher
+        "github.com" = {
           hostname = "github.com";
           user = "git";
-          identityFile = "~/.ssh/id_ed25519_cypher";
+          identityFile = "~/.ssh/id_ed25519";
           # StrictHostKeyChecking = accept-new: accepts unknown host keys on first
           # connect but warns if a known key changes (MITM indicator).
           # Remove or change to "yes" once you've connected and the key is cached.
@@ -84,20 +88,27 @@
         };
 
         # ── GitHub: PentaraTechSolutions (org account) ──────────────────────────
-        "github.com-pentara" = {
-          hostname = "github.com";
-          user = "git";
-          identityFile = "~/.ssh/id_ed25519_pentara";
-          extraOptions = {
-            StrictHostKeyChecking = "accept-new";
-          };
-        };
+
+        # NOTE: Before support for multiple keys, simply handle ssh authentication
+        # the manual way of evaluating they key; e.g via keychain.
+
+        # "github.com-pentara" = {
+        #   hostname = "github.com";
+        #   user = "git";
+        #   identityFile = "~/.ssh/id_ed25519_pentara";
+        #   extraOptions = {
+        #     StrictHostKeyChecking = "accept-new";
+        #   };
+        # };
 
         # ── GitLab: CypherWhisperer ───────────────────────────────────────────
-        "gitlab.com-cypher" = {
+        # NOTE: update to "gitlab.com-cypher" when extending implementation to support
+        # multiple keys.
+        # Also move ~/.ssh/id_ed25519 to ~/.ssh/id_ed25519_cypher
+        "gitlab.com" = {
           hostname = "gitlab.com";
           user = "git";
-          identityFile = "~/.ssh/id_ed25519_cypher";
+          identityFile = "~/.ssh/id_ed25519";
           extraOptions = {
             StrictHostKeyChecking = "accept-new";
           };

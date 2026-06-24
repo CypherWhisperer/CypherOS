@@ -1,4 +1,4 @@
-# modules/apps/zsh.nix
+# modules/shell/zsh.nix
 #
 # Home Manager module for Zsh shell configuration.
 #
@@ -204,8 +204,20 @@
           # login session and caches the socket path so all shells (and tmux panes)
           # share the same agent. --quiet suppresses the startup banner.
           # The key name here is the filename under ~/.ssh/ — no path, no extension.
-          # We check for the key's existence before invoking keychain so the shell
-          # doesn't error on machines where the key hasn't been generated yet.
+          # Each key is checked for existence before invoking keychain so the shell
+          # doesn't error on machines where a key hasn't been generated yet.
+
+          # ATTEMPT FOR EXTENDING SUPPORT FOR MULTIPLE KEYS
+          # To add a new identity: generate the key, add it to the relevant service,
+          # then append the filename to the keychain invocation below.
+          #local _keychain_keys=()
+          #[[ -f "$HOME/.ssh/id_ed25519_cypher" ]]  && _keychain_keys+=(id_ed25519_cypher)
+          #[[ -f "$HOME/.ssh/id_ed25519_pentara" ]] && _keychain_keys+=(id_ed25519_pentara)
+          #if (( ''${#_keychain_keys[@]} > 0 )); then
+          #  eval $(keychain --quiet --eval "''${_keychain_keys[@]}")
+          #fi
+
+          # ORIGINAL AND CURRENT IMPLEMENTATION - FOR A SINGLE KEY
           if [[ -f "$HOME/.ssh/id_ed25519" ]]; then
             eval $(keychain --quiet --eval id_ed25519)
           fi
