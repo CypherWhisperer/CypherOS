@@ -880,7 +880,7 @@ in
             # Then inspect the backed-up JSONs to port your existing appearance/app settings
             # into the `settings` block here if you want to preserve them declaratively.
             my-obsidian-notes = {
-              target = "DATA/FILES/PROJECTS/PRIVATE/PERSONAL/MY_OBSIDIAN_NOTES";
+              target = "DATA/FILES/PROJECTS/PRIVATE/OBSIDIAN_NOTES";
               # vault-specific overrides — uncomment and adjust if this vault
               # should diverge from defaultSettings above.
               # settings.appearance.cssTheme = "Minimal";
